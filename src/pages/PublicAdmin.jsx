@@ -14,7 +14,7 @@ export default function Dashboard() {
     home: <HomePage />,
     policies: <PolicyManagement />,
     feedback: <FeedbackModule />,
-    analytics: <DataAnalytics />,
+    // analytics: <DataAnalytics />,
     profile: <ProfileModule />,
   };
 
@@ -24,7 +24,7 @@ export default function Dashboard() {
         <NavButton icon={<Home />} onClick={() => setActiveModule("home")} />
         <NavButton icon={<FileText />} onClick={() => setActiveModule("policies")} />
         <NavButton icon={<Map />} onClick={() => setActiveModule("feedback")} />
-        <NavButton icon={<BarChart />} onClick={() => setActiveModule("analytics")} />
+        {/* <NavButton icon={<BarChart />} onClick={() => setActiveModule("analytics")} /> */}
         <NavButton icon={<Users />} onClick={() => setActiveModule("profile")} />
       </aside>
       <main className="flex-1 p-6 ml-20">{modules[activeModule]}</main>
