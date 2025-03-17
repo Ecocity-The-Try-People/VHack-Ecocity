@@ -12,13 +12,13 @@ const RequestPickup = () => {
     loadRequests();
   }, []);
 
- 
+  // 加载本地存储的请求
   const loadRequests = () => {
     const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
     setRequests(storedRequests);
   };
 
-
+  // 获取当前位置
   const handleLocation = () => {
     if (window.confirm("Do you wish to use your current location? Please ensure you are in an open area for better accuracy.")) {
       setIsUsingCurrentLocation(true);
@@ -66,11 +66,12 @@ const RequestPickup = () => {
           alert("Failed to get location: " + error.message);
           setIsUsingCurrentLocation(false);
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 } 
+        { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 } // 启用高精度模式，超时时间增加到 30 秒
       );
     }
   };
 
+  // 处理手动输入位置
   const handleLocationInput = (e) => {
     if (isUsingCurrentLocation) return;
 
@@ -96,6 +97,7 @@ const RequestPickup = () => {
     setTypingTimeout(newTimeout);
   };
 
+  // 提交请求
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!location.trim() || !coords) {
@@ -114,6 +116,7 @@ const RequestPickup = () => {
     setIsUsingCurrentLocation(false);
   };
 
+  // 删除请求
   const handleDeleteRequest = (index) => {
     if (!window.confirm("Are you sure you want to delete this request?")) return;
     const updatedRequests = requests.filter((_, i) => i !== index);
@@ -121,6 +124,7 @@ const RequestPickup = () => {
     setRequests(updatedRequests);
   };
 
+  // 清除历史记录
   const handleClearHistory = () => {
     if (window.confirm("Are you sure you want to clear the history?")) {
       localStorage.removeItem("requests");
