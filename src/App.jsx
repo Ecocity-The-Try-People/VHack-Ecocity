@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import VehicleMap from "./VehicleMap.jsx";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [isMapVisible, setIsMapVisible] = useState(true);
+
+  const toggleMapVisibility = () => {
+    setIsMapVisible(!isMapVisible);
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <h2>Live Vehicle Tracking with Google Maps</h2>
+        <button onClick={toggleMapVisibility}>
+          {isMapVisible ? "Hide Map" : "Show Map"}
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        {isMapVisible && <VehicleMap />}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
+
+// src/App.js
+// import React, { useState } from "react";
+// import MapComponent from "./MapComponent";
+// import SearchComponent from "./SearchComponent";
+
+// const App = () => {
+//   const [start, setStart] = useState([37.7749, -122.4194]);
+//   const [end, setEnd] = useState([34.0522, -118.2437]);
+
+//   const handleSearch = (startLocation, endLocation) => {
+//     // Convert location names to coordinates (you'll need a geocoding API for this)
+//     setStart([37.7749, -122.4194]); // Example: San Francisco
+//     setEnd([34.0522, -118.2437]); // Example: Los Angeles
+//   };
+
+//   return (
+//     <div>
+//       <SearchComponent onSearch={handleSearch} />
+//       <MapComponent start={start} end={end} />
+//     </div>
+//   );
+// };
+
+// export default App;
