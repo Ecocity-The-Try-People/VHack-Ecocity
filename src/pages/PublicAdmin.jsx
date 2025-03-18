@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Home, FileText, Map, BarChart, Users } from "lucide-react";
+import { Home, FileText, Map, Users } from "lucide-react";
 import ProfileModule from "@/modules/ProfileModule";
 import PolicyManagement from "@/modules/PolicyManagement";
-import DataAnalytics from "@/modules/DataAnalytics";
 import FeedbackModule from "@/modules/FeedbackModule";
 import HomePage from "@/modules/HomePage";
 import NavButton from "@/components/NavButton";
@@ -11,10 +10,9 @@ export default function Dashboard() {
   const [activeModule, setActiveModule] = useState("home");
 
   const modules = {
-    home: <HomePage />,
+    home: <HomePage setActiveModule={setActiveModule} />,
     policies: <PolicyManagement />,
     feedback: <FeedbackModule />,
-    // analytics: <DataAnalytics />,
     profile: <ProfileModule />,
   };
 
@@ -24,7 +22,6 @@ export default function Dashboard() {
         <NavButton icon={<Home />} onClick={() => setActiveModule("home")} />
         <NavButton icon={<FileText />} onClick={() => setActiveModule("policies")} />
         <NavButton icon={<Map />} onClick={() => setActiveModule("feedback")} />
-        {/* <NavButton icon={<BarChart />} onClick={() => setActiveModule("analytics")} /> */}
         <NavButton icon={<Users />} onClick={() => setActiveModule("profile")} />
       </aside>
       <main className="flex-1 p-6 ml-20">{modules[activeModule]}</main>

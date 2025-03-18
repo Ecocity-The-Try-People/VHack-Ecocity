@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { useNotificationContext } from '../context/NotificationContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faExclamationCircle, faInfoCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faExclamationCircle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import clsx from 'clsx';
 
 const Notification = () => {

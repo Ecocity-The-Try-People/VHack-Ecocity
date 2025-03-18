@@ -1,17 +1,12 @@
 import { Card, CardContent } from "@/components/Card";
 import { LineChart, BarChart, PieChart } from "@/components/Charts";
 import { AlertTriangle, CheckCircle, Trash2, TrafficCone } from "lucide-react";
-import { useState } from "react";
+import { chartData, statsData, systemFeedbacks, userFeedbacks } from "../data";
+import { StatCard } from "../components/Card";
 
-export default function HomePage() {
-  const data = [
-    { category: "Traffic Reports", value: "245 Cases" },
-    { category: "Waste Issues", value: "32 Pending" },
-    { category: "Flood Warnings", value: "7 Alerts" },
-    { category: "Resolved Cases", value: "85%" },
-  ];
+export default function HomePage({ setActiveModule }) {
 
-  const [stats, setStats] = useState(data);
+  const stats = statsData;
 
   return (
     <div className="p-4">
@@ -39,47 +34,74 @@ export default function HomePage() {
         <Card>
           <CardContent>
             <h3 className="font-semibold mb-2">Traffic Congestion Trends</h3>
-            <LineChart data={[10, 20, 30, 25, 35, 50, 60]} />
+            <LineChart data={chartData.traffic} />
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
             <h3 className="font-semibold mb-2">Waste Collection Efficiency</h3>
-            <BarChart data={[75, 80, 78, 85, 90]} />
+            <BarChart data={chartData.waste} />
           </CardContent>
         </Card>
 
         <Card>
           <CardContent>
             <h3 className="font-semibold mb-2">Flood Risk Distribution</h3>
-            <PieChart data={[30, 40, 20, 10]} />
+            <PieChart data={chartData.flood} />
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent>
-            <h3 className="font-semibold mb-2">Latest Feedback & Complaints</h3>
-            <ul className="list-disc ml-5 text-sm break-words">
-              <li>🚧 Road blockage near downtown</li>
-              <li>🗑️ Overflowing garbage at Sector 5</li>
-              <li>🌊 Flood alert in North Street</li>
-            </ul>
-          </CardContent>
-        </Card>
+        <div onClick={() => setActiveModule("feedback")} className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card>
+            <CardContent>
+
+
+              <h3 className="font-semibold mb-2">Latest Feedback & Complaints</h3>
+              <div className="bg-white p-4 rounded-lg shadow-md">
+
+                {/* System Feedbacks */}
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold text-red-600 flex items-center">
+                    🚨 System Feedbacks
+                  </h2>
+                  <div className="border-l-4 border-red-500 pl-3 mt-2 space-y-2">
+                    {systemFeedbacks.length > 0 ? (
+                      systemFeedbacks.slice(-3).reverse().map((feedback, index) => (
+                        <div key={index} className="bg-red-50 p-1.5 rounded">
+                          {feedback.message}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No system feedback available.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* User Feedbacks */}
+                <div>
+                  <h2 className="text-lg font-semibold text-blue-600 flex items-center">
+                    🗣️ User Feedbacks
+                  </h2>
+                  <div className="border-l-4 border-blue-500 pl-3 mt-2 space-y-2">
+                    {userFeedbacks.length > 0 ? (
+                      userFeedbacks.slice(-3).reverse().map((feedback, index) => (
+                        <div key={index} className="bg-blue-50 p-1.5 rounded">
+                          {feedback.message}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-500">No user feedback available.</p>
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
-  );
-}
-
-
-function StatCard({ icon, title, value }) {
-  return (
-    <Card className="flex flex-col items-center p-4 min-h-[80px] text-center">
-      <div className="text-blue-500">{icon}</div>
-      <h4 className="text-lg font-semibold mt-2 break-words">{title}</h4>
-      <p className="text-xl font-bold">{value}</p>
-    </Card>
   );
 }
 
