@@ -1,21 +1,44 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell } from "lucide-react";
 import { motion } from "framer-motion";
 
-const Notification = ({ weather }) => {
+const weather_api = import.meta.env.VITE_API_KEY;
+
+const Notification = ({ weatherData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [alerts, setAlerts] = useState([]);
+  const addedAlerts = useRef(new Set());
 
-  const addAlert = (message) => {
-    setAlerts((prevAlerts) => [...prevAlerts, message]);
-  };
+  useEffect(() => {
+    if (!weatherData.length) return;
+    
+    weatherData.forEach((weather) => {
+      if (!weather?.current || !weather?.location) return;
+      
+      const { wind_mph, precip_in, temp_c, pressure_mb, humidity } = weather.current;
+      const { name, region, country } = weather.location;
+      const location = `<strong>${name}, ${region}, ${country}</strong>`;
 
-  // Use the weather alert hook
-  useWeatherAlert(weather, addAlert);
+      const alertMessages = [
+        { condition: wind_mph >= 15, message: `Strong winds detected in ${location}! Stay cautious.` },
+        { condition: precip_in >= 2, message: `Heavy rain detected in ${location}! Take necessary precautions.` },
+        { condition: temp_c >= 40, message: `Extreme heat alert in ${location}! Stay hydrated and avoid prolonged exposure.` },
+        { condition: temp_c <= 5, message: `Cold weather alert in ${location}! Dress warmly.` },
+        { condition: pressure_mb < 980, message: `Low atmospheric pressure detected in ${location}! Possible storm approaching.` },
+        { condition: humidity >= 90, message: `High humidity alert in ${location}! Stay cool and hydrated.` },
+      ];
+
+      alertMessages.forEach(({ condition, message }) => {
+        if (condition && !addedAlerts.current.has(message)) {
+          setAlerts((prevAlerts) => [...prevAlerts, message]);
+          addedAlerts.current.add(message);
+        }
+      });
+    });
+  }, [weatherData]);
 
   return (
     <div className="relative">
-      {/* Notification Icon */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition relative"
@@ -25,8 +48,6 @@ const Notification = ({ weather }) => {
           <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
         )}
       </button>
-
-      {/* Notification Panel */}
       {isOpen && (
         <motion.div
           initial={{ x: 300, opacity: 0 }}
@@ -39,7 +60,7 @@ const Notification = ({ weather }) => {
           {alerts.length > 0 ? (
             <ul className="mt-2 text-sm text-gray-600">
               {alerts.map((alert, index) => (
-                <li key={index} className="border-b py-1 last:border-none">{alert}</li>
+                <li key={index} className="border-b py-1 last:border-none" dangerouslySetInnerHTML={{ __html: alert }}></li>
               ))}
             </ul>
           ) : (
@@ -51,39 +72,41 @@ const Notification = ({ weather }) => {
   );
 };
 
-// Weather Alert Hook
-const useWeatherAlert = (weather, addAlert) => {
+const useWeatherData = (cities) => {
+  const [weatherData, setWeatherData] = useState([]);
+
   useEffect(() => {
-    if (!weather?.api?.current || !weather?.api?.location || typeof addAlert !== 'function') return;
+    const fetchWeather = async () => {
+      try {
+        const weatherResponses = await Promise.all(
+          cities.map(async (city) => {
+            const response = await fetch(
+              `https://api.weatherapi.com/v1/current.json?key=${weather_api}&q=${city}`
+            );
+            return response.json();
+          })
+        );
+        setWeatherData(weatherResponses);
+      } catch (error) {
+        console.error("Error fetching weather data:", error);
+      }
+    };
 
-    const { wind_mph, precip_in, temp_c, pressure_mb, humidity } = weather.api.current;
-    const { name, region, country } = weather.api.location;
-    const location = `${name}, ${region}, ${country}`;
+    fetchWeather();
+  }, [cities]);
 
-    if (wind_mph >= 15) {
-      addAlert(`Strong winds detected in ${location}! Stay cautious.`);
-    }
-
-    if (precip_in >= 2) {
-      addAlert(`Heavy rain detected in ${location}! Take necessary precautions.`);
-    }
-
-    if (temp_c >= 40) {
-      addAlert(`Extreme heat alert in ${location}! Stay hydrated and avoid prolonged exposure.`);
-    }
-
-    if (temp_c <= 5) {
-      addAlert(`Cold weather alert in ${location}! Dress warmly.`);
-    }
-
-    if (pressure_mb < 980) {
-      addAlert(`Low atmospheric pressure detected in ${location}! Possible storm approaching.`);
-    }
-
-    if (humidity >= 90) {
-      addAlert(`High humidity alert in ${location}! Stay cool and hydrated.`);
-    }
-  }, [weather, addAlert]);
+  return weatherData;
 };
 
-export default Notification;
+const App = () => {
+  const cities = ["Kuala Lumpur", "Selangor", "Cheras"]; // Add multiple cities
+  const weatherData = useWeatherData(cities);
+
+  return (
+    <div>
+      <Notification weatherData={weatherData} />
+    </div>
+  );
+};
+
+export default App;
