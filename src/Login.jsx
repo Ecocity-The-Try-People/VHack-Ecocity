@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    alert(`You have successfully logged in!`);
+    alert(`Username: ${username}\nPassword: ${password}`);
+  };
+
+  const handleSignUp = () => {
+    navigate('/register'); // Redirect to the register page
   };
 
   return (
@@ -35,6 +41,9 @@ function Login() {
         </div>
         <button type="submit">Login</button>
       </form>
+      <button className="sign-up-button" onClick={handleSignUp}>
+        Sign Up
+      </button>
     </div>
   );
 }

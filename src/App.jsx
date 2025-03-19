@@ -1,12 +1,18 @@
-import Login from "./Login";
-import Register from "./Register";
-import UserProfile from "./UserProfile";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './Login';
+import Register from './Register';
+import './App.css';
 
 function App() {
-
   return (
-    <Register/>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
