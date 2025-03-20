@@ -1,3 +1,5 @@
+import VehicleMap from "./VehicleMap.jsx";
+
 export default function traffic_page(){
     return(
         <div style={{ textAlign: "center", marginTop: "20px" }}>
