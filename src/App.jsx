@@ -1,25 +1,6 @@
-import MapView from "./components/MapView.jsx";
-import RequestPickup from "./components/RequestPickup.jsx";
 import "./App.css"; 
 
 function App() {
-  return (
-    <div className="container">
-      <h1 className="text-2xl font-bold text-center text-[var(--primary-color)] mb-6">
-        Smart Waste Management
-      </h1>
-      
-      <div className="card mb-6">
-        <MapView />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="card">
-          <RequestPickup />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export default App;
