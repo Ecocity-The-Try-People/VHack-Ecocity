@@ -9,6 +9,7 @@ import Traffic_page from './page/traffic_page';
 import Smart_waste_management_page from './page/smart_waste_management_page'
 
 function App() {
+
   return (
     <Router>
       <Routes>
@@ -21,6 +22,9 @@ function App() {
       </Routes>
     </Router>
   );
+    //   <div>
+    //     <PublicAdminModule />
+    //   </div>
 }
 
 export default App;

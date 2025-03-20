@@ -42,3 +42,17 @@
 .read-the-docs {
   color: #888;
 }
+
+@layer base {
+    :root {
+      --primary-color: #1976d2;
+      --secondary-color: #dc004e;
+      --background-color: #f4f4f4;
+      --text-color: #333;
+      --font-family: 'Inter', sans-serif;
+    }
+  
+    body {
+      @apply bg-[var(--background-color)] text-[var(--text-color)] font-[var(--font-family)];
+    }
+  }
