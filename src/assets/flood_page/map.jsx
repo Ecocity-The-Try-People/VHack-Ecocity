@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import malaysiaCities from './assets/cities'; // Import the city list
+import malaysiaCities from '../cities'; // Import the city list
 
 const SS2Map = () => {
     const mapContainer = useRef(null);

@@ -1,5 +1,5 @@
 import React, {userState, useState} from "react";
-import styles from "./Styles.jsx";
+import styles from "../../Styles.jsx";
 
 const UserProfile = () => {
     // State to manage form data

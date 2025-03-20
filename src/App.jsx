@@ -1,14 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './Login';
-import Register from './Register';
+import Login from './page/CRUD/Login';
+import Register from './page/CRUD/Register';
 import './App.css';
-import Flood_homepage from './assets/weather_detail'
-import Weather_box from './weather_box'
-import Notification from './notification';
-import Map from './map';
-import Homepage from './homepage';
-import Flood_page from './flood_page';
+import Homepage from './page/homepage';
+import Flood_page from './page/flood_page';
 
 function App() {
   return (

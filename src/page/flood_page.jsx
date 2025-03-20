@@ -1,6 +1,6 @@
-import Weather_box from './weather_box'
-import Notification from './notification';
-import Map from './map';
+import Weather_box from '../assets/flood_page/weather_box'
+import Notification from '../assets/flood_page/notification';
+import Map from '../assets/flood_page/map';
 
 export default function Flood_page(){
     return (
