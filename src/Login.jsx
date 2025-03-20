@@ -8,7 +8,7 @@ function Login() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    alert(`Username: ${username}\nPassword: ${password}`);
+    navigate('/homepage');
   };
 
   const handleSignUp = () => {
