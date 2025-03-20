@@ -1,5 +1,5 @@
-import MapView from "./components/MapView.jsx";
-import RequestPickup from "./components/RequestPickup.jsx";
+import MapView from "../assets/components/MapView";
+import RequestPickup from "../assets/components/RequestPickup";
 
 export default function smart_waste_management_page(){
     return (

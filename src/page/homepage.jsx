@@ -13,7 +13,7 @@ export default function HomePage() {
     };
 
     const edwards_page = () => {
-        navigate("/edwards");
+        navigate("/smart_waste_management_page");
     };
 
     return (
