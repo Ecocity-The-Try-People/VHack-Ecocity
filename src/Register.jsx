@@ -7,8 +7,11 @@ function Register() {
     dob: '',
     address: '',
     icNumber: '',
+    password: '',
+    confirmPassword: '', // Add confirm password field
   });
 
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,17 +24,29 @@ function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Check if password and confirm password match
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
+
     alert(`
       Registration Successful!\n
       Name: ${formData.name}\n
       Date of Birth: ${formData.dob}\n
       Address: ${formData.address}\n
-      IC Number: ${formData.icNumber}
+      IC Number: ${formData.icNumber}\n
+      Password: ${formData.password}
     `);
   };
 
   const handleBackToLogin = () => {
     navigate('/'); // Redirect back to the login page
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword); // Toggle password visibility
   };
 
   return (
@@ -84,6 +99,34 @@ function Register() {
             required
           />
         </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Password:</label>
+          <input
+            type={showPassword ? 'text' : 'password'} 
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password:</label>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <button type="button" onClick={toggleShowPassword} className="show-password-button">
+          {showPassword ? 'Hide Password' : 'Show Password'}
+        </button>
 
         <button type="submit">Register</button>
       </form>
