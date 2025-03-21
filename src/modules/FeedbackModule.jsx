@@ -48,7 +48,7 @@ function FeedbackModule({ role = "Admin" }) {
       <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" /> {/* Add `ml-20` to avoid covering the sidebar */}
 
       {/* Content */}
-      <div className="p-4 ml-20"> {/* Adjust `ml-20` to match the sidebar width */}
+      <div className="p-4"> {/* Adjust `ml-20` to match the sidebar width */}
         <div className="mb-5">
           <Card className="bg-[hsla(180,0%,10%,0.8)] text-white">
             <CardContent>
