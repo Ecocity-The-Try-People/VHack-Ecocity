@@ -7,7 +7,7 @@ import Homepage from './page/homepage';
 import Flood_page from './page/flood_page';
 import Traffic_page from './page/traffic_page';
 import Smart_waste_management_page from './page/smart_waste_management_page';
-import PublicAdminModule from '@/pages/PublicAdmin'
+import PublicAdminModule from '@/page/PublicAdmin'
 
 function App() {
 
