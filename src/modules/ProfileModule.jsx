@@ -58,7 +58,7 @@ export default function ProfileModule() {
       <div className="p-4"> {/* Adjust `ml-20` to match the sidebar width */}
         <Card className="bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 p-8 rounded-lg shadow-lg text-gray-800 dark:text-gray-200">
           <CardContent>
-            <h2 className="text-3xl font-bold text-center mb-6">User Profile & e-KYC Management</h2>
+            <h2 className="text-3xl font-bold text-center mb-6">User Profile</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center">
