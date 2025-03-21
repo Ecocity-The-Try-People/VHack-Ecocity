@@ -45,8 +45,8 @@
     :root {
       --primary-color: #1976d2;
       --secondary-color: #dc004e;
-      --background-color: #f4f4f4;
-      --text-color: #333;
+      --background-color: #1e1e1e;
+      --text-color: white;
       --font-family: 'Inter', sans-serif;
     }
   

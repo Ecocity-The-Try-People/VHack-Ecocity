@@ -5,17 +5,19 @@ import { chartData, statsData, systemFeedbacks, userFeedbacks } from "../data";
 import { StatCard } from "../components/Card";
 
 export default function HomePage({ setActiveModule }) {
-
   const stats = statsData;
 
   return (
     <div className="p-4">
+      {/* Background Layer */}
+      <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" /> {/* Add `ml-20` to avoid covering the sidebar */}
+      
       {/* Overview Section */}
-      <div className="mb-5 flex justify-between flex-col">
+      <div className="bg-[hsla(180,0%,10%,0.8)] mb-5 ">
         <Card>
           <CardContent>
             <h2 className="text-xl font-semibold mb-2">Smart City Management Dashboard</h2>
-            <p className="text-gray-500 break-words whitespace-normal mb-2">
+            <p className="text-white-500 break-words whitespace-normal mb-2">
               Monitor key city operations, statistics, and public concerns in real time.
             </p>
           </CardContent>
@@ -52,50 +54,47 @@ export default function HomePage({ setActiveModule }) {
           </CardContent>
         </Card>
 
+        {/* Feedback Section */}
         <div onClick={() => setActiveModule("feedback")} className="cursor-pointer hover:shadow-lg transition-shadow">
           <Card>
             <CardContent>
-
-
               <h3 className="font-semibold mb-2">Latest Feedback & Complaints</h3>
-              <div className="bg-white p-4 rounded-lg shadow-md">
-
+              <div className="bg-[#1e1e1e] p-4 rounded-lg shadow-md">
                 {/* System Feedbacks */}
                 <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-red-600 flex items-center">
+                  <h2 className="text-lg font-semibold text-red-400 flex items-center">
                     🚨 System Feedbacks
                   </h2>
-                  <div className="border-l-4 border-red-500 pl-3 mt-2 space-y-2">
+                  <div className="text-gray-100 border-l-4 border-red-500 pl-3 mt-2 space-y-2">
                     {systemFeedbacks.length > 0 ? (
                       systemFeedbacks.slice(-3).reverse().map((feedback, index) => (
-                        <div key={index} className="bg-red-50 p-1.5 rounded">
+                        <div key={index} className="bg-red-900 bg-opacity-50 p-2 rounded">
                           {feedback.message}
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">No system feedback available.</p>
+                      <p className="text-gray-400">No system feedback available.</p>
                     )}
                   </div>
                 </div>
 
                 {/* User Feedbacks */}
                 <div>
-                  <h2 className="text-lg font-semibold text-blue-600 flex items-center">
+                  <h2 className="text-lg font-semibold text-blue-400 flex items-center">
                     🗣️ User Feedbacks
                   </h2>
-                  <div className="border-l-4 border-blue-500 pl-3 mt-2 space-y-2">
+                  <div className="text-gray-100 border-l-4 border-blue-500 pl-3 mt-2 space-y-2">
                     {userFeedbacks.length > 0 ? (
                       userFeedbacks.slice(-3).reverse().map((feedback, index) => (
-                        <div key={index} className="bg-blue-50 p-1.5 rounded">
+                        <div key={index} className="bg-blue-900 bg-opacity-50 p-2 rounded">
                           {feedback.message}
                         </div>
                       ))
                     ) : (
-                      <p className="text-gray-500">No user feedback available.</p>
+                      <p className="text-gray-400">No user feedback available.</p>
                     )}
                   </div>
                 </div>
-
               </div>
             </CardContent>
           </Card>
@@ -108,13 +107,13 @@ export default function HomePage({ setActiveModule }) {
 function getIcon(category) {
   switch (category) {
     case "Traffic Reports":
-      return <TrafficCone size={24} />;
+      return <TrafficCone size={24} aria-label="Traffic Reports" />;
     case "Waste Issues":
-      return <Trash2 size={24} />;
+      return <Trash2 size={24} aria-label="Waste Issues" />;
     case "Flood Warnings":
-      return <AlertTriangle size={24} />;
+      return <AlertTriangle size={24} aria-label="Flood Warnings" />;
     case "Resolved Cases":
-      return <CheckCircle size={24} />;
+      return <CheckCircle size={24} aria-label="Resolved Cases" />;
     default:
       return null;
   }
