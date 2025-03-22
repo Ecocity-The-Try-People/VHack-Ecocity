@@ -202,7 +202,11 @@ function Register() {
                   onClick={togglePasswordVisibility}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer"
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Toggle eye icon */}
+                  {showPassword ? (
+                    <FaEyeSlash className="text-gray-400 hover:text-gray-600" /> // Eye slash icon
+                  ) : (
+                    <FaEye className="text-gray-400 hover:text-gray-600" /> // Eye icon
+                  )}
                 </a>
               </div>
             </div>
@@ -230,7 +234,11 @@ function Register() {
                   onClick={toggleConfirmPasswordVisibility}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer"
                 >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />} {/* Toggle eye icon */}
+                  {showConfirmPassword ? (
+                    <FaEyeSlash className="text-gray-400 hover:text-gray-600" /> // Eye slash icon
+                  ) : (
+                    <FaEye className="text-gray-400 hover:text-gray-600" /> // Eye icon
+                  )}
                 </a>
               </div>
             </div>
