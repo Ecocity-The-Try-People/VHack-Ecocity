@@ -6,11 +6,26 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [error, setError] = useState(''); // State to handle login errors
   const navigate = useNavigate();
+
+  // Define admin credentials (for demonstration purposes)
+  const adminCredentials = {
+    username: 'admin',
+    password: 'admin123',
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    navigate('/homepage');
+
+    // Check if credentials match admin credentials
+    if (username === adminCredentials.username && password === adminCredentials.password) {
+      navigate('/admin_page'); // Redirect to admin page
+    } else if (username && password) {
+      navigate('/homepage'); // Redirect to user's home page
+    } else {
+      setError('Invalid username or password'); // Show error message
+    }
   };
 
   const handleSignUp = () => {
@@ -39,6 +54,7 @@ function Login() {
       <div className="fixed inset-0 z-10 flex items-center justify-center bg-[hsla(180,0%,10%,0.8)]">
         <div className="bg-[white] bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>} {/* Display error message */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Username Field */}
             <div className="form-group">
@@ -97,12 +113,12 @@ function Login() {
           </form>
 
           {/* Sign Up Button */}
-            <button
-              className="w-full mt-4 bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
-              onClick={handleSignUp}
-            >
-              Sign Up
-            </button>
+          <button
+            className="w-full mt-4 bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+            onClick={handleSignUp}
+          >
+            Sign Up
+          </button>
         </div>
       </div>
     </div>
