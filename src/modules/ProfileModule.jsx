@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/Card";
 import DatePicker from "react-datepicker"; // Import DatePicker
 import "react-datepicker/dist/react-datepicker.css"; // Import DatePicker CSS
+import userProfileImage from "@/assets/user.png"; // Import the default profile picture
 
 export default function ProfileModule() {
   // State to manage form data
@@ -10,7 +11,7 @@ export default function ProfileModule() {
     dob: null, // Use null for DatePicker
     address: "",
     ic: "",
-    profilePicture: "", // Base64 string for the profile picture
+    profilePicture: userProfileImage, // Use the imported default image
   });
 
   // Ref for the hidden file input
@@ -74,10 +75,7 @@ export default function ProfileModule() {
               <div className="flex flex-col items-center">
                 <div className="w-32 h-32 rounded-full border-3 border-gray-500 overflow-hidden"> {/* Border added here */}
                   <img
-                    src={
-                      profile.profilePicture ||
-                      "https://via.placeholder.com/150" // Default placeholder image
-                    }
+                    src={profile.profilePicture}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
