@@ -20,8 +20,12 @@ export default function Dashboard() {
 
   // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem("isAdminAuthenticated"); // Clear admin authentication state
-    navigate("/"); // Redirect to the login page
+    // Show confirmation popup
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    if (confirmLogout) {
+      localStorage.removeItem("isAdminAuthenticated"); // Clear admin authentication state
+      navigate("/"); // Redirect to the login page
+    }
   };
 
   return (

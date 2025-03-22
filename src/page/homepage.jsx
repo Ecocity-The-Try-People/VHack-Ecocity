@@ -1,13 +1,20 @@
 import React from "react";
 import { motion } from "framer-motion";
-import SmartCityVideo from "../assets/Smart-City.mp4"; // Import the video file
+import SmartCityVideo from "../assets/Smart-City.mp4"; // Import the first video file
+import FeaturesVideo from "../assets/weather.mp4"; // Import the second video file
+import TransportationVideo from "../assets/transportation.mp4"; // Import the third video file
+import EnergyVideo from "../assets/energy.mp4"; // Import the fourth video file
+// import EmergencyVideo from "../assets/emergency.mp4"; // Import the fifth video file
 import Weather_detail from "../assets/flood_page/weather_detail.jsx";
-
+import Sidebar from "./Sidebar"; // Import the Sidebar component
 
 export default function SmartCityHome() {
   return (
     <div className="h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative">
-      {/* Video Background */}
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Video Background for Hero Section */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
           autoPlay
@@ -21,7 +28,7 @@ export default function SmartCityHome() {
       </div>
 
       {/* Hero Section */}
-      <section className="snap-start flex items-center justify-center h-screen relative z-10">
+      <section className="snap-start flex items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -41,18 +48,32 @@ export default function SmartCityHome() {
       </section>
 
       {/* Features Section */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 bg-gradient-to-r from-[#8AA8C2] to-[#6C8CB6]">        {/* Section Heading */}
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
+        {/* Video Background for Features Section */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover opacity-50" // Adjust opacity here
+          >
+            <source src={FeaturesVideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        {/* Section Heading */}
         <motion.h2
           initial={{ opacity: 0, y: -50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-4xl md:text-5xl font-bold text-white mb-8 text-center"
+          className="text-4xl md:text-5xl font-bold text-white mb-8 text-center relative z-10"
         >
           Smart City Features
         </motion.h2>
 
         {/* Cards Grid */}
-        <div className="w-full max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+        <div className="w-full max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 px-4 relative z-10">
           {/* Weather Card - Kuala Lumpur */}
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -89,49 +110,91 @@ export default function SmartCityHome() {
       </section>
 
       {/* Smart Transportation */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 bg-gradient-to-br from-yellow-500 to-orange-500 bg-opacity-90">
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
+        {/* Video Background for Smart Transportation Section */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover opacity-50" // Adjust opacity here
+          >
+            <source src={TransportationVideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        {/* Section Content */}
         <motion.h2
           initial={{ opacity: 0, y: -50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-3xl font-semibold text-white"
+          className="text-3xl font-semibold text-white relative z-10"
         >
           Smart Transportation
         </motion.h2>
-        <p className="text-lg mt-4 text-white">
+        <p className="text-lg mt-4 text-white relative z-10">
           Advanced public transport systems with AI-driven optimization.
         </p>
-        <button className="mt-8 px-6 py-3 bg-white text-yellow-600 rounded-lg hover:bg-gray-100 transition duration-300">
+        <button className="mt-8 px-6 py-3 bg-white text-yellow-600 rounded-lg hover:bg-gray-100 transition duration-300 relative z-10">
           Learn More
         </button>
       </section>
 
       {/* Renewable Energy */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 bg-gradient-to-br from-green-600 to-teal-600 bg-opacity-90">
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
+        {/* Video Background for Renewable Energy Section */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover opacity-50" // Adjust opacity here
+          >
+            <source src={EnergyVideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        {/* Section Content */}
         <motion.h2
           initial={{ opacity: 0, y: -50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-3xl font-semibold text-white"
+          className="text-3xl font-semibold text-white relative z-10"
         >
           Renewable Energy
         </motion.h2>
-        <p className="text-lg mt-4 text-white">
+        <p className="text-lg mt-4 text-white relative z-10">
           Solar, wind, and sustainable energy powering the future.
         </p>
       </section>
 
       {/* Emergency Alerts */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 bg-gradient-to-br from-red-600 to-pink-600 bg-opacity-90">
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
+        {/* Video Background for Emergency Alerts Section */}
+        {/* <div className="absolute inset-0 z-0 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            className="w-full h-full object-cover opacity-50" // Adjust opacity here
+          >
+            <source src={EmergencyVideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div> */}
+
+        {/* Section Content */}
         <motion.h2
           initial={{ opacity: 0, y: -50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-3xl font-semibold text-white"
+          className="text-3xl font-semibold text-white relative z-10"
         >
           Emergency Alerts
         </motion.h2>
-        <p className="text-lg mt-4 text-white">
+        <p className="text-lg mt-4 text-white relative z-10">
           Real-time alerts for disasters and emergency responses.
         </p>
       </section>
