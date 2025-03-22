@@ -1,11 +1,13 @@
 import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/Card";
+import DatePicker from "react-datepicker"; // Import DatePicker
+import "react-datepicker/dist/react-datepicker.css"; // Import DatePicker CSS
 
 export default function ProfileModule() {
   // State to manage form data
   const [profile, setProfile] = useState({
     name: "",
-    dob: "",
+    dob: null, // Use null for DatePicker
     address: "",
     ic: "",
     profilePicture: "", // Base64 string for the profile picture
@@ -20,6 +22,14 @@ export default function ProfileModule() {
     setProfile({
       ...profile,
       [name]: value,
+    });
+  };
+
+  // Handle date change
+  const handleDateChange = (date) => {
+    setProfile({
+      ...profile,
+      dob: date,
     });
   };
 
@@ -62,14 +72,16 @@ export default function ProfileModule() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Picture */}
               <div className="flex flex-col items-center">
-                <img
-                  src={
-                    profile.profilePicture ||
-                    "https://via.placeholder.com/150" // Default placeholder image
-                  }
-                  alt="Profile"
-                  className="w-32 h-32 rounded-full object-cover mb-4"
-                />
+                <div className="w-32 h-32 rounded-full border-3 border-gray-500 overflow-hidden"> {/* Border added here */}
+                  <img
+                    src={
+                      profile.profilePicture ||
+                      "https://via.placeholder.com/150" // Default placeholder image
+                    }
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 {/* Hidden file input */}
                 <input
                   type="file"
@@ -82,7 +94,7 @@ export default function ProfileModule() {
                 <button
                   type="button"
                   onClick={handleChangePictureClick}
-                  className="bg-blue-600 dark:bg-green-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+                  className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 mt-4"
                 >
                   Change Picture
                 </button>
@@ -108,14 +120,15 @@ export default function ProfileModule() {
                 <label htmlFor="dob" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Date of Birth:
                 </label>
-                <input
-                  type="date"
-                  name="dob"
-                  value={profile.dob}
-                  onChange={handleInputChange}
-                  className="text-[#111] dark:text-gray-200 block w-full pl-4 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 bg-white dark:bg-gray-700"
-                  required
-                />
+                <div className="w-full"> {/* Wrapper div to ensure full width */}
+                  <DatePicker
+                    selected={profile.dob}
+                    onChange={handleDateChange}
+                    className="custom-datepicker" // Add custom CSS class
+                    placeholderText="Select Date"
+                    required
+                  />
+                </div>
               </div>
 
               {/* Address Field */}
@@ -152,7 +165,7 @@ export default function ProfileModule() {
               <div className="form-group">
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 dark:bg-green-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
                 >
                   Save Changes
                 </button>
@@ -161,6 +174,36 @@ export default function ProfileModule() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Custom CSS for DatePicker */}
+      <style>
+        {`
+          .custom-datepicker {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #4b5563; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            background-color: #374151; /* bg-white */
+            color: #f3f4f6; /* text-[#111] */
+            transition: all 0.2s ease-in-out; /* transition duration-200 */
+          }
+
+          .custom-datepicker:focus {
+            outline: none;
+            border-color: #3b82f6; /* focus:border-blue-500 */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* focus:ring-2 focus:ring-blue-500 */
+          }
+
+          .react-datepicker-wrapper {
+            width: 100%;
+          }
+
+          .react-datepicker__input-container {
+            width: 100%;
+          }
+        `}
+      </style>
     </div>
   );
 }

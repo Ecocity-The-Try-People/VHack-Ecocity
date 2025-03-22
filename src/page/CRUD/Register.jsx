@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaCalendarAlt, FaHome, FaIdCard, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
+import DatePicker from 'react-datepicker'; // Import DatePicker
+import 'react-datepicker/dist/react-datepicker.css'; // Import DatePicker CSS
 
 function Register() {
   const [formData, setFormData] = useState({
     name: '',
-    dob: '',
+    dob: null, // Use null for DatePicker
     address: '',
     icNumber: '',
     password: '',
@@ -23,6 +25,14 @@ function Register() {
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  // Handle date change
+  const handleDateChange = (date) => {
+    setFormData({
+      ...formData,
+      dob: date,
     });
   };
 
@@ -109,17 +119,21 @@ function Register() {
                 Date of Birth:
               </label>
               <div className="relative mt-1">
+                {/* Custom Calendar Icon */}
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaCalendarAlt className="text-gray-400" /> {/* Date of Birth icon */}
+                  <FaCalendarAlt className="text-gray-400" />
                 </div>
-                <input
-                  type="date"
-                  id="dob"
-                  name="dob"
-                  value={formData.dob}
-                  onChange={handleChange}
-                  className="text-[#111] block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                  required
+                {/* Date Input */}
+                <DatePicker
+                  selected={formData.dob}
+                  onChange={handleDateChange}
+                  customInput={
+                    <input
+                      className="text-[#111] block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                      placeholder="Select Date"
+                      required
+                    />
+                  }
                 />
               </div>
             </div>
@@ -231,7 +245,7 @@ function Register() {
             {/* Register Button */}
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+              className="w-full bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
             >
               Register
             </button>
@@ -239,13 +253,24 @@ function Register() {
 
           {/* Back to Login Button */}
           <button
-            className="w-full mt-4 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-200"
+            className="w-full mt-4 bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
             onClick={handleBackToLogin}
           >
             Click here if you have an account!
           </button>
         </div>
       </div>
+      <style>
+        {`
+          .react-datepicker-wrapper {
+            width: 100%; /* Ensure the DatePicker takes full width */
+          }
+
+          .react-datepicker__input-container {
+            width: 100%; /* Ensure the input container takes full width */
+          }
+        `}
+      </style>
     </div>
   );
 }
