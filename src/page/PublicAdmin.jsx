@@ -32,22 +32,22 @@ export default function Dashboard() {
       {/* Sidebar */}
       <aside className="w-20 bg-white dark:bg-gray-800 shadow-md flex flex-col items-center py-4 fixed min-h-dvh z-20">
         <NavButton
-          icon={<Home className="hover:text-black" />}
+          icon={<Home className={`w-6 h-6 ${activeModule === "home" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
           onClick={() => setActiveModule("home")}
           isActive={activeModule === "home"}
         />
         <NavButton
-          icon={<FileText className="hover:text-black" />}
+          icon={<FileText className={`w-6 h-6 ${activeModule === "policies" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
           onClick={() => setActiveModule("policies")}
           isActive={activeModule === "policies"}
         />
         <NavButton
-          icon={<Map className="hover:text-black" />}
+          icon={<Map className={`w-6 h-6 ${activeModule === "feedback" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
           onClick={() => setActiveModule("feedback")}
           isActive={activeModule === "feedback"}
         />
         <NavButton
-          icon={<Users className="hover:text-black" />}
+          icon={<Users className={`w-6 h-6 ${activeModule === "profile" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
           onClick={() => setActiveModule("profile")}
           isActive={activeModule === "profile"}
         />
