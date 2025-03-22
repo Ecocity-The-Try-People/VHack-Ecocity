@@ -1,4 +1,4 @@
-import Weather_detail from "../weather_detail";
+import Weather_detail from "./weather_detail";
 
 function WeatherBox() {
     return (
