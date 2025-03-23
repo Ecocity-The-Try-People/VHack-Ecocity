@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/Card";
 import DatePicker from "react-datepicker"; // Import DatePicker
 import "react-datepicker/dist/react-datepicker.css"; // Import DatePicker CSS
-import userProfileImage from "@/assets/user.png"; // Import the default profile picture
+import userProfileImage from "@/assets/png/user.png"; // Import the default profile picture
 
 export default function ProfileModule() {
   // State to manage form data
@@ -61,7 +61,7 @@ export default function ProfileModule() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="max-w-2xl mx-auto">
       {/* Background Layer */}
       <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] dark:bg-[hsla(180,0%,5%,0.9)] -z-10 ml-20" /> {/* Dark mode background */}
 

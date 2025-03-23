@@ -26,7 +26,7 @@ input[type="date"] {
       --secondary-color: #dc004e;
       --background-color: #1e1e1e;
       --text-color: white;
-      --font-family: 'Inter', sans-serif;
+      --font-family: 'Inter', "font-roboto";
     }
   
     body {

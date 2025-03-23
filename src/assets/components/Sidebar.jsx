@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, FileText, Map, Users, LogOut } from "lucide-react";
+import { Home, FileText, Map, Users, LogOut, CloudRain } from "lucide-react";
 import NavButton from "@/components/NavButton";
 
 export default function Sidebar() {
@@ -22,7 +22,7 @@ export default function Sidebar() {
       <NavButton
         icon={<Home className={`w-6 h-6 ${activeSection === "home" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
         onClick={() => {
-          navigate("#home");
+          navigate("/homepage");
           setActiveSection("home");
         }}
         isActive={activeSection === "home"}
@@ -34,7 +34,7 @@ export default function Sidebar() {
       <NavButton
         icon={<FileText className={`w-6 h-6 ${activeSection === "features" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
         onClick={() => {
-          navigate("#features");
+          navigate("/homepage#policy");
           setActiveSection("features");
         }}
         isActive={activeSection === "features"}
@@ -46,7 +46,7 @@ export default function Sidebar() {
       <NavButton
         icon={<Map className={`w-6 h-6 ${activeSection === "transportation" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
         onClick={() => {
-          navigate("#transportation");
+          navigate("/homepage#feedback");
           setActiveSection("transportation");
         }}
         isActive={activeSection === "transportation"}
@@ -58,11 +58,41 @@ export default function Sidebar() {
       <NavButton
         icon={<Users className={`w-6 h-6 ${activeSection === "profile" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
         onClick={() => {
-          navigate("#profile");
+          navigate("/homepage#profile");
           setActiveSection("profile");
         }}
         isActive={activeSection === "profile"}
         aria-label="Profile"
+        className="hover:bg-gray-100 dark:hover:bg-gray-700"
+      />
+      <NavButton
+        icon={<CloudRain className={`w-6 h-6 ${activeSection === "flood_page" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+        onClick={() => {
+          navigate("/flood_page");
+          setActiveSection("flood_page");
+        }}
+        isActive={activeSection === "flood_page"}
+        aria-label="flood_page"
+        className="hover:bg-gray-100 dark:hover:bg-gray-700"
+      />
+      <NavButton
+        icon={<CloudRain className={`w-6 h-6 ${activeSection === "traffic" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+        onClick={() => {
+          navigate("/traffic");
+          setActiveSection("Transportation");
+        }}
+        isActive={activeSection === "traffic"}
+        aria-label="traffic"
+        className="hover:bg-gray-100 dark:hover:bg-gray-700"
+      />
+      <NavButton
+        icon={<CloudRain className={`w-6 h-6 ${activeSection === "smart_waste_management_page" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+        onClick={() => {
+          navigate("/smart_waste_management_page");
+          setActiveSection("smart_waste_management_page");
+        }}
+        isActive={activeSection === "smart_waste_management_page"}
+        aria-label="smart_waste_management_page"
         className="hover:bg-gray-100 dark:hover:bg-gray-700"
       />
 

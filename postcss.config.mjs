@@ -1,6 +1,16 @@
 const config = {
-    plugins: {
-      "@tailwindcss/postcss": {},
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {
+      fontFamily: {
+        roboto: ["Roboto", "sans-serif"], // Custom font
+        sans: ["Roboto", "sans-serif"], // Override the default sans-serif font
+      },
     },
-  };
-  export default config;
+  },
+  plugins: [
+    // Add any Tailwind plugins here
+  ],
+};
+
+export default config;

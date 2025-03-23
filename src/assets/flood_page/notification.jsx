@@ -54,7 +54,7 @@ const Notification = ({ weatherData }) => {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 300, opacity: 0 }}
           transition={{ type: "spring", stiffness: 200, damping: 20 }}
-          className="absolute right-0 top-20 w-64 bg-white shadow-lg rounded-lg p-4"
+          className="absolute right-0 top-20 w-64 bg-white shadow-lg rounded-lg p-4 z-50" // Added z-50 here
         >
           <h3 className="font-semibold text-lg">Notifications</h3>
           {alerts.length > 0 ? (
