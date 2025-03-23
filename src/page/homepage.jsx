@@ -16,9 +16,11 @@ import PolicyManagement from "../modules/PolicyManagement.jsx";
 
 export default function SmartCityHome() {
 
+
     const navigate = useNavigate();
     const location = useLocation();
     const [visibleSection, setVisibleSection] = useState("home");
+    const UserRole = "User";
 
     useEffect(() => {
       const hash = location.hash.replace('#',"");
@@ -49,12 +51,12 @@ export default function SmartCityHome() {
     </div>
     <div className="flex-1 ml-20 z-20 relative">
       <div className={`relative min-h-screen ${visibleSection === "policy" ? "block" : "hidden"}`}>
-        <PolicyManagement />
+        <PolicyManagement userRole={UserRole} />
       </div>
     </div>
     <div className="flex-1 ml-20 z-20 relative">
       <div className={`relative min-h-screen ${visibleSection === "feedback" ? "block" : "hidden"}`}>
-          <FeedbackModule />
+          <FeedbackModule userRole={UserRole}/>
       </div>
     </div>
     <div className={`${visibleSection === "home" ? "block" : "hidden"}`}> 
