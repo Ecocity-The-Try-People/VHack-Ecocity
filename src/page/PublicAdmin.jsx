@@ -10,11 +10,12 @@ import NavButton from "@/components/NavButton";
 export default function Dashboard() {
   const [activeModule, setActiveModule] = useState("home");
   const navigate = useNavigate(); // Initialize useNavigate
+  const userRole = "User";
 
   const modules = {
     home: <HomePage setActiveModule={setActiveModule} />,
-    policies: <PolicyManagement />,
-    feedback: <FeedbackModule />,
+    policies: <PolicyManagement userRole ={userRole} />,
+    feedback: <FeedbackModule userRole ={userRole} />,
     profile: <ProfileModule />,
   };
 

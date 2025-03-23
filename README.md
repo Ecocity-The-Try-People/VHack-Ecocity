@@ -1,12 +1,62 @@
-# React + Vite
+﻿# 🌍 Smart City Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🚀 Overview
 
-Currently, two official plugins are available:
+The **Smart City Management System** is an innovative solution designed to enhance urban living by leveraging technology to tackle key challenges such as **traffic congestion, flood management, waste disposal inefficiencies, and public administration hurdles**. This system aligns with **Malaysia's Smart City Vision** and supports **United Nations Sustainable Development Goals (SDGs 7, 12, 13, and 16)**, ensuring efficiency, accessibility, and sustainability.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🔥 Features
 
-## Expanding the ESLint configuration
+### **For Users** 🏙️
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **🚛 Automated Waste Collection Vehicles**
+
+  - Real-time tracking of garbage trucks.
+  - Request for recyclable waste pickup.
+
+- **🚌 Public Transport Tracking**
+
+  - View real-time public transport locations.
+  - Estimated time of arrival (ETA) calculations.
+  - Identify transport types and route status.
+
+- **🌦️ Climate and Disaster Alerts**
+
+  - Real-time weather updates.
+  - Notifications about floods affecting traffic.
+  - Emergency alerts for extreme climate changes.
+
+- **💬 Community Engagement**
+
+  - Report drainage issues, road conditions, and other urban concerns.
+  - Propose policies and vote on community initiatives.
+  - Comment and engage with others on policy discussions.
+
+### **For Admins** 🏛️
+
+- **⚠️ Public Issue Management**
+
+  - Review and address user-reported issues.
+  - Monitor and resolve system and public complaints.
+  - Propose policies, manage discussions, and review community feedback.
+  - Delete comments violating community guidelines.
+
+- **📜 Policy & Proposal Management**
+
+  - Admins can propose new policies.
+  - View and comment on different policy proposals.
+  - Remove comments violating community standards.
+
+- **📊 Data Analytics & Decision Making**
+
+  - View detailed analytics on **traffic, waste management, and climate data**.
+  - Generate reports for city planning and sustainability initiatives.
+
+## 🛠️ Technology Stack
+
+- **Frontend:** React.js (Vite.js), Tailwind CSS
+- **Mapping & Geolocation:** Leaflet.js / Google Maps API
+
+## 📬 Contact & Support
+
+🌐 **Website:** [smartcity.com](https://smartcity.com)\
+🐞 **GitHub Issues:** [Report Issues](https://github.com/jiayin04/VHack-Ecocity/issues)

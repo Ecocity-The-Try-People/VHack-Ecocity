@@ -5,7 +5,7 @@ import { Card, CardContent } from "../components/Card";
 import { systemFeedbacks, userFeedbacks } from "../data";
 import { useToggle } from "../hooks/useToggle";
 
-function FeedbackModule({ role = "Admin" }) {
+function FeedbackModule({ userRole }) {
   const [feedbacks, setFeedbacks] = useState([...systemFeedbacks, ...userFeedbacks]);
   const [newFeedback, setNewFeedback] = useState({ name: "", email: "", message: "" });
   const notificationContext = useNotificationContext();
@@ -59,7 +59,7 @@ function FeedbackModule({ role = "Admin" }) {
         </div>
 
         <Card className="w-full bg-[hsla(180,0%,10%,0.8)] text-white">
-          {role === "User" && (
+          {userRole === "User" && (
             <form onSubmit={handleSubmit} className="mb-6">
               <input
                 type="text"
@@ -87,7 +87,7 @@ function FeedbackModule({ role = "Admin" }) {
             </form>
           )}
 
-          {role === "Admin" && (
+          {userRole === "Admin" && (
             <div>
               <h3 className="text-xl font-semibold mb-3">Admin Panel - Feedback Management</h3>
               <div className="mb-4 relative inline-block w-full">

@@ -8,7 +8,7 @@ import { proposalsData } from "../data";
 import { ProposalCard } from "../components/ProposalCard";
 import { PopUpDialog } from "../components/PopUpDialog";
 
-export default function PolicyManagement({ role = "Admin" }) {
+export default function PolicyManagement({ userRole }) {
   const [proposals, setProposals] = useState(proposalsData);
   const [openModal, setOpenModal] = useState(false);
   const [newProposal, setNewProposal] = useState({ title: "", description: "", file: null });
@@ -116,7 +116,7 @@ export default function PolicyManagement({ role = "Admin" }) {
                   proposal={proposal}
                   proposals={proposals}
                   setProposals={setProposals}
-                  role={role}
+                  role={userRole}
                 />
               </motion.div>
             ))
