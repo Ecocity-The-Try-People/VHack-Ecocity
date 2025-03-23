@@ -32,7 +32,10 @@ export default function TrafficIntro() {
   return (
     <div className="flex w-full max-w-6xl mx-auto text-white p-8 rounded-lg shadow-lg">
       {/* Map on the Left */}
-      <div className="w-1/2 p-4 bg-[#1F1D21]">
+      <div
+        className="w-1/2 p-4 bg-[#1F1D21] cursor-pointer" // Add cursor-pointer to indicate it's clickable
+        onClick={handleExploreClick} // Use handleExploreClick instead of traffic_page
+      >
         <div className="h-96 rounded-lg overflow-hidden shadow-lg">
           <MapContainer
             center={[3.1390, 101.6869]} // Center of the transportation hub

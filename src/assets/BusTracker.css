@@ -31,6 +31,156 @@
   .recenter-button:hover {
     background-color: #0056b3;
   }
+
+  /* Route Planner Container */
+.route-planner {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Route Planner Title */
+.route-planner-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Destination Input Container */
+.destination-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Destination Label */
+.destination-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+/* Destination Input Field */
+.destination-field {
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #4a5568;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.destination-field:focus {
+  border-color: #3182ce;
+}
+
+/* Search Button */
+.search-button {
+  padding: 10px 20px;
+  background-color: #3182ce;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+  background-color: #2c5282;
+}
+
+.search-button:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+/* Error Message */
+.error-message {
+  color: #e53e3e;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Route Details Container */
+.route-details {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f7fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Route Details Title */
+.route-details-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 10px;
+}
+
+/* Route Description */
+.route-description {
+  font-size: 14px;
+  color: #4a5568;
+  margin-bottom: 10px;
+}
+
+/* Route Info (Distance, Duration, ETA) */
+.route-info {
+  font-size: 14px;
+  color: #4a5568;
+  margin-bottom: 5px;
+}
+
+/* TrafficPage.css */
+.video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.main-content {
+  position: relative;
+  z-index: 10;
+  margin-left: 80px;
+  padding: 2rem;
+}
+
+.map-container {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+/* Add this to your CSS file */
+.recenter-button,
+.center-to-bus-button {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.center-to-bus-button {
+  bottom: 70px; /* Adjust this value to position the button above the "Recenter to Self" button */
+}
   
   @media (max-width: 768px) {
     .map-container {
