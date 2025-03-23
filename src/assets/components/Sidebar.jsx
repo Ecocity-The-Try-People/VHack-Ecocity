@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, FileText, Map, Users, LogOut, CloudRain } from "lucide-react";
+import { Home, FileText, Map, Users, LogOut, CloudRain, Car, Recycle } from "lucide-react";
 import NavButton from "@/components/NavButton";
 
 export default function Sidebar() {
@@ -76,7 +76,7 @@ export default function Sidebar() {
         className="hover:bg-gray-100 dark:hover:bg-gray-700"
       />
       <NavButton
-        icon={<CloudRain className={`w-6 h-6 ${activeSection === "traffic" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+        icon={<Car className={`w-6 h-6 ${activeSection === "traffic" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
         onClick={() => {
           navigate("/traffic");
           setActiveSection("Transportation");
@@ -86,7 +86,7 @@ export default function Sidebar() {
         className="hover:bg-gray-100 dark:hover:bg-gray-700"
       />
       <NavButton
-        icon={<CloudRain className={`w-6 h-6 ${activeSection === "smart_waste_management_page" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+        icon={<Recycle className={`w-6 h-6 ${activeSection === "smart_waste_management_page" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
         onClick={() => {
           navigate("/smart_waste_management_page");
           setActiveSection("smart_waste_management_page");
