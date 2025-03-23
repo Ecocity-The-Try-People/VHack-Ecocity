@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import useWeatherAlert from "../alert_function"; // Import the alert function hook
-import Toggle_button from "../toggle_button";
+import Toggle_button from "../toggle_button"; // Import the toggle button component
 
 const weather_api = import.meta.env.VITE_API_KEY;
 
@@ -10,6 +10,7 @@ const Weather_detail = ({ location }) => {
     const [error, setError] = useState(null);
     const [showDetails, setShowDetails] = useState(false); // Controls visibility of additional details
 
+    // Fetch weather data
     const fetchWeather = async () => {
         setLoading(true);
         setError(null);
@@ -20,7 +21,7 @@ const Weather_detail = ({ location }) => {
             );
 
             if (!response.ok) {
-                throw new Error("Failed to fetch weather data");
+                throw new Error("Failed to fetch weather data. Please try again.");
             }
 
             const data = await response.json();
@@ -36,19 +37,36 @@ const Weather_detail = ({ location }) => {
         fetchWeather();
     }, [location]);
 
+    // Toggle additional details visibility
     const toggleDetails = () => {
-        setShowDetails((prev) => !prev); // Toggle visibility of additional details
+        setShowDetails((prev) => !prev);
     };
 
-    return (
-        <div className="max-w-xs mx-auto p-6 border-2 border-gray-200 rounded-lg bg-white shadow-md">
-            {/* Loading and Error Messages */}
-            {loading && <p className="text-center text-gray-800">Loading...</p>}
-            {error && <p className="text-center text-red-500">{error}</p>}
+    // Use the weather alert hook
+    const alertMessage = useWeatherAlert(weather);
 
-            {/* Basic Weather Info (Always Visible) */}
+    return (
+        <div className="max-w-xs mx-auto p-6 border-2 border-gray-200 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
+            {/* Loading and Error Messages */}
+            {loading && (
+                <p className="text-center text-gray-800 animate-pulse">Loading weather data...</p>
+            )}
+            {error && (
+                <div className="text-center">
+                    <p className="text-red-500 mb-4">{error}</p>
+                    <button
+                        onClick={fetchWeather}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
+
+            {/* Weather Data */}
             {weather && (
                 <div className="text-center">
+                    {/* Location and Temperature */}
                     <h2 className="text-2xl font-bold text-gray-800">
                         {weather.location.name}, {weather.location.country}
                     </h2>
@@ -66,14 +84,23 @@ const Weather_detail = ({ location }) => {
                         {weather.current.condition.text}
                     </p>
 
-                    {/* Show More Button */}
-                    <button
-                        onClick={toggleDetails}
-                        className="mt-6 px-4 py-2 text-blue-600 hover:text-blue-800 underline transition duration-300 cursor-pointer">
-                        {showDetails ? "Show Less" : "Show More"}
-                    </button>
+                    {/* Weather Alert */}
+                    {alertMessage && (
+                        <div className="mt-4 p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
+                            <p>{alertMessage}</p>
+                        </div>
+                    )}
 
-                    {/* Additional Weather Details (Conditionally Rendered) */}
+                    {/* Toggle Button for Additional Details */}
+                    <div className="mt-6">
+                        <Toggle_button
+                            isOn={showDetails}
+                            onToggle={toggleDetails}
+                            label={showDetails ? "Show Less" : "Show More"}
+                        />
+                    </div>
+
+                    {/* Additional Weather Details */}
                     {showDetails && (
                         <div className="mt-6 space-y-3">
                             <div className="flex items-center justify-center">
@@ -92,6 +119,12 @@ const Weather_detail = ({ location }) => {
                                 <span className="text-gray-800 text-lg">👀</span>
                                 <p className="text-lg text-gray-800 ml-2">
                                     Visibility: {weather.current.vis_km} km
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-center">
+                                <span className="text-gray-800 text-lg">🌡</span>
+                                <p className="text-lg text-gray-800 ml-2">
+                                    Feels Like: {weather.current.feelslike_c}°C
                                 </p>
                             </div>
                         </div>
