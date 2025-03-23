@@ -171,7 +171,7 @@ export default function SmartCityHome() {
       </section>
       {/* Renewable Energy */}
       <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20">
-  {/* Video Background for Renewable Energy Section */}
+  {/* Video Background for Waste Collection Section */}
   <div className="absolute inset-0 z-0 overflow-hidden">
     <video
       autoPlay
@@ -191,60 +191,60 @@ export default function SmartCityHome() {
     transition={{ duration: 1 }}
     className="text-3xl font-semibold text-white relative z-10"
   >
-    Renewable Energy
+    Automated Waste Collection Vehicles
   </motion.h2>
   <p className="text-lg mt-4 text-white relative z-10">
-    Solar, wind, and sustainable energy powering the future.
+    Deploy autonomous or semi-autonomous garbage trucks equipped with robotic arms for efficient collection.
   </p>
 
   {/* Widgets Grid */}
   <div className="w-full max-w-6xl mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 px-4 relative z-10">
-    {/* Widget 1: Solar Power */}
+    {/* Widget 1: Real-Time Tracking */}
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.2 }}
       className="p-6 bg-white/20 backdrop-blur-sm rounded-lg shadow-lg border border-white/10"
     >
-      <h3 className="text-xl font-bold text-white mb-4">Solar Power</h3>
+      <h3 className="text-xl font-bold text-white mb-4">Real-Time Tracking</h3>
       <p className="text-gray-200 mb-6">
-        Harness the power of the sun with our advanced solar energy solutions. Reduce your carbon footprint and save on energy costs.
+        Track the location of waste collection vehicles in real-time using our interactive map. Know exactly when your recyclables will be picked up.
       </p>
       <button
         className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
       >
-        Learn More
+        Track Now
       </button>
     </motion.div>
 
-    {/* Widget 2: Wind Energy */}
+    {/* Widget 2: Request Pickup */}
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.4 }}
       className="p-6 bg-white/20 backdrop-blur-sm rounded-lg shadow-lg border border-white/10"
     >
-      <h3 className="text-xl font-bold text-white mb-4">Wind Energy</h3>
+      <h3 className="text-xl font-bold text-white mb-4">Request Pickup</h3>
       <p className="text-gray-200 mb-6">
-        Utilize wind turbines to generate clean, renewable energy. Perfect for both residential and commercial applications.
+        Request for recyclable garbage to be picked up at your location. Our vehicles are equipped to handle plastic, paper, and metal.
       </p>
       <button
         className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
       >
-        Learn More
+        Request Now
       </button>
     </motion.div>
 
-    {/* Widget 3: Sustainability */}
+    {/* Widget 3: Advanced Recycling */}
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, delay: 0.6 }}
       className="p-6 bg-white/20 backdrop-blur-sm rounded-lg shadow-lg border border-white/10"
     >
-      <h3 className="text-xl font-bold text-white mb-4">Sustainability</h3>
+      <h3 className="text-xl font-bold text-white mb-4">Advanced Recycling</h3>
       <p className="text-gray-200 mb-6">
-        Our commitment to sustainability ensures a greener future. Explore how we integrate renewable energy into everyday life.
+        Our vehicles are equipped with high-tech cameras that can differentiate between types of recyclable garbage, ensuring efficient sorting and processing.
       </p>
       <button
         className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
