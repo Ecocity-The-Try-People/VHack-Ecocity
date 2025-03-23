@@ -26,7 +26,7 @@ export default function SmartWasteManagementPage() {
                 </div>
 
                 {/* Page Title */}
-                <h1 className="text-2xl font-bold text-center text-[var(--primary-color)] dark:text-gray-100 mb-6 relative z-10">
+                <h1 className="text-5xl font-bold text-center text-[var(--primary-color)] dark:text-gray-100 mb-6 relative z-10">
                     Smart Waste Management
                 </h1>
 

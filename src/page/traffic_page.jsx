@@ -25,7 +25,7 @@ export default function TrafficPage() {
       {/* Main Content */}
       <div className="flex-grow relative z-10" style={{ marginLeft: "80px" }}>
         <div className="p-8">
-          <h2 className="text-3xl font-bold text-white-800 mb-6 text-center pt-5">Smart Transportation</h2>
+          <h2 className="text-5xl font-bold text-white-800 mb-6 text-center pt-5">Smart Transportation</h2>
           {/* Map is always visible */}
           <div className="rounded-lg shadow-lg p-6">
             <VehicleMap />

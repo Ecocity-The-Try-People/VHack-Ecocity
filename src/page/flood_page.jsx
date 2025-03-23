@@ -17,7 +17,7 @@ export default function Flood_page() {
                 <div className="mb-6">
                     {/* Centered h2 */}
                     <div className="flex justify-center">
-                        <h2 className="text-2xl font-bold text-white-800 z-10">
+                        <h2 className="text-5xl font-bold text-white-800 z-10">
                             Weather Forecast
                         </h2>
                     </div>
