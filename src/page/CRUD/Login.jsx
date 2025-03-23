@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
 
+
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -46,7 +47,7 @@ function Login() {
         muted
         className="fixed top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src="src/assets/Smart-City.mp4" type="video/mp4" />
+        <source src="src/assets/videos/Smart-City.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 

@@ -2,19 +2,17 @@ import { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./BusTracker.css";
+import "./BusTracker.css"; // Import your existing CSS file
 
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
-
+// Fix for default marker icons in Leaflet
 const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
 });
-
 L.Marker.prototype.options.icon = DefaultIcon;
 
 // GTFS-Realtime API endpoint
@@ -22,21 +20,11 @@ const GTFS_API_URL = "https://api.data.gov.my/gtfs-realtime/vehicle-position/pra
 
 // Mock vehicle positions for fallback
 const mockVehiclePositions = [
-  {
-    id: "1",
-    name: "Bus 123",
-    position: [3.212, 101.579],
-    speed: 30,
-  },
-  {
-    id: "2",
-    name: "Bus 456",
-    position: [3.220, 101.585],
-    speed: 25,
-  },
+  { id: "1", name: "Bus 123", position: [3.212, 101.579], speed: 30 },
+  { id: "2", name: "Bus 456", position: [3.220, 101.585], speed: 25 },
 ];
 
-// Example static GTFS data (replace with real data or API call)
+// Example static GTFS data
 const staticStops = [
   { id: "1", name: "Sungai Buloh Station", type: "MRT", position: [3.212, 101.579] },
   { id: "2", name: "Bukit Rahman Putra Bus Stop", type: "Bus", position: [3.220, 101.585] },
@@ -57,7 +45,11 @@ const RecenterButton = ({ position }) => {
   const map = useMap();
   const handleRecenter = () => map.setView(position, map.getZoom());
   return (
-    <button className="recenter-button" onClick={handleRecenter}>
+    <button
+      className="recenter-button bg-gray-800 text-white p-2 rounded-full shadow-lg hover:bg-gray-700 transition-colors"
+      onClick={handleRecenter}
+      aria-label="Recenter Map"
+    >
       <i className="fa-solid fa-location-crosshairs"></i>
     </button>
   );
@@ -155,6 +147,21 @@ const BusTracker = () => {
   );
 };
 
+// Utility function to convert seconds to hours and minutes
+const formatDuration = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+
+  let durationString = "";
+  if (hours > 0) {
+    durationString += `${hours} hour${hours > 1 ? "s" : ""} `;
+  }
+  if (minutes > 0) {
+    durationString += `${minutes} minute${minutes > 1 ? "s" : ""}`;
+  }
+  return durationString.trim() || "0 minutes";
+};
+
 // Vehicle Map Component
 const VehicleMap = () => {
   const [vehiclePositions, setVehiclePositions] = useState([]);
@@ -216,8 +223,6 @@ const VehicleMap = () => {
 
       setVehiclePositions(positions);
     } catch (error) {
-      console.error("Error fetching GTFS-Realtime data:", error);
-      setError("Failed to fetch real-time vehicle data. Using mock data.");
       setVehiclePositions(mockVehiclePositions);
     }
   };
@@ -329,74 +334,92 @@ const VehicleMap = () => {
   }, [destinationCoords]);
 
   return (
-    <div className="map-container">
-      <div className="sidebar">
-        <h2>Route Planner</h2>
-        <div>
-          <label>Destination:</label>
-          <input
-            type="text"
-            placeholder="Enter destination"
-            value={destinationQuery}
-            onChange={(e) => setDestinationQuery(e.target.value)}
-          />
-          <button onClick={handleDestinationSearch} disabled={isLoading}>
-            {isLoading ? "Searching..." : "Search"}
-          </button>
-        </div>
-        {error && <p className="error">{error}</p>}
-        {destinationCoords && (
-          <div>
-            <h3>Route to Destination</h3>
-            <p>From Your Location to {destinationQuery}</p>
-            {routeDetails.distance && <p>Distance: {routeDetails.distance} km</p>}
-            {routeDetails.duration && <p>Estimated Duration: {routeDetails.duration} seconds</p>}
-            {eta && <p>ETA: {eta}</p>}
+    <div className="flex justify-center items-center">
+      {/* Main Container */}
+      <div className="flex bg-gray-800 rounded-lg shadow-lg overflow-hidden" style={{ width: "90%", maxWidth: "1200px", height: "600px" }}>
+        {/* Sidebar */}
+        <div className="w-96 bg-gray-800 p-6 overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-6 text-white">Route Planner</h2>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-2">Destination:</label>
+            <input
+              type="text"
+              placeholder="Enter destination"
+              value={destinationQuery}
+              onChange={(e) => setDestinationQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleDestinationSearch()}
+              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+            />
+            <button
+              onClick={handleDestinationSearch}
+              disabled={isLoading}
+              className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+            >
+              {isLoading ? "Searching..." : "Search"}
+            </button>
           </div>
-        )}
-      </div>
-      {userLocation && (
-        <MapContainer center={userLocation} zoom={14} style={{ height: "600px", width: "100%" }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <Marker position={userLocation} icon={userIcon}>
-            <Popup>Your Location</Popup>
-          </Marker>
-          {vehiclePositions.map((vehicle) => (
-            <Marker key={vehicle.id} position={vehicle.position} icon={vehicleIcon}>
-              <Popup>{vehicle.name}</Popup>
-            </Marker>
-          ))}
-          {staticStops.map((stop) => (
-            <Marker key={stop.id} position={stop.position} icon={stopIcon}>
-              <Popup>
-                {stop.name} ({stop.type})
-              </Popup>
-            </Marker>
-          ))}
-          {stations.map((station) => (
-            <Marker key={station.id} position={station.position} icon={stopIcon}>
-              <Popup>
-                {station.name} <br /> Arrival: {station.scheduledArrival}
-              </Popup>
-            </Marker>
-          ))}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
           {destinationCoords && (
-            <Marker position={destinationCoords}>
-              <Popup>Destination: {destinationQuery}</Popup>
-            </Marker>
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold mb-2 text-white">Route to Destination</h3>
+              <p className="text-gray-300 mb-4">From Your Location to {destinationQuery}</p>
+              {routeDetails.distance && <p className="text-gray-300">Distance: {routeDetails.distance} km</p>}
+              {routeDetails.duration && (
+                <p className="text-gray-300">Estimated Duration: {formatDuration(routeDetails.duration)}</p>
+              )}
+              {eta && <p className="text-gray-300">ETA: {eta}</p>}
+            </div>
           )}
-          {routePath.length > 0 && (
-            <Polyline positions={routePath} color="blue" weight={4} opacity={0.8} />
-          )}
-          <BusTracker />
-          <RecenterButton position={userLocation} />
-        </MapContainer>
-      )}
+        </div>
+
+        {/* Map Container */}
+        <div className="flex-grow relative">
+          <div className="h-full w-full rounded-r-lg overflow-hidden">
+            {userLocation && (
+              <MapContainer center={userLocation} zoom={14} className="h-full w-full">
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <Marker position={userLocation} icon={userIcon}>
+                  <Popup>Your Location</Popup>
+                </Marker>
+                {vehiclePositions.map((vehicle) => (
+                  <Marker key={vehicle.id} position={vehicle.position} icon={vehicleIcon}>
+                    <Popup>{vehicle.name}</Popup>
+                  </Marker>
+                ))}
+                {staticStops.map((stop) => (
+                  <Marker key={stop.id} position={stop.position} icon={stopIcon}>
+                    <Popup>
+                      {stop.name} ({stop.type})
+                    </Popup>
+                  </Marker>
+                ))}
+                {stations.map((station) => (
+                  <Marker key={station.id} position={station.position} icon={stopIcon}>
+                    <Popup>
+                      {station.name} <br /> Arrival: {station.scheduledArrival}
+                    </Popup>
+                  </Marker>
+                ))}
+                {destinationCoords && (
+                  <Marker position={destinationCoords}>
+                    <Popup>Destination: {destinationQuery}</Popup>
+                  </Marker>
+                )}
+                {routePath.length > 0 && (
+                  <Polyline positions={routePath} color="cyan" weight={4} opacity={0.8} />
+                )}
+                <BusTracker />
+                <RecenterButton position={userLocation} />
+              </MapContainer>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default VehicleMap; 
+export default VehicleMap;
