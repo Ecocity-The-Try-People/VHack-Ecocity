@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import the first video file
 import FeaturesVideo from "../assets/videos/weather.mp4"; // Import the second video file
 import TransportationVideo from "../assets/videos/transportation.mp4"; // Import the third video file
@@ -9,23 +10,54 @@ import Weather_detail from "../assets/flood_page/weather_detail.jsx";
 import { useNavigate } from "react-router-dom";
 import TrafficIntro from "./homepage_section/TrafficIntro.jsx"; 
 import Sidebar from "../assets/components/Sidebar.jsx";
+import PublicAdminModule from '@/modules/ProfileModule.jsx';
+import FeedbackModule from "../modules/FeedbackModule.jsx";
+import PolicyManagement from "../modules/PolicyManagement.jsx";
 
 export default function SmartCityHome() {
 
     const navigate = useNavigate();
-  
+    const location = useLocation();
+    const [visibleSection, setVisibleSection] = useState("home");
+
+    useEffect(() => {
+      const hash = location.hash.replace('#',"");
+    if (hash){
+      setVisibleSection(hash);
+
+    }else{
+      setVisibleSection("home");
+    }
+  }, [location.hash]);
+
     const traffic_page = () => {
       navigate("/traffic"); // Redirect to the TrafficPage
     };
     const weather_page = () => {
       navigate("/flood_page"); // Redirect to the TrafficPage
     };
+    const smart_waste_page = () => {
+      navigate("/smart_waste_management_page"); // Redirect to the TrafficPage
+    };
 
   return (
-    <div className="h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative">
+    <div className={`h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative `}>
       {/* Sidebar */}
       <Sidebar />
-
+    <div className={`h-6 ${visibleSection === "profile" ? "block" : "hidden"}`}>
+        <PublicAdminModule />
+    </div>
+    <div className="flex-1 ml-20 z-20 relative">
+      <div className={`relative min-h-screen ${visibleSection === "policy" ? "block" : "hidden"}`}>
+        <PolicyManagement />
+      </div>
+    </div>
+    <div className="flex-1 ml-20 z-20 relative">
+      <div className={`relative min-h-screen ${visibleSection === "feedback" ? "block" : "hidden"}`}>
+          <FeedbackModule />
+      </div>
+    </div>
+    <div className={`${visibleSection === "home" ? "block" : "hidden"}`}> 
       {/* Video Background for Hero Section */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <video
@@ -40,7 +72,7 @@ export default function SmartCityHome() {
       </div>
 
       {/* Hero Section */}
-      <section className="snap-start flex items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
+      <section className={`snap-start flex items-center justify-center h-screen relative z-10 ml-20 `}> {/* Add ml-20 to account for sidebar width */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -211,7 +243,7 @@ export default function SmartCityHome() {
         Track the location of waste collection vehicles in real-time using our interactive map. Know exactly when your recyclables will be picked up.
       </p>
       <button
-        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
       >
         Track Now
       </button>
@@ -229,7 +261,7 @@ export default function SmartCityHome() {
         Request for recyclable garbage to be picked up at your location. Our vehicles are equipped to handle plastic, paper, and metal.
       </p>
       <button
-        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
       >
         Request Now
       </button>
@@ -247,7 +279,7 @@ export default function SmartCityHome() {
         Our vehicles are equipped with high-tech cameras that can differentiate between types of recyclable garbage, ensuring efficient sorting and processing.
       </p>
       <button
-        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
       >
         Learn More
       </button>
@@ -262,7 +294,8 @@ export default function SmartCityHome() {
     className="mt-12 text-center relative z-10"
   >
     <button
-      className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+    onClick={smart_waste_page}
+      className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
     >
       Explore Features
     </button>
@@ -334,6 +367,7 @@ export default function SmartCityHome() {
           </div>
         </motion.div>
       </div>
+    </div>
     </div>
   );
 }

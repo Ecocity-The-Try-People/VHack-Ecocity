@@ -89,7 +89,7 @@ const SS2Map = () => {
         };
     }, [mapLoaded, weatherData]);
 
-    return <div ref={mapContainer} style={{ height: '80vh', width: '100%' }} />;
+    return <div className='z-1' ref={mapContainer} style={{ height: '80vh', width: '100%' }} />;
 };
 
 export default SS2Map;
