@@ -1,14 +1,26 @@
 import React from "react";
 import { motion } from "framer-motion";
-import SmartCityVideo from "../assets/Smart-City.mp4"; // Import the first video file
-import FeaturesVideo from "../assets/weather.mp4"; // Import the second video file
-import TransportationVideo from "../assets/transportation.mp4"; // Import the third video file
-import EnergyVideo from "../assets/energy.mp4"; // Import the fourth video file
+import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import the first video file
+import FeaturesVideo from "../assets/videos/weather.mp4"; // Import the second video file
+import TransportationVideo from "../assets/videos/transportation.mp4"; // Import the third video file
+import EnergyVideo from "../assets/videos/energy.mp4"; // Import the fourth video file
 // import EmergencyVideo from "../assets/emergency.mp4"; // Import the fifth video file
 import Weather_detail from "../assets/flood_page/weather_detail.jsx";
-import Sidebar from "./Sidebar"; // Import the Sidebar component
+import { useNavigate } from "react-router-dom";
+import TrafficIntro from "./homepage_section/TrafficIntro.jsx"; 
+import Sidebar from "../assets/components/Sidebar.jsx";
 
 export default function SmartCityHome() {
+
+    const navigate = useNavigate();
+  
+    const traffic_page = () => {
+      navigate("/traffic"); // Redirect to the TrafficPage
+    };
+    const weather_page = () => {
+      navigate("/flood_page"); // Redirect to the TrafficPage
+    };
+
   return (
     <div className="h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative">
       {/* Sidebar */}
@@ -41,14 +53,11 @@ export default function SmartCityHome() {
           <p className="text-lg md:text-xl mt-4 text-gray-200">
             A sustainable and efficient urban future powered by technology.
           </p>
-          <button className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
-            Explore Features
-          </button>
         </motion.div>
       </section>
 
       {/* Features Section */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20">
         {/* Video Background for Features Section */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <video
@@ -107,11 +116,47 @@ export default function SmartCityHome() {
             </div>
           </motion.div>
         </div>
+
+        {/* Explore Features Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="mt-12 relative z-10"
+        >
+          <button
+            onClick={weather_page}
+            className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
+          >
+            Explore Features
+          </button>
+        </motion.div>
       </section>
 
-      {/* Smart Transportation */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
-        {/* Video Background for Smart Transportation Section */}
+{/* Smart Transportation */}
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10">
+        {/* Content Container */}
+        <div className="w-full max-w-6xl mx-auto p-5 z-10">
+          <h1 className="text-4xl font-bold text-center mb-5">Welcome to Our Transportation Hub</h1>
+          <TrafficIntro />
+
+          {/* Explore Features Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mt-12 text-center"
+          >
+            <button
+              onClick={traffic_page}
+              className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
+            >
+              Explore Live Map
+            </button>
+          </motion.div>
+        </div>
+
+        {/* Video Background */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <video
             autoPlay
@@ -123,52 +168,106 @@ export default function SmartCityHome() {
             Your browser does not support the video tag.
           </video>
         </div>
-
-        {/* Section Content */}
-        <motion.h2
-          initial={{ opacity: 0, y: -50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-3xl font-semibold text-white relative z-10"
-        >
-          Smart Transportation
-        </motion.h2>
-        <p className="text-lg mt-4 text-white relative z-10">
-          Advanced public transport systems with AI-driven optimization.
-        </p>
-        <button className="mt-8 px-6 py-3 bg-white text-yellow-600 rounded-lg hover:bg-gray-100 transition duration-300 relative z-10">
-          Learn More
-        </button>
       </section>
-
       {/* Renewable Energy */}
-      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
-        {/* Video Background for Renewable Energy Section */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            className="w-full h-full object-cover opacity-50" // Adjust opacity here
-          >
-            <source src={EnergyVideo} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
+      <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20">
+  {/* Video Background for Renewable Energy Section */}
+  <div className="absolute inset-0 z-0 overflow-hidden">
+    <video
+      autoPlay
+      loop
+      muted
+      className="w-full h-full object-cover opacity-50" // Adjust opacity here
+    >
+      <source src={EnergyVideo} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
 
-        {/* Section Content */}
-        <motion.h2
-          initial={{ opacity: 0, y: -50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-3xl font-semibold text-white relative z-10"
-        >
-          Renewable Energy
-        </motion.h2>
-        <p className="text-lg mt-4 text-white relative z-10">
-          Solar, wind, and sustainable energy powering the future.
-        </p>
-      </section>
+  {/* Section Content */}
+  <motion.h2
+    initial={{ opacity: 0, y: -50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1 }}
+    className="text-3xl font-semibold text-white relative z-10"
+  >
+    Renewable Energy
+  </motion.h2>
+  <p className="text-lg mt-4 text-white relative z-10">
+    Solar, wind, and sustainable energy powering the future.
+  </p>
+
+  {/* Widgets Grid */}
+  <div className="w-full max-w-6xl mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 px-4 relative z-10">
+    {/* Widget 1: Solar Power */}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 0.2 }}
+      className="p-6 bg-white/20 backdrop-blur-sm rounded-lg shadow-lg border border-white/10"
+    >
+      <h3 className="text-xl font-bold text-white mb-4">Solar Power</h3>
+      <p className="text-gray-200 mb-6">
+        Harness the power of the sun with our advanced solar energy solutions. Reduce your carbon footprint and save on energy costs.
+      </p>
+      <button
+        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+      >
+        Learn More
+      </button>
+    </motion.div>
+
+    {/* Widget 2: Wind Energy */}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 0.4 }}
+      className="p-6 bg-white/20 backdrop-blur-sm rounded-lg shadow-lg border border-white/10"
+    >
+      <h3 className="text-xl font-bold text-white mb-4">Wind Energy</h3>
+      <p className="text-gray-200 mb-6">
+        Utilize wind turbines to generate clean, renewable energy. Perfect for both residential and commercial applications.
+      </p>
+      <button
+        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+      >
+        Learn More
+      </button>
+    </motion.div>
+
+    {/* Widget 3: Sustainability */}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 0.6 }}
+      className="p-6 bg-white/20 backdrop-blur-sm rounded-lg shadow-lg border border-white/10"
+    >
+      <h3 className="text-xl font-bold text-white mb-4">Sustainability</h3>
+      <p className="text-gray-200 mb-6">
+        Our commitment to sustainability ensures a greener future. Explore how we integrate renewable energy into everyday life.
+      </p>
+      <button
+        className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+      >
+        Learn More
+      </button>
+    </motion.div>
+  </div>
+
+  {/* Explore Features Button */}
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1, delay: 0.8 }}
+    className="mt-12 text-center relative z-10"
+  >
+    <button
+      className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300"
+    >
+      Explore Features
+    </button>
+  </motion.div>
+</section>
 
       {/* Emergency Alerts */}
       <section className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> {/* Add ml-20 to account for sidebar width */}
