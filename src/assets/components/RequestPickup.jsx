@@ -1,205 +1,271 @@
 import { useState, useEffect } from "react";
+import { MapPin, Navigation, Trash2, Clock, X, Check, Trash } from "lucide-react";
+import Swal from "sweetalert2";
 
 const RequestPickup = () => {
-  const [location, setLocation] = useState("");
-  const [coords, setCoords] = useState(null);
-  const [type, setType] = useState("Plastic");
-  const [requests, setRequests] = useState([]);
-  const [typingTimeout, setTypingTimeout] = useState(null);
-  const [isUsingCurrentLocation, setIsUsingCurrentLocation] = useState(false);
+    const [location, setLocation] = useState("");
+    const [coords, setCoords] = useState(null);
+    const [type, setType] = useState("Plastic");
+    const [requests, setRequests] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isUsingCurrentLocation, setIsUsingCurrentLocation] = useState(false);
 
-  useEffect(() => {
-    loadRequests();
-  }, []);
+    useEffect(() => {
+        loadRequests();
+    }, []);
 
-  // 加载本地存储的请求
-  const loadRequests = () => {
-    const storedRequests = JSON.parse(localStorage.getItem("requests")) || [];
-    setRequests(storedRequests);
-  };
+    const loadRequests = () => {
+        const storedRequests = JSON.parse(localStorage.getItem("waste_requests")) || [];
+        setRequests(storedRequests);
+    };
 
-  // 获取当前位置
-  const handleLocation = () => {
-    if (window.confirm("Do you wish to use your current location? Please ensure you are in an open area for better accuracy.")) {
-      setIsUsingCurrentLocation(true);
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude, accuracy } = position.coords;
-          console.log(`Coordinates: ${latitude}, ${longitude} (Accuracy: ${accuracy} meters)`);
-          setCoords([latitude, longitude]);
+    const handleLocation = async () => {
+        if (!navigator.geolocation) {
+            showAlert("Error", "Geolocation is not supported by your browser", "error");
+            return;
+        }
 
-          if (accuracy > 100) {
-            alert(`Warning: Location accuracy is low (${accuracy} meters). Try moving to an open area.`);
-          }
+        try {
+            setIsUsingCurrentLocation(true);
+            setIsLoading(true);
+            
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 15000
+                });
+            });
 
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
-            );
-            const data = await response.json();
-            console.log("Reverse Geocoding Data:", data);
+            const { latitude, longitude, accuracy } = position.coords;
+            setCoords([latitude, longitude]);
 
-            if (!data || !data.address) {
-              alert("Failed to retrieve an accurate address. Please try again.");
-              setLocation(`Lat: ${latitude}, Lon: ${longitude}`);
-              return;
+            if (accuracy > 100) {
+                showAlert(
+                    "Low Accuracy", 
+                    `Location accuracy is low (${Math.round(accuracy)} meters). For better results, move to an open area.`, 
+                    "warning"
+                );
             }
 
-            const { house_number, road, suburb, city, town, village, state, country } = data.address;
-            let formattedLocation = [
-              house_number ? `${house_number} ${road}` : road,
-              suburb,
-              city || town || village,
-              state,
-              country
+            const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await response.json();
+            
+            const address = [
+                data.address?.house_number,
+                data.address?.road,
+                data.address?.suburb,
+                data.address?.city || data.address?.town,
+                data.address?.state,
+                data.address?.country
             ].filter(Boolean).join(", ");
 
-            setLocation(formattedLocation || `Lat: ${latitude}, Lon: ${longitude}`);
-          } catch (error) {
-            alert("Failed to fetch address: " + error.message);
-            setLocation(`Lat: ${latitude}, Lon: ${longitude}`);
-          } finally {
+            setLocation(address || `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
+        } catch (error) {
+            showAlert("Error", "Failed to get location: " + error.message, "error");
+        } finally {
+            setIsLoading(false);
             setIsUsingCurrentLocation(false);
-          }
-        },
-        (error) => {
-          alert("Failed to get location: " + error.message);
-          setIsUsingCurrentLocation(false);
-        },
-        { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 } // 启用高精度模式，超时时间增加到 30 秒
-      );
-    }
-  };
-
-  // 处理手动输入位置
-  const handleLocationInput = (e) => {
-    if (isUsingCurrentLocation) return;
-
-    const input = e.target.value;
-    setLocation(input);
-    if (typingTimeout) clearTimeout(typingTimeout);
-
-    const newTimeout = setTimeout(async () => {
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}`
-        );
-        const data = await response.json();
-        if (data.length > 0) {
-          setLocation(data[0].display_name);
-          setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
         }
-      } catch (error) {
-        console.error("Failed to fetch coordinates:", error);
-      }
-    }, 2000);
+    };
 
-    setTypingTimeout(newTimeout);
-  };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!location.trim() || !coords) {
+            showAlert("Error", "Please enter a valid location", "error");
+            return;
+        }
 
-  // 提交请求
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!location.trim() || !coords) {
-      alert("Please enter a valid location.");
-      return;
-    }
-    if (!window.confirm("Are you sure you want to submit this request?")) return;
+        const newRequest = {
+            id: Date.now(),
+            location,
+            coords,
+            type,
+            status: "pending",
+            timestamp: new Date().toISOString()
+        };
 
-    const newRequest = { location, coords, type, timestamp: new Date().toISOString() };
-    const updatedRequests = [...requests, newRequest];
-    localStorage.setItem("requests", JSON.stringify(updatedRequests));
-    setRequests(updatedRequests);
-    setLocation("");
-    setCoords(null);
-    setType("Plastic");
-    setIsUsingCurrentLocation(false);
-  };
+        const updatedRequests = [...requests, newRequest];
+        localStorage.setItem("waste_requests", JSON.stringify(updatedRequests));
+        setRequests(updatedRequests);
+        setLocation("");
+        setCoords(null);
+        setType("Plastic");
+        showAlert("Success", "Pickup request submitted successfully!", "success");
+    };
 
-  // 删除请求
-  const handleDeleteRequest = (index) => {
-    if (!window.confirm("Are you sure you want to delete this request?")) return;
-    const updatedRequests = requests.filter((_, i) => i !== index);
-    localStorage.setItem("requests", JSON.stringify(updatedRequests));
-    setRequests(updatedRequests);
-  };
+    const handleDeleteRequest = async (id) => {
+        const requestToDelete = requests.find(req => req.id === id);
+        
+        const result = await showConfirm(
+            "Delete this request?",
+            `<div class="text-left">
+                <p><strong>Location:</strong> ${requestToDelete.location}</p>
+                <p><strong>Type:</strong> ${requestToDelete.type}</p>
+                <p><strong>Date:</strong> ${new Date(requestToDelete.timestamp).toLocaleString()}</p>
+            </div>`,
+            "warning"
+        );
 
-  // 清除历史记录
-  const handleClearHistory = () => {
-    if (window.confirm("Are you sure you want to clear the history?")) {
-      localStorage.removeItem("requests");
-      setRequests([]);
-    }
-  };
+        if (result.isConfirmed) {
+            const updatedRequests = requests.filter(req => req.id !== id);
+            localStorage.setItem("waste_requests", JSON.stringify(updatedRequests));
+            setRequests(updatedRequests);
+            showAlert("Deleted!", "Your waste request has been deleted.", "success");
+        }
+    };
 
-  return (
-    <div className="p-6 max-w-lg mx-auto bg-white rounded-xl shadow-md space-y-4">
-      <h2 className="text-xl font-bold text-center text-gray-800">Garbage Pickup Request</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-col gap-2">
-          <input
-            type="text"
-            placeholder="Enter your location (e.g., Kuala Lumpur OR 3.14, 101.68)"
-            value={location}
-            onChange={handleLocationInput}
-            className="border p-3 rounded-md w-full focus:ring-2 focus:ring-blue-400"
-          />
-          <button
-            type="button"
-            onClick={handleLocation}
-            className="bg-gray-200 p-3 rounded-md hover:bg-gray-300"
-          >
-            📍 Use Current Location
-          </button>
-        </div>
-        <select
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-          className="border p-3 rounded-md w-full focus:ring-2 focus:ring-blue-400"
-        >
-          <option value="Plastic">Plastic</option>
-          <option value="Paper">Paper</option>
-          <option value="Metal">Metal</option>
-        </select>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white p-3 rounded-md w-full hover:bg-blue-600"
-        >
-          Post Request
-        </button>
-      </form>
-      <div className="border-t pt-4">
-        <h3 className="text-lg font-semibold text-gray-700">History</h3>
-        {requests.length > 0 ? (
-          <ul className="divide-y divide-gray-200">
-            {requests.map((req, index) => (
-              <li key={index} className="py-3 flex justify-between items-center">
-                <span>
-                  📍 {req.location} - 🗑 {req.type} ({new Date(req.timestamp).toLocaleString()})
-                </span>
+    const handleClearAll = async () => {
+        if (requests.length === 0) {
+            showAlert("Info", "There are no requests to clear", "info");
+            return;
+        }
+
+        const result = await showConfirm(
+            "Clear All Requests?",
+            "Are you sure you want to delete all ${requests.length} requests? This action cannot be undone.",
+            "warning"
+        );
+
+        if (result.isConfirmed) {
+            localStorage.removeItem("waste_requests");
+            setRequests([]);
+            showAlert("Cleared!", "All requests have been deleted.", "success");
+        }
+    };
+
+    // Dark mode compatible alert
+    const showAlert = (title, text, icon) => {
+        return Swal.fire({
+            title,
+            text,
+            icon,
+            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#1f2937',
+            confirmButtonColor: '#3b82f6',
+        });
+    };
+
+    // Dark mode compatible confirmation
+    const showConfirm = (title, html, icon) => {
+        return Swal.fire({
+            title,
+            html,
+            icon,
+            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
+            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#1f2937',
+            showCancelButton: true,
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: document.documentElement.classList.contains('dark') ? '#6b7280' : '#9ca3af',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+    };
+
+    return (
+        <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Collection Location
+                    </label>
+                    <div className="flex space-x-2">
+                        <input
+                            type="text"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            placeholder="Enter address or coordinates"
+                            className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                            disabled={isUsingCurrentLocation}
+                        />
+                        <button
+                            type="button"
+                            onClick={handleLocation}
+                            disabled={isLoading}
+                            className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+                        >
+                            {isLoading ? (
+                                <span className="animate-pulse">...</span>
+                            ) : (
+                                <>
+                                    <Navigation className="w-4 h-4 mr-2" />
+                                    Current
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Waste Type
+                    </label>
+                    <select
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    >
+                        <option value="Plastic">Plastic</option>
+                        <option value="Paper">Paper</option>
+                        <option value="Metal">Metal</option>
+                        <option value="Glass">Glass</option>
+                        <option value="Organic">Organic</option>
+                    </select>
+                </div>
+
                 <button
-                  onClick={() => handleDeleteRequest(index)}
-                  className="bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
+                    type="submit"
+                    disabled={!location || !coords}
+                    className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
                 >
-                  ❌
+                    <Check className="w-5 h-5 mr-2" />
+                    Submit Pickup Request
                 </button>
-              </li>
-            ))}
-          </ul>
-        ) : ( 
-          <p className="text-gray-500 text-center">No requests yet.</p>
-        )}
-        {requests.length > 0 && (
-          <button
-            onClick={handleClearHistory}
-            className="bg-red-500 text-white p-3 rounded-md w-full mt-4 hover:bg-red-600"
-          >
-            Clear History
-          </button>
-        )}
-      </div>
-    </div>
-  );
+            </form>
+
+            {requests.length > 0 && (
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="flex items-center text-lg font-semibold text-gray-700 dark:text-gray-200">
+                            <Clock className="w-5 h-5 mr-2 text-amber-500" />
+                            Recent Requests ({requests.length})
+                        </h3>
+                        <button
+                            onClick={handleClearAll}
+                            className="flex items-center text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                        >
+                            <Trash className="w-4 h-4 mr-1" />
+                            Clear All
+                        </button>
+                    </div>
+                    <div className="space-y-3">
+                        {requests.slice(0, 3).map((request) => (
+                            <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <div>
+                                    <p className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                                        <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+                                        {request.location}
+                                    </p>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center mt-1">
+                                        <Trash2 className="w-4 h-4 mr-2 text-amber-500" />
+                                        {request.type} • {new Date(request.timestamp).toLocaleString()}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => handleDeleteRequest(request.id)}
+                                    className="p-2 text-gray-500 hover:text-red-500 dark:hover:text-red-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    aria-label="Delete request"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 };
 
 export default RequestPickup;
