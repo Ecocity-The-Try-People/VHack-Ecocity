@@ -4,6 +4,7 @@ import { useNotificationContext } from "../context/NotificationContext";
 import { Card, CardContent } from "../components/Card";
 import { systemFeedbacks, userFeedbacks } from "../data";
 import { useToggle } from "../hooks/useToggle";
+import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import your video file
 
 function FeedbackModule({ userRole }) {
   const [feedbacks, setFeedbacks] = useState([...systemFeedbacks, ...userFeedbacks]);
@@ -44,11 +45,24 @@ function FeedbackModule({ userRole }) {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background Layer */}
-      <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" /> {/* Add `ml-20` to avoid covering the sidebar */}
+      {/* Video Background - positioned to avoid covering the sidebar */}
+      <div className="fixed inset-0 z-0 overflow-hidden ml-20"> {/* ml-20 matches sidebar width */}
+        <video
+          autoPlay
+          loop
+          muted
+          className="w-full h-full object-cover opacity-50"
+        >
+          <source src={SmartCityVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
-      {/* Content */}
-      <div className="p-4"> {/* Adjust `ml-20` to match the sidebar width */}
+      {/* Semi-transparent overlay to improve text readability */}
+      <div className="fixed inset-0 z-0 bg-[hsla(180,0%,10%,0.6)] ml-20" />
+
+      {/* Content - positioned to appear above the video */}
+      <div className="relative z-10 p-4 ml-3">
         <div className="mb-5">
           <Card className="bg-[hsla(180,0%,10%,0.8)] text-white">
             <CardContent>
