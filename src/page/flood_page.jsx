@@ -12,19 +12,19 @@ export default function Flood_page() {
             <Sidebar />
 
             {/* Main Content */}
-            <div className="ml-20 flex-grow p-6 pl-10 pr-10">
-                {/* Header Section */}
-                <div className="mb-6">
-                    {/* Centered h2 */}
-                    <div className="flex justify-center">
-                        <h2 className="text-5xl font-bold text-white-800 z-10">
-                            Weather Forecast
-                        </h2>
-                    </div>
-                </div>
+            <div className="ml-20 flex-grow p-6 pl-10 pr-10 z-10">
+                {/* Header */}
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+            Weather Forecast
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+          Real-time weather and flood risk updates for Malaysia
+          </p>
+        </header>
 
                 {/* Notification Button at Top Right */}
-                <div className="fixed top-5 right-5 z-10">
+                <div className="fixed top-5 right-5 z-10 cursor-pointer">
                     <Notification />
                 </div>
 
@@ -38,17 +38,17 @@ export default function Flood_page() {
                     <Map />
                 </div>
                 {/* Video Background for Features Section */}
-        <div className="fixed inset-0 z-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            className="w-full h-full object-cover opacity-50" // Adjust opacity here
-          >
-            <source src={FeaturesVideo} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
             </div>
+            <div className="fixed inset-0 z-0 overflow-hidden">
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    className="w-full h-full object-cover opacity-50" // Adjust opacity here
+                >
+                    <source src={FeaturesVideo} type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
             </div>
         </div>
     );
