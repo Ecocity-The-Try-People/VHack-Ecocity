@@ -250,6 +250,7 @@ export default function SmartCityHome() {
                 Track the location of waste collection vehicles in real-time using our interactive map. Know exactly when your recyclables will be picked up.
               </p>
               <button
+                onClick={smart_waste_page}
                 className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
               >
                 Track Now
@@ -268,6 +269,7 @@ export default function SmartCityHome() {
                 Request for recyclable garbage to be picked up at your location. Our vehicles are equipped to handle plastic, paper, and metal.
               </p>
               <button
+                onClick={smart_waste_page}
                 className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
               >
                 Request Now
@@ -286,6 +288,7 @@ export default function SmartCityHome() {
                 Our vehicles are equipped with high-tech cameras that can differentiate between types of recyclable garbage, ensuring efficient sorting and processing.
               </p>
               <button
+                onClick={smart_waste_page}
                 className="px-6 py-2 bg-transparent border-2 border-white text-white rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 cursor-pointer"
               >
                 Learn More
@@ -310,9 +313,9 @@ export default function SmartCityHome() {
         </section>
 
         {/* Emergency Alerts */}
-        <section id="emergency" className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20">
+        {/* <section id="emergency" className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> */}
           {/* Section Content */}
-          <motion.h2
+          {/* <motion.h2
             initial={{ opacity: 0, y: -50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
@@ -322,8 +325,8 @@ export default function SmartCityHome() {
           </motion.h2>
           <p className="text-lg mt-4 text-white relative z-10">
             Real-time alerts for disasters and emergency responses.
-          </p>
-        </section>
+          </p> */}
+        {/* </section> */}
 
         {/* Floating Climate Change Indicators */}
         <div className="fixed bottom-10 right-10 flex flex-col gap-4 z-20">

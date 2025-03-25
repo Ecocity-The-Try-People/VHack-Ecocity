@@ -1,49 +1,92 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./BusTracker.css"; // Import your existing CSS file
+import "./BusTracker.css";
 
-// Fix for default marker icons in Leaflet
-const DefaultIcon = L.icon({
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
-
-// GTFS-Realtime API endpoint
+// Constants
 const GTFS_API_URL = "https://api.data.gov.my/gtfs-realtime/vehicle-position/prasarana?category=rapid-bus-kl";
+const OSRM_ROUTE_API = "https://router.project-osrm.org/route/v1/driving";
+const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
 
-// Mock vehicle positions for fallback
-const mockVehiclePositions = [
-  { id: "1", name: "Bus 123", position: [3.212, 101.579], speed: 30 },
-  { id: "2", name: "Bus 456", position: [3.220, 101.585], speed: 25 },
-];
+// Default KL coordinates
+const DEFAULT_POSITION = [3.0556, 101.7110]; // Roughly between both areas
 
-// Example static GTFS data
+// Icons configuration
+const ICONS = {
+  default: L.icon({
+    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  }),
+  user: L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  }),
+  vehicle: L.icon({
+    iconUrl: "src/assets/png/front-of-bus.png",
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
+  }),
+  stop: L.icon({
+    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    iconSize: [20, 33],
+    iconAnchor: [12, 25],
+    popupAnchor: [0, -25],
+  }),
+  selectedStop: L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/128/2776/2776067.png",
+    iconSize: [30, 30],
+    iconAnchor: [15, 30],
+    popupAnchor: [0, -30],
+  }),
+};
+
+// Set default icon
+L.Marker.prototype.options.icon = ICONS.default;
+
+// Data
 const staticStops = [
-  { id: "1", name: "Sungai Buloh Station", type: "MRT", position: [3.212, 101.579] },
-  { id: "2", name: "Bukit Rahman Putra Bus Stop", type: "Bus", position: [3.220, 101.585] },
-  { id: "3", name: "Kampung Selamat LRT Station", type: "LRT", position: [3.225, 101.590] },
-  { id: "4", name: "Kwasa Damansara MRT Station", type: "MRT", position: [3.230, 101.595] },
+  // Bukit Jalil Area Stops
+  { id: "bj1", name: "Bukit Jalil LRT Station", type: "LRT", position: [3.0638, 101.6981] },
+  { id: "bj2", name: "National Sports Complex", type: "Bus", position: [3.0564, 101.6932] },
+  { id: "bj3", name: "Sri Petaling Station", type: "LRT", position: [3.0719, 101.6936] },
+  { id: "bj4", name: "Arena Mall Bus Stop", type: "Bus", position: [3.0592, 101.7038] },
+  
+  // Cheras Area Stops
+  { id: "ch1", name: "Cheras LRT Station", type: "LRT", position: [3.0481, 101.7275] },
+  { id: "ch2", name: "Taman Connaught Bus Stop", type: "Bus", position: [3.0679, 101.7324] },
+  { id: "ch3", name: "Taman Midah Station", type: "MRT", position: [3.0922, 101.7361] },
+  { id: "ch4", name: "Leisure Mall Bus Stop", type: "Bus", position: [3.0853, 101.7478] },
 ];
 
-// Mock data for stations
 const stations = [
-  { id: 1, name: "Sungai Buloh", position: [3.212, 101.579], scheduledArrival: "08:00" },
-  { id: 2, name: "Bukit Rahman Putra", position: [3.220, 101.585], scheduledArrival: "08:15" },
-  { id: 3, name: "Kampung Selamat", position: [3.225, 101.590], scheduledArrival: "08:30" },
-  { id: 4, name: "Kwasa Damansara", position: [3.230, 101.595], scheduledArrival: "08:45" },
+  // Bukit Jalil Stations
+  { id: "bj1", name: "Bukit Jalil LRT", position: [3.0638, 101.6981], scheduledArrival: "08:00" },
+  { id: "bj2", name: "Sri Petaling LRT", position: [3.0719, 101.6936], scheduledArrival: "08:15" },
+  
+  // Cheras Stations
+  { id: "ch1", name: "Cheras LRT", position: [3.0481, 101.7275], scheduledArrival: "08:30" },
+  { id: "ch2", name: "Taman Midah MRT", position: [3.0922, 101.7361], scheduledArrival: "08:45" },
 ];
 
-// Component to handle recentering the map
+// Utility functions
+const formatDuration = (seconds) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours > 0 ? `${hours} h ` : ''}${minutes} min`;
+};
+
 const RecenterButton = ({ position }) => {
   const map = useMap();
-  const handleRecenter = () => map.setView(position, map.getZoom());
+  const handleRecenter = useCallback(() => map.setView(position, map.getZoom()), [map, position]);
+  
   return (
     <button
       className="recenter-button bg-gray-800 text-white p-2 rounded-full shadow-lg hover:bg-gray-700 transition-colors"
@@ -55,7 +98,6 @@ const RecenterButton = ({ position }) => {
   );
 };
 
-// Bus Tracker Component
 const BusTracker = () => {
   const [busPosition, setBusPosition] = useState(stations[0].position);
   const [routePath, setRoutePath] = useState([]);
@@ -63,81 +105,62 @@ const BusTracker = () => {
   const [isMovingForward, setIsMovingForward] = useState(true);
   const animationRef = useRef(null);
 
-  useEffect(() => {
-    const fetchRoute = async () => {
-      const coordinates = stations.map((station) => station.position.reverse().join(",")).join(";");
-      const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`;
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data.routes && data.routes[0]) {
-          const path = data.routes[0].geometry.coordinates.map((coord) => [coord[1], coord[0]]);
-          setRoutePath(path);
-        }
-      } catch (error) {
-        console.error("Failed to fetch route:", error);
+  const fetchRoute = useCallback(async () => {
+    const coordinates = stations.map(s => s.position.reverse().join(",")).join(";");
+    try {
+      const response = await fetch(`${OSRM_ROUTE_API}/${coordinates}?overview=full&geometries=geojson`);
+      const data = await response.json();
+      if (data.routes?.[0]) {
+        setRoutePath(data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]));
       }
-    };
-
-    fetchRoute();
+    } catch (error) {
+      console.error("Route fetch error:", error);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchRoute();
+    return () => {
+      if (animationRef.current) clearInterval(animationRef.current);
+    };
+  }, [fetchRoute]);
 
   useEffect(() => {
     if (routePath.length === 0) return;
 
     const moveBus = () => {
-      setCurrentPathIndex((prevIndex) => {
-        let nextIndex;
-        if (isMovingForward) {
-          nextIndex = prevIndex + 1;
-          if (nextIndex >= routePath.length) {
-            setIsMovingForward(false);
-            return prevIndex;
-          }
-        } else {
-          nextIndex = prevIndex - 1;
-          if (nextIndex < 0) {
-            setIsMovingForward(true);
-            return prevIndex;
-          }
+      setCurrentPathIndex(prev => {
+        let next = isMovingForward ? prev + 1 : prev - 1;
+        
+        if (next >= routePath.length || next < 0) {
+          setIsMovingForward(!isMovingForward);
+          return prev;
         }
 
-        const isAtStation = stations.some(
-          (station) =>
-            station.position[0] === routePath[nextIndex][0] &&
-            station.position[1] === routePath[nextIndex][1]
+        const isAtStation = stations.some(s => 
+          s.position[0] === routePath[next][0] && 
+          s.position[1] === routePath[next][1]
         );
 
         if (isAtStation) {
           clearInterval(animationRef.current);
           setTimeout(() => {
             animationRef.current = setInterval(moveBus, 500);
-          }, Math.random() * 3000 + 2000);
+          }, 2000 + Math.random() * 3000);
         }
 
-        setBusPosition(routePath[nextIndex]);
-        return nextIndex;
+        setBusPosition(routePath[next]);
+        return next;
       });
     };
 
     animationRef.current = setInterval(moveBus, 500);
-
-    return () => {
-      if (animationRef.current) clearInterval(animationRef.current);
-    };
+    return () => clearInterval(animationRef.current);
   }, [routePath, isMovingForward]);
-
-  const busIcon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/128/3126/3126531.png",
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40],
-  });
 
   return (
     <>
-      <Marker position={busPosition} icon={busIcon}>
+      <Marker position={busPosition} icon={ICONS.vehicle}>
         <Popup>Bus is here!</Popup>
       </Marker>
       {routePath.length > 0 && (
@@ -147,22 +170,6 @@ const BusTracker = () => {
   );
 };
 
-// Utility function to convert seconds to hours and minutes
-const formatDuration = (seconds) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  let durationString = "";
-  if (hours > 0) {
-    durationString += `${hours} hour${hours > 1 ? "s" : ""} `;
-  }
-  if (minutes > 0) {
-    durationString += `${minutes} minute${minutes > 1 ? "s" : ""}`;
-  }
-  return durationString.trim() || "0 minutes";
-};
-
-// Vehicle Map Component
 const VehicleMap = () => {
   const [vehiclePositions, setVehiclePositions] = useState([]);
   const [destinationCoords, setDestinationCoords] = useState(null);
@@ -172,250 +179,282 @@ const VehicleMap = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [routePath, setRoutePath] = useState([]);
   const [routeDetails, setRouteDetails] = useState({ distance: null, duration: null });
-  const [eta, setEta] = useState(null);
+  const [selectedStop, setSelectedStop] = useState(null);
+  const mapRef = useRef();
 
-  // Custom icons
-  const userIcon = L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/128/684/684908.png",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-  });
-
-  const vehicleIcon = L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/128/3126/3126531.png",
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -40],
-  });
-
-  const stopIcon = L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/128/484/484167.png",
-    iconSize: [25, 25],
-    iconAnchor: [12, 25],
-    popupAnchor: [0, -25],
-  });
-
-  // Fetch GTFS-Realtime data
-  const fetchGTFSData = async () => {
+  const fetchGTFSData = useCallback(async () => {
     try {
       const response = await fetch(GTFS_API_URL);
-      if (!response.ok) throw new Error("Failed to fetch GTFS-Realtime data");
+      if (!response.ok) throw new Error("API request failed");
+      
       const data = await response.json();
-      console.log("API Response:", data);
-
-      if (!data.entity || data.entity.length === 0) {
-        throw new Error("No real-time data available");
-      }
-
       const positions = data.entity
-        .filter((entity) => entity.vehicle)
-        .map((entity) => ({
-          id: entity.id,
-          name: entity.vehicle.vehicle.label,
-          position: [entity.vehicle.position.latitude, entity.vehicle.position.longitude],
-          speed: entity.vehicle.position.speed || 30,
-        }));
+        ?.filter(e => e.vehicle)
+        .map(e => ({
+          id: e.id,
+          name: e.vehicle.vehicle.label,
+          position: [e.vehicle.position.latitude, e.vehicle.position.longitude],
+          speed: e.vehicle.position.speed || 30,
+        })) || [];
 
-      if (positions.length === 0) {
-        throw new Error("No vehicle positions found");
-      }
-
-      setVehiclePositions(positions);
+      setVehiclePositions(positions.length ? positions : [
+        { id: "1", name: "Bus 123", position: [3.212, 101.579], speed: 30 },
+        { id: "2", name: "Bus 456", position: [3.220, 101.585], speed: 25 },
+      ]);
     } catch (error) {
-      setVehiclePositions(mockVehiclePositions);
-    }
-  };
-
-  // Poll GTFS-Realtime API every 30 seconds
-  useEffect(() => {
-    fetchGTFSData();
-    const interval = setInterval(fetchGTFSData, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Get user's current location
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => setUserLocation([position.coords.latitude, position.coords.longitude]),
-        (error) => {
-          console.error("Error fetching user location:", error);
-          setError("Failed to fetch your location. Using default location.");
-          setUserLocation([3.212, 101.579]);
-        }
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-      setError("Geolocation is not supported. Using default location.");
-      setUserLocation([3.212, 101.579]);
+      console.error("GTFS fetch error:", error);
+      setError("Real-time data unavailable. Showing demo data.");
     }
   }, []);
 
-  // Geocode destination using Nominatim API
-  const geocodeDestination = async (query) => {
+  const geocodeDestination = useCallback(async (query) => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
-      );
-      if (!response.ok) throw new Error("Failed to geocode destination");
+      const response = await fetch(`${NOMINATIM_API}?format=json&q=${encodeURIComponent(query)}`);
       const data = await response.json();
-      if (data.length > 0) {
-        const { lat, lon } = data[0];
-        setDestinationCoords([parseFloat(lat), parseFloat(lon)]);
-      } else {
-        throw new Error("No results found");
+      if (data.length) {
+        return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
       }
+      throw new Error("No results found");
     } catch (error) {
-      console.error("Error geocoding destination:", error);
-      setError("Failed to find the destination. Please try again.");
+      console.error("Geocoding error:", error);
+      setError("Destination not found. Please try another location.");
+      return null;
     }
-  };
+  }, []);
 
-  // Fetch route from user location to destination
-  const fetchRoute = async () => {
-    if (!userLocation || !destinationCoords) return;
-    setIsLoading(true);
+  const fetchRoute = useCallback(async (start, end) => {
     try {
-      const coordinates = [userLocation, destinationCoords]
-        .map((pos) => [...pos].reverse().join(","))
-        .join(";");
-      const url = `https://router.project-osrm.org/route/v1/driving/${coordinates}?overview=full&geometries=geojson`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch route");
+      const coords = [start, end].map(pos => [...pos].reverse().join(",")).join(";");
+      const response = await fetch(`${OSRM_ROUTE_API}/${coords}?overview=full&geometries=geojson`);
       const data = await response.json();
-      if (data.routes && data.routes[0]) {
-        const path = data.routes[0].geometry.coordinates.map((coord) => [coord[1], coord[0]]);
-        setRoutePath(path);
-
-        // Store route details
+      
+      if (data.routes?.[0]) {
+        setRoutePath(data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]));
         setRouteDetails({
-          distance: (data.routes[0].distance / 1000).toFixed(2), // Distance in km
-          duration: data.routes[0].duration, // Duration in seconds
+          distance: (data.routes[0].distance / 1000).toFixed(2),
+          duration: data.routes[0].duration,
         });
-
-        // Calculate ETA
-        const now = new Date();
-        const etaTime = new Date(now.getTime() + data.routes[0].duration * 1000);
-        setEta(etaTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }));
+        setError(null);
       } else {
         throw new Error("No route found");
       }
     } catch (error) {
-      console.error("Failed to fetch route:", error);
-      setError("Failed to fetch the route. Please try again.");
-    } finally {
-      setIsLoading(false);
+      console.error("Routing error:", error);
+      setError("Could not calculate route. Please try again.");
     }
-  };
+  }, []);
 
-  // Handle destination search
-  const handleDestinationSearch = async () => {
-    if (!destinationQuery) {
-      setError("Please enter a destination.");
+  const handleDestinationSearch = useCallback(async () => {
+    if (!destinationQuery.trim()) {
+      setError("Please enter a destination");
       return;
     }
+
     setIsLoading(true);
+    setError(null);
+    
     try {
-      await geocodeDestination(destinationQuery);
+      const coords = await geocodeDestination(destinationQuery);
+      if (coords) {
+        setDestinationCoords(coords);
+        await fetchRoute(userLocation || DEFAULT_POSITION, coords);
+      } else {
+        setError("Destination not found. Please try another location.");
+      }
     } catch (error) {
-      console.error("Error handling destination search:", error);
-      setError("Failed to find the destination. Please try again.");
+      console.error("Search error:", error);
+      setError("Failed to find destination. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [destinationQuery, userLocation, geocodeDestination, fetchRoute]);
 
-  // Fetch route when destination coordinates change
-  useEffect(() => {
-    if (destinationCoords) {
-      fetchRoute();
+  const handleStopClick = useCallback((stop) => {
+    setSelectedStop(stop);
+    if (mapRef.current) {
+      // Smoothly fly to the selected stop
+      mapRef.current.flyTo(stop.position, 16, {
+        duration: 0.75,
+        easeLinearity: 0.25
+      });
+
+      // Open the popup after the animation completes
+      setTimeout(() => {
+        const markerLayer = mapRef.current._layers[stop.id];
+        if (markerLayer && markerLayer.openPopup) {
+          markerLayer.openPopup();
+        }
+      }, 750);
     }
-  }, [destinationCoords]);
+  }, []);
+
+  // Effects
+  useEffect(() => {
+    fetchGTFSData();
+    const interval = setInterval(fetchGTFSData, 30000);
+    return () => clearInterval(interval);
+  }, [fetchGTFSData]);
+
+  // Update the geolocation effect to use the new default position
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => setUserLocation([pos.coords.latitude, pos.coords.longitude]),
+        () => {
+          setError("Location access denied. Using default location.");
+          setUserLocation(DEFAULT_POSITION);
+        }
+      );
+    } else {
+      setError("Geolocation not supported. Using default location.");
+      setUserLocation(DEFAULT_POSITION);
+    }
+  }, []);
+
+  const eta = useMemo(() => {
+    if (!routeDetails.duration) return null;
+    const now = new Date();
+    return new Date(now.getTime() + routeDetails.duration * 1000)
+      .toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  }, [routeDetails.duration]);
 
   return (
-    <div className="flex justify-center items-center">
-      {/* Main Container */}
-      <div className="flex bg-gray-800 rounded-lg shadow-lg overflow-hidden" style={{ width: "90%", maxWidth: "1200px", height: "600px" }}>
+    <div className="flex justify-center items-center p-4">
+      <div className="flex bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full max-w-6xl h-[650px]">
         {/* Sidebar */}
         <div className="w-96 bg-gray-800 p-6 overflow-y-auto">
           <h2 className="text-2xl font-bold mb-6 text-white">Route Planner</h2>
+          
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-300 mb-2">Destination:</label>
-            <input
-              type="text"
-              placeholder="Enter destination"
-              value={destinationQuery}
-              onChange={(e) => setDestinationQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleDestinationSearch()}
-              className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-            />
-            <button
-              onClick={handleDestinationSearch}
-              disabled={isLoading}
-              className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
-            >
-              {isLoading ? "Searching..." : "Search"}
-            </button>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={destinationQuery}
+                onChange={(e) => {
+                  setDestinationQuery(e.target.value);
+                  setError(null);
+                }}
+                onKeyDown={(e) => e.key === "Enter" && handleDestinationSearch()}
+                placeholder="Enter destination"
+                className="flex-grow px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+              />
+              <button
+                onClick={handleDestinationSearch}
+                disabled={isLoading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+              >
+                {isLoading ? "..." : "Go"}
+              </button>
+            </div>
           </div>
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          {destinationCoords && (
-            <div className="bg-gray-700 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold mb-2 text-white">Route to Destination</h3>
-              <p className="text-gray-300 mb-4">From Your Location to {destinationQuery}</p>
-              {routeDetails.distance && <p className="text-gray-300">Distance: {routeDetails.distance} km</p>}
-              {routeDetails.duration && (
-                <p className="text-gray-300">Estimated Duration: {formatDuration(routeDetails.duration)}</p>
-              )}
-              {eta && <p className="text-gray-300">ETA: {eta}</p>}
+
+          {error && (
+            <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+              {error}
             </div>
           )}
+
+          {destinationCoords && (
+            <div className="bg-gray-700 p-4 rounded-lg mb-6">
+              <h3 className="text-lg font-semibold mb-2 text-white">Route Details</h3>
+              <div className="space-y-2 text-gray-300">
+                <p>From: Your Location</p>
+                <p>To: {destinationQuery}</p>
+                {routeDetails.distance && <p>Distance: {routeDetails.distance} km</p>}
+                {routeDetails.duration && <p>Duration: {formatDuration(routeDetails.duration)}</p>}
+                {eta && <p>ETA: {eta}</p>}
+              </div>
+            </div>
+          )}
+
+          <div className="bg-gray-700 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2 text-white">Nearby Stops</h3>
+            <ul className="space-y-2">
+              {staticStops.map(stop => (
+                <li 
+                  key={stop.id} 
+                  className={`text-gray-300 hover:text-white cursor-pointer p-2 rounded ${
+                    selectedStop?.id === stop.id ? 'bg-blue-600 text-white' : 'hover:bg-gray-600'
+                  }`}
+                  onClick={() => handleStopClick(stop)}
+                >
+                  {stop.name} ({stop.type})
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* Map Container */}
+        {/* Map */}
         <div className="flex-grow relative">
-          <div className="h-full w-full rounded-r-lg overflow-hidden">
-            {userLocation && (
-              <MapContainer center={userLocation} zoom={14} className="h-full w-full">
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                <Marker position={userLocation} icon={userIcon}>
-                  <Popup>Your Location</Popup>
+          {userLocation && (
+            <MapContainer 
+              center={userLocation} 
+              zoom={14} 
+              className="h-full w-full"
+              whenCreated={(map) => { 
+                mapRef.current = map;
+                // Store references to markers
+                mapRef.current._layers = {};
+                map.on('layeradd', (e) => {
+                  if (e.layer instanceof L.Marker && e.layer.options.stopId) {
+                    mapRef.current._layers[e.layer.options.stopId] = e.layer;
+                  }
+                });
+              }}
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              
+              <Marker position={userLocation} icon={ICONS.user}>
+                <Popup>Your Location</Popup>
+              </Marker>
+
+              {vehiclePositions.map(vehicle => (
+                <Marker key={vehicle.id} position={vehicle.position} icon={ICONS.vehicle}>
+                  <Popup>{vehicle.name}</Popup>
                 </Marker>
-                {vehiclePositions.map((vehicle) => (
-                  <Marker key={vehicle.id} position={vehicle.position} icon={vehicleIcon}>
-                    <Popup>{vehicle.name}</Popup>
-                  </Marker>
-                ))}
-                {staticStops.map((stop) => (
-                  <Marker key={stop.id} position={stop.position} icon={stopIcon}>
-                    <Popup>
-                      {stop.name} ({stop.type})
-                    </Popup>
-                  </Marker>
-                ))}
-                {stations.map((station) => (
-                  <Marker key={station.id} position={station.position} icon={stopIcon}>
-                    <Popup>
-                      {station.name} <br /> Arrival: {station.scheduledArrival}
-                    </Popup>
-                  </Marker>
-                ))}
-                {destinationCoords && (
-                  <Marker position={destinationCoords}>
-                    <Popup>Destination: {destinationQuery}</Popup>
-                  </Marker>
-                )}
-                {routePath.length > 0 && (
-                  <Polyline positions={routePath} color="cyan" weight={4} opacity={0.8} />
-                )}
-                <BusTracker />
-                <RecenterButton position={userLocation} />
-              </MapContainer>
-            )}
-          </div>
+              ))}
+
+              {[...staticStops, ...stations].map(stop => (
+                <Marker 
+                  key={stop.id}
+                  position={stop.position}
+                  icon={selectedStop?.id === stop.id ? ICONS.selectedStop : ICONS.stop}
+                  stopId={stop.id}
+                  eventHandlers={{
+                    click: () => handleStopClick(stop)
+                  }}
+                >
+                  <Popup>
+                    <div className="font-bold">{stop.name}</div>
+                    <div>{stop.type}</div>
+                    {stop.scheduledArrival && <div>Next arrival: {stop.scheduledArrival}</div>}
+                  </Popup>
+                </Marker>
+              ))}
+
+              {destinationCoords && (
+                <Marker position={destinationCoords}>
+                  <Popup>Destination: {destinationQuery}</Popup>
+                </Marker>
+              )}
+
+              {routePath.length > 0 && (
+                <Polyline 
+                positions={routePath} 
+                color="blue" 
+                weight={4} 
+                opacity={0.8} />
+              )}
+
+              <BusTracker />
+              <RecenterButton position={userLocation} />
+            </MapContainer>
+          )}
         </div>
       </div>
     </div>

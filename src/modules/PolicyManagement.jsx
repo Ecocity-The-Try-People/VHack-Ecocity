@@ -7,6 +7,7 @@ import { useNotificationContext } from "../context/NotificationContext";
 import { proposalsData } from "../data";
 import { ProposalCard } from "../components/ProposalCard";
 import { PopUpDialog } from "../components/PopUpDialog";
+import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import your video file
 
 export default function PolicyManagement({ userRole }) {
   const [proposals, setProposals] = useState(proposalsData);
@@ -62,11 +63,24 @@ export default function PolicyManagement({ userRole }) {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background Layer */}
-      <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" /> {/* Add `ml-20` to avoid covering the sidebar */}
+      {/* Video Background - positioned to avoid covering the sidebar */}
+      <div className="fixed inset-0 z-0 overflow-hidden ml-20"> {/* ml-20 matches sidebar width */}
+        <video
+          autoPlay
+          loop
+          muted
+          className="w-full h-full object-cover opacity-50"
+        >
+          <source src={SmartCityVideo} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
-      {/* Content */}
-      <div className="p-4"> {/* Adjust `ml-20` to match the sidebar width */}
+      {/* Semi-transparent overlay to improve text readability */}
+      <div className="fixed inset-0 z-0 bg-[hsla(180,0%,10%,0.6)] ml-20" />
+
+      {/* Content - positioned to appear above the video */}
+      <div className="relative z-10 p-4 ml-3">
         <div className="mb-5">
           <Card className="bg-[hsla(180,0%,10%,0.8)] text-white">
             <CardContent>
@@ -76,6 +90,7 @@ export default function PolicyManagement({ userRole }) {
           </Card>
         </div>
 
+        {/* ... (rest of your existing content remains unchanged) */}
         <div className="flex justify-end mb-4">
           <Button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition" onClick={openDialog}>
             Add Proposal
