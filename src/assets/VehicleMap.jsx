@@ -10,9 +10,9 @@ const OSRM_ROUTE_API = "https://router.project-osrm.org/route/v1/driving";
 const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
 
 // Default KL coordinates
-const DEFAULT_POSITION = [3.0556, 101.7110]; // Roughly between both areas
+const DEFAULT_POSITION = [3.0556, 101.7110];
 
-// Icons configuration
+// Icons configuration with orange stop markers
 const ICONS = {
   default: L.icon({
     iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -34,17 +34,29 @@ const ICONS = {
     iconAnchor: [20, 40],
     popupAnchor: [0, -40],
   }),
-  stop: L.icon({
-    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-    iconSize: [20, 33],
-    iconAnchor: [12, 25],
-    popupAnchor: [0, -25],
+  stop: L.divIcon({
+    className: "custom-marker orange-marker",
+    html: `
+      <div style="position: relative;">
+        <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#252422" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [28, 28],
+    iconAnchor: [14, 28],
   }),
-  selectedStop: L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/128/2776/2776067.png",
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30],
+  selectedStop: L.divIcon({
+    className: "custom-marker orange-marker selected",
+    html: `
+      <div style="position: relative;">
+        <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#FF6D00" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+        </svg>
+      </div>
+    `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
   }),
 };
 
@@ -53,13 +65,10 @@ L.Marker.prototype.options.icon = ICONS.default;
 
 // Data
 const staticStops = [
-  // Bukit Jalil Area Stops
   { id: "bj1", name: "Bukit Jalil LRT Station", type: "LRT", position: [3.0638, 101.6981] },
   { id: "bj2", name: "National Sports Complex", type: "Bus", position: [3.0564, 101.6932] },
   { id: "bj3", name: "Sri Petaling Station", type: "LRT", position: [3.0719, 101.6936] },
   { id: "bj4", name: "Arena Mall Bus Stop", type: "Bus", position: [3.0592, 101.7038] },
-  
-  // Cheras Area Stops
   { id: "ch1", name: "Cheras LRT Station", type: "LRT", position: [3.0481, 101.7275] },
   { id: "ch2", name: "Taman Connaught Bus Stop", type: "Bus", position: [3.0679, 101.7324] },
   { id: "ch3", name: "Taman Midah Station", type: "MRT", position: [3.0922, 101.7361] },
@@ -67,11 +76,8 @@ const staticStops = [
 ];
 
 const stations = [
-  // Bukit Jalil Stations
   { id: "bj1", name: "Bukit Jalil LRT", position: [3.0638, 101.6981], scheduledArrival: "08:00" },
   { id: "bj2", name: "Sri Petaling LRT", position: [3.0719, 101.6936], scheduledArrival: "08:15" },
-  
-  // Cheras Stations
   { id: "ch1", name: "Cheras LRT", position: [3.0481, 101.7275], scheduledArrival: "08:30" },
   { id: "ch2", name: "Taman Midah MRT", position: [3.0922, 101.7361], scheduledArrival: "08:45" },
 ];
@@ -272,13 +278,11 @@ const VehicleMap = () => {
   const handleStopClick = useCallback((stop) => {
     setSelectedStop(stop);
     if (mapRef.current) {
-      // Smoothly fly to the selected stop
       mapRef.current.flyTo(stop.position, 16, {
         duration: 0.75,
         easeLinearity: 0.25
       });
 
-      // Open the popup after the animation completes
       setTimeout(() => {
         const markerLayer = mapRef.current._layers[stop.id];
         if (markerLayer && markerLayer.openPopup) {
@@ -288,14 +292,12 @@ const VehicleMap = () => {
     }
   }, []);
 
-  // Effects
   useEffect(() => {
     fetchGTFSData();
     const interval = setInterval(fetchGTFSData, 30000);
     return () => clearInterval(interval);
   }, [fetchGTFSData]);
 
-  // Update the geolocation effect to use the new default position
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -395,7 +397,6 @@ const VehicleMap = () => {
               className="h-full w-full"
               whenCreated={(map) => { 
                 mapRef.current = map;
-                // Store references to markers
                 mapRef.current._layers = {};
                 map.on('layeradd', (e) => {
                   if (e.layer instanceof L.Marker && e.layer.options.stopId) {
@@ -426,13 +427,20 @@ const VehicleMap = () => {
                   icon={selectedStop?.id === stop.id ? ICONS.selectedStop : ICONS.stop}
                   stopId={stop.id}
                   eventHandlers={{
-                    click: () => handleStopClick(stop)
+                    click: () => handleStopClick(stop),
+                    mouseover: (e) => e.target.openPopup(),
+                    mouseout: (e) => e.target.closePopup()
                   }}
                 >
-                  <Popup>
-                    <div className="font-bold">{stop.name}</div>
-                    <div>{stop.type}</div>
-                    {stop.scheduledArrival && <div>Next arrival: {stop.scheduledArrival}</div>}
+                  <Popup className="custom-popup">
+                    <div className="font-bold text-orange-800">{stop.name}</div>
+                    <div className="text-sm text-gray-600">{stop.type}</div>
+                    {stop.scheduledArrival && (
+                      <div className="mt-1 text-xs text-orange-600">
+                        <i className="fas fa-clock mr-1"></i>
+                        Next arrival: {stop.scheduledArrival}
+                      </div>
+                    )}
                   </Popup>
                 </Marker>
               ))}
@@ -445,10 +453,11 @@ const VehicleMap = () => {
 
               {routePath.length > 0 && (
                 <Polyline 
-                positions={routePath} 
-                color="blue" 
-                weight={4} 
-                opacity={0.8} />
+                  positions={routePath} 
+                  color="blue" 
+                  weight={4} 
+                  opacity={0.8} 
+                />
               )}
 
               <BusTracker />
