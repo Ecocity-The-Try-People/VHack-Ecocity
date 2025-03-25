@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import ProfileModule from "@/modules/ProfileModule";
 import PolicyManagement from "@/modules/PolicyManagement";
 import FeedbackModule from "@/modules/FeedbackModule";
-import HomePage from "@/modules/HomePage";
+import HomePage from "@/modules/admin_homePage";
 import NavButton from "@/components/NavButton";
 import { Sun, Moon } from "lucide-react";
 

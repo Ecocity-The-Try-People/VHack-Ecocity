@@ -8,7 +8,7 @@ const GTFS_API_URL = "https://api.data.gov.my/gtfs-realtime/vehicle-position/pra
 const OSRM_ROUTE_API = "https://router.project-osrm.org/route/v1/driving";
 const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
 
-// Default KL coordinates
+//KL coordinates
 const DEFAULT_POSITION = [3.0556, 101.7110];
 
 const ICONS = {

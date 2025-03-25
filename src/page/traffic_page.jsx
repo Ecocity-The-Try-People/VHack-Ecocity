@@ -1,9 +1,8 @@
 import React from "react";
 import useDarkMode from "../hooks/DarkMode.jsx";
-import VehicleMap from "../assets/VehicleMap.jsx";
-import Sidebar from "../assets/components/Sidebar.jsx";
+import VehicleMap from "../components/VehicleMap.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 import TransportationVideo from "../assets/videos/transportation.mp4";
-import Notification from "../assets/flood_page/notification";
 
 export default function TrafficPage() {
   const isDarkMode = useDarkMode();

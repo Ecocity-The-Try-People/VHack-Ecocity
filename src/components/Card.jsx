@@ -24,7 +24,7 @@ export function StatCard({ icon, title, value }) {
   const isDarkMode = useDarkMode();
 
   return (
-    <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} flex flex-col items-center p-4 min-h-[80px] text-center shadow-md rounded-lg w-full break-words transition-colors duration-200`}>
+    <div className={`${isDarkMode ? "bg-gray-800" : "bg-white"} flex flex-col items-start p-4 min-h-[80px] text-center shadow-md rounded-lg w-full break-words transition-colors duration-200`}>
       <div className="text-blue-500" >{icon}</div>
       <h4 className={`${isDarkMode ? "text-gray-200" : "text-gray-800"} text-lg font-semibold mt-2 break-words transition-colors duration-200`}>{title}</h4>
       <p className={`${isDarkMode ? "text-gray-200" : "text-gray-800"} text-xl font-bold transition-colors duration-200`}>{value}</p>

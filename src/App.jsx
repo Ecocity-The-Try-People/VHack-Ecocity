@@ -9,16 +9,10 @@ import Traffic_page from './page/traffic_page';
 import Smart_waste_management_page from './page/smart_waste_management_page';
 import PublicAdminModule from '@/page/PublicAdmin'
 
-
-// Force dark modeimport { useEffect } from 'react';
-// Import all your page components here
-
 function App() {
   useEffect(() => {
-    // Force dark mode on initial load
     document.documentElement.classList.add('dark')
     
-    // Debugging
     console.log('Dark mode enabled:', 
       document.documentElement.classList.contains('dark'))
   }, [])

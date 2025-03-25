@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import useWeatherAlert from "../alert_function";
+import useWeatherAlert from "./alert_function";
 import Toggle_button from "../toggle_button";
 const weather_api = import.meta.env.VITE_API_KEY;
 

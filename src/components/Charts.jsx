@@ -18,23 +18,6 @@ export function LineChart({ data }) {
   );
 }
 
-
-// export function LineChart({ data }) {
-//   return (
-//     <div className="w-full h-64 md:h-80 mt-10">
-//       <ResponsiveContainer width="80%" height="80%">
-//         <ReLineChart data={data.map((val, index) => ({ x: index, y: val }))}>
-//           <XAxis dataKey="x" />
-//           <YAxis />
-//           <CartesianGrid stroke="#ccc" />
-//           <Tooltip />
-//           <Line type="monotone" dataKey="y" stroke="#8884d8" />
-//         </ReLineChart>
-//       </ResponsiveContainer>
-//     </div>
-//   );
-// }
-
 // Bar Chart Component
 export function BarChart({ data }) {
   return (

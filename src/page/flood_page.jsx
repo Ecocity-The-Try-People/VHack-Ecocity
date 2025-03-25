@@ -1,7 +1,7 @@
-import Weather_box from '../assets/flood_page/weather_box';
-import Notification from '../assets/flood_page/notification';
-import Map from '../assets/flood_page/map';
-import Sidebar from '../assets/components/Sidebar';
+import Weather_box from '../components/weatherPage/weather_box';
+import Notification from '../components/weatherPage/notification';
+import Map from '../components/weatherPage/map';
+import Sidebar from '../components/Sidebar';
 import React from 'react';
 import FeaturesVideo from "../assets/videos/weather.mp4";
 import { useEffect, useState } from "react";
@@ -48,12 +48,10 @@ export default function Flood_page() {
           </p>
         </header>
 
-                {/* Notification Button at Top Right */}
                 <div className="fixed top-5 right-5 z-10 cursor-pointer">
                     <Notification />
                 </div>
 
-                {/* Weather Box */}
                 <div className={`${isDarkMode ? "bg-gray-900" : "bg-white"} rounded-lg shadow-md p-6 mb-8 hover:shadow-lg transition-shadow duration-300`}>
                     <Weather_box />
                 </div>
@@ -62,14 +60,13 @@ export default function Flood_page() {
                 <div className={`${isDarkMode ? "bg-gray-700" : "bg-white"} dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300`}>
                     <Map />
                 </div>
-                {/* Video Background for Features Section */}
             </div>
             <div className="fixed inset-0 z-0 overflow-hidden">
                 <video
                     autoPlay
                     loop
                     muted
-                    className="w-full h-full object-cover opacity-50" // Adjust opacity here
+                    className="w-full h-full object-cover opacity-50"
                 >
                     <source src={FeaturesVideo} type="video/mp4" />
                     Your browser does not support the video tag.

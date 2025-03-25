@@ -1,9 +1,9 @@
 import React from "react";
 import 
 useDarkMode  from "../hooks/DarkMode.jsx";
-import MapView from "../assets/components/MapView.jsx";
-import RequestPickup from "../assets/components/RequestPickup.jsx";
-import Sidebar from "../assets/components/Sidebar.jsx";
+import MapView from "../components/smart_waste_management/MapView.jsx";
+import RequestPickup from "../components/smart_waste_management/RequestPickup.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 import EnergyVideo from "../assets/videos/energy.mp4";
 
 export default function SmartWasteManagementPage() {
@@ -11,7 +11,6 @@ export default function SmartWasteManagementPage() {
 
     return (
         <div className={`flex min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-            {/* Sidebar */}
             <Sidebar />
 
             <div className="ml-20 flex-grow p-6 pl-10 pr-10 relative">
@@ -38,7 +37,6 @@ export default function SmartWasteManagementPage() {
                         </p>
                     </div>
 
-                    {/* MapView Card */}
                     <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                         <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                             Waste Collection Map
@@ -47,7 +45,6 @@ export default function SmartWasteManagementPage() {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* RequestPickup Card */}
                         <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Request Collection
@@ -55,7 +52,6 @@ export default function SmartWasteManagementPage() {
                             <RequestPickup />
                         </div>
 
-                        {/* Stats Card */}
                         <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Waste Collection Stats

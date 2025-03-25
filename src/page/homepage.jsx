@@ -5,10 +5,10 @@ import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import the firs
 import FeaturesVideo from "../assets/videos/weather.mp4"; // Import the second video file
 import TransportationVideo from "../assets/videos/transportation.mp4"; // Import the third video file
 import EnergyVideo from "../assets/videos/energy.mp4"; // Import the fourth video file
-import Weather_detail from "../assets/flood_page/weather_detail.jsx";
+import Weather_detail from "../components/weatherPage/weather_detail.jsx";
 import { useNavigate } from "react-router-dom";
-import TrafficIntro from "./homepage_section/TrafficIntro.jsx";
-import Sidebar from "../assets/components/Sidebar.jsx";
+import TrafficIntro from "../components/TrafficIntro.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 import ProfileModule from '@/modules/ProfileModule.jsx';
 import FeedbackModule from "../modules/FeedbackModule.jsx";
 import PolicyManagement from "../modules/PolicyManagement.jsx";
@@ -29,16 +29,15 @@ export default function SmartCityHome() {
   }, [location.hash]);
 
   const traffic_page = () => {
-    navigate("/traffic"); // Redirect to the TrafficPage
+    navigate("/traffic");
   };
   const weather_page = () => {
-    navigate("/flood_page"); // Redirect to the FloodPage
+    navigate("/flood_page");
   };
   const smart_waste_page = () => {
-    navigate("/smart_waste_management_page"); // Redirect to the SmartWastePage
+    navigate("/smart_waste_management_page");
   };
 
-  // Function to scroll to a specific section
   const scrollToSection = (id) => {
     const section = document.getElementById(id);
     if (section) {
@@ -48,7 +47,6 @@ export default function SmartCityHome() {
 
   return (
     <div className={`h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative`}>
-      {/* Sidebar */}
       <Sidebar />
       <div className={`h-6 ${visibleSection === "profile" ? "block" : "hidden"}`}>
         <ProfileModule userRole={UserRole} />
@@ -64,20 +62,18 @@ export default function SmartCityHome() {
         </div>
       </div>
       <div className={`${visibleSection === "home" ? "block" : "hidden"}`}>
-        {/* Video Background for Hero Section */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <video
             autoPlay
             loop
             muted
-            className="w-full h-full object-cover opacity-50" // Adjust opacity here
+            className="w-full h-full object-cover opacity-50"
           >
             <source src={SmartCityVideo} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         </div>
 
-        {/* Hero Section */}
         <section id="home" className={`snap-start flex items-center justify-center h-screen relative z-10 ml-20`}>
           <motion.div
             initial={{ opacity: 0, y: -50 }}
@@ -94,22 +90,19 @@ export default function SmartCityHome() {
           </motion.div>
         </section>
 
-        {/* Features Section */}
         <section id="features" className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20">
-          {/* Video Background for Features Section */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
               autoPlay
               loop
               muted
-              className="w-full h-full object-cover opacity-50" // Adjust opacity here
+              className="w-full h-full object-cover opacity-50"
             >
               <source src={FeaturesVideo} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
 
-          {/* Section Heading */}
           <motion.h2
             initial={{ opacity: 0, y: -50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -119,9 +112,7 @@ export default function SmartCityHome() {
             Smart City Features
           </motion.h2>
 
-          {/* Cards Grid */}
           <div className="w-full max-w-6xl mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 px-4 relative z-10">
-            {/* Weather Card - Kuala Lumpur */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="p-8 bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-white/10"
@@ -132,7 +123,6 @@ export default function SmartCityHome() {
               </div>
             </motion.div>
 
-            {/* Weather Card - Cheras */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="p-8 bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-white/10"
@@ -143,7 +133,6 @@ export default function SmartCityHome() {
               </div>
             </motion.div>
 
-            {/* Weather Card - SS2 */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="p-8 bg-white/20 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-white/10"
@@ -155,7 +144,6 @@ export default function SmartCityHome() {
             </motion.div>
           </div>
 
-          {/* Explore Features Button */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -171,14 +159,11 @@ export default function SmartCityHome() {
           </motion.div>
         </section>
 
-        {/* Smart Transportation */}
         <section id="transportation" className="snap-start flex flex-col items-center justify-center h-screen relative z-10">
-          {/* Content Container */}
           <div className="w-full max-w-6xl mx-auto p-5 z-10">
             <h1 className="text-4xl font-bold text-center mb-5">Welcome to Our Transportation Hub</h1>
             <TrafficIntro />
 
-            {/* Explore Features Button */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -194,13 +179,12 @@ export default function SmartCityHome() {
             </motion.div>
           </div>
 
-          {/* Video Background */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
               autoPlay
               loop
               muted
-              className="w-full h-full object-cover opacity-50" // Adjust opacity here
+              className="w-full h-full object-cover opacity-50"
             >
               <source src={TransportationVideo} type="video/mp4" />
               Your browser does not support the video tag.
@@ -208,22 +192,19 @@ export default function SmartCityHome() {
           </div>
         </section>
 
-        {/* Renewable Energy */}
         <section id="waste-collection" className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20">
-          {/* Video Background for Waste Collection Section */}
           <div className="absolute inset-0 z-0 overflow-hidden">
             <video
               autoPlay
               loop
               muted
-              className="w-full h-full object-cover opacity-50" // Adjust opacity here
+              className="w-full h-full object-cover opacity-50"
             >
               <source src={EnergyVideo} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
 
-          {/* Section Content */}
           <motion.h2
             initial={{ opacity: 0, y: -50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -236,9 +217,7 @@ export default function SmartCityHome() {
             Deploy autonomous or semi-autonomous garbage trucks equipped with robotic arms for efficient collection.
           </p>
 
-          {/* Widgets Grid */}
           <div className="w-full max-w-6xl mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 px-4 relative z-10">
-            {/* Widget 1: Real-Time Tracking */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -257,7 +236,6 @@ export default function SmartCityHome() {
               </button>
             </motion.div>
 
-            {/* Widget 2: Request Pickup */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -276,7 +254,6 @@ export default function SmartCityHome() {
               </button>
             </motion.div>
 
-            {/* Widget 3: Advanced Recycling */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -296,7 +273,6 @@ export default function SmartCityHome() {
             </motion.div>
           </div>
 
-          {/* Explore Features Button */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -312,29 +288,11 @@ export default function SmartCityHome() {
           </motion.div>
         </section>
 
-        {/* Emergency Alerts */}
-        {/* <section id="emergency" className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> */}
-        {/* Section Content */}
-        {/* <motion.h2
-            initial={{ opacity: 0, y: -50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            className="text-3xl font-semibold text-white relative z-10"
-          >
-            Emergency Alerts
-          </motion.h2>
-          <p className="text-lg mt-4 text-white relative z-10">
-            Real-time alerts for disasters and emergency responses.
-          </p> */}
-        {/* </section> */}
-
-        {/* Floating Climate Change Indicators */}
         <div className="fixed bottom-10 right-10 flex flex-col gap-4 z-20">
-          {/* Home Button */}
           <motion.div
             whileHover={{ scale: 1.1 }}
             className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-            style={{ backgroundColor: "#205781" }} // Updated background color
+            style={{ backgroundColor: "#205781" }}
             onClick={() => scrollToSection("home")}
           >
             <span role="img" aria-label="home" className="text-2xl">
@@ -345,11 +303,10 @@ export default function SmartCityHome() {
             </div>
           </motion.div>
 
-          {/* Weather Button */}
           <motion.div
             whileHover={{ scale: 1.1 }}
             className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-            style={{ backgroundColor: "#4F959D" }} // Updated background color
+            style={{ backgroundColor: "#4F959D" }}
             onClick={() => scrollToSection("features")}
           >
             <span role="img" aria-label="weather" className="text-2xl">
@@ -360,11 +317,10 @@ export default function SmartCityHome() {
             </div>
           </motion.div>
 
-          {/* Transport Button */}
           <motion.div
             whileHover={{ scale: 1.1 }}
             className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-            style={{ backgroundColor: "#98D2C0" }} // Updated background color
+            style={{ backgroundColor: "#98D2C0" }}
             onClick={() => scrollToSection("transportation")}
           >
             <span role="img" aria-label="transport" className="text-2xl">
@@ -375,11 +331,10 @@ export default function SmartCityHome() {
             </div>
           </motion.div>
 
-          {/* Waste Collection Button */}
           <motion.div
             whileHover={{ scale: 1.1 }}
             className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-            style={{ backgroundColor: "#F6F8D5" }} // Updated background color
+            style={{ backgroundColor: "#F6F8D5" }}
             onClick={() => scrollToSection("waste-collection")}
           >
             <span role="img" aria-label="waste collection" className="text-2xl">
