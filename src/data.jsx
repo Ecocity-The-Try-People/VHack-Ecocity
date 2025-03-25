@@ -33,12 +33,31 @@ export const statsData = [
     { category: "Resolved Cases", value: calcResolvedCase(systemFeedbacks, userFeedbacks) },
 ];
 
-
 export const chartData = {
-    traffic: [10, 20, 30, 25, 35, 50, 60],
-    waste: [75, 80, 78, 85, 90],
-    flood: [30, 40, 20, 10],
+    traffic: [
+        { zone: "Kuala Lumpur", value: 50, timestamp: "2024-03-01 08:30 AM" },
+        { zone: "Petaling Jaya", value: 30, timestamp: "2024-03-02 09:15 AM" },
+        { zone: "Shah Alam", value: 20, timestamp: "2024-03-03 07:45 AM" },
+        { zone: "Penang", value: 45, timestamp: "2024-03-04 10:00 AM" },
+        { zone: "Johor Bahru", value: 35, timestamp: "2024-03-05 11:30 AM" },
+        { zone: "Ipoh", value: 40, timestamp: "2024-03-06 06:50 AM" },
+        { zone: "Kota Kinabalu", value: 55, timestamp: "2024-03-07 12:10 PM" },
+    ],
+    waste: [
+        { area: "KL City Centre", value: 85, timestamp: "2024-03-01 06:00 AM" },
+        { area: "Ampang", value: 78, timestamp: "2024-03-02 07:10 AM" },
+        { area: "Cheras", value: 80, timestamp: "2024-03-03 05:30 AM" },
+        { area: "Subang Jaya", value: 90, timestamp: "2024-03-04 08:15 AM" },
+        { area: "Cyberjaya", value: 88, timestamp: "2024-03-05 09:45 AM" },
+    ],
+    flood: [
+        { region: "Klang Valley", value: 60, timestamp: "2024-03-01 03:00 PM" },
+        { region: "East Coast (Kelantan, Terengganu, Pahang)", value: 90, timestamp: "2024-03-02 02:45 PM" },
+        { region: "Penang", value: 40, timestamp: "2024-03-03 01:30 PM" },
+        { region: "Sarawak", value: 30, timestamp: "2024-03-04 04:00 PM" },
+    ],
 };
+
 
 // Proposal Data
 export const proposalsData = [
