@@ -4,10 +4,26 @@ import { useNotificationContext } from "../context/NotificationContext";
 import { Card, CardContent } from "../components/Card";
 import { systemFeedbacks, userFeedbacks } from "../data";
 import { useToggle } from "../hooks/useToggle";
-import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import your video file
+import SmartCityVideo from "../assets/videos/Smart-City.mp4";
+
+// Add Charlie Brown's feedback to the initial data
+const initialFeedbacks = [
+  ...systemFeedbacks,
+  ...userFeedbacks,
+  {
+    id: 104,
+    message: "The park benches in my neighborhood are broken and need replacement",
+    category: "Infrastructure",
+    name: "Charlie Brown",
+    email: "charlie@example.com",
+    status: "Pending",
+    remark: "",
+    date: new Date().toISOString()
+  }
+];
 
 function FeedbackModule({ userRole }) {
-  const [feedbacks, setFeedbacks] = useState([...systemFeedbacks, ...userFeedbacks]);
+  const [feedbacks, setFeedbacks] = useState(initialFeedbacks);
   const [newFeedback, setNewFeedback] = useState({ name: "", email: "", message: "" });
   const notificationContext = useNotificationContext();
   const showNotification = notificationContext ? notificationContext.showNotification : () => { };
@@ -23,7 +39,16 @@ function FeedbackModule({ userRole }) {
       return;
     }
 
-    setFeedbacks([...feedbacks, { ...newFeedback, status: "Pending" }]);
+    const newId = Math.max(...feedbacks.map(fb => fb.id), 0) + 1;
+    setFeedbacks([
+      ...feedbacks, 
+      { 
+        ...newFeedback, 
+        id: newId,
+        status: "Pending",
+        date: new Date().toISOString()
+      }
+    ]);
     setNewFeedback({ name: "", email: "", message: "", remark: "" });
     showNotification("Feedback submitted successfully!", "success");
     setSubmitted(false);
@@ -31,22 +56,19 @@ function FeedbackModule({ userRole }) {
 
   const updateStatus = (id, newStatus) => {
     setFeedbacks(feedbacks.map((fb) => (fb.id === id ? { ...fb, status: newStatus } : fb)));
+    showNotification(`Status updated to ${newStatus}`, "info");
   };
   
   const updateRemark = (id, remark) => {
-    setFeedbacks((prevFeedbacks) =>
-      prevFeedbacks.map((fb) =>
-        fb.id === id ? { ...fb, remark } : fb
-      )
-    );
+    setFeedbacks(feedbacks.map((fb) => (fb.id === id ? { ...fb, remark } : fb)));
   };
 
   const sortedFeedbacks = feedbacks.filter(fb => fb.status.toLowerCase() === sortOrder.toLowerCase() || sortOrder === "All");
 
   return (
     <div className="relative min-h-screen">
-      {/* Video Background - positioned to avoid covering the sidebar */}
-      <div className="fixed inset-0 z-0 overflow-hidden ml-20"> {/* ml-20 matches sidebar width */}
+      {/* Video Background */}
+      <div className="fixed inset-0 z-0 overflow-hidden ml-20">
         <video
           autoPlay
           loop
@@ -54,14 +76,13 @@ function FeedbackModule({ userRole }) {
           className="w-full h-full object-cover opacity-50"
         >
           <source src={SmartCityVideo} type="video/mp4" />
-          Your browser does not support the video tag.
         </video>
       </div>
 
-      {/* Semi-transparent overlay to improve text readability */}
+      {/* Overlay */}
       <div className="fixed inset-0 z-0 bg-[hsla(180,0%,10%,0.6)] ml-20" />
 
-      {/* Content - positioned to appear above the video */}
+      {/* Content */}
       <div className="relative z-10 p-4 ml-3">
         <div className="mb-5">
           <Card className="bg-[hsla(180,0%,10%,0.8)] text-white">
@@ -105,7 +126,6 @@ function FeedbackModule({ userRole }) {
             <div>
               <h3 className="text-xl font-semibold mb-3">Admin Panel - Feedback Management</h3>
               <div className="mb-4 relative inline-block w-full">
-                {/* Filter Button */}
                 <div className="flex justify-end">
                   <button
                     onClick={toggleOpen}

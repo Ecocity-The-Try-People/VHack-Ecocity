@@ -1,104 +1,124 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
+import { FaUser, FaLock, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
-  const [error, setError] = useState(''); // State to handle login errors
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Define admin credentials (for demonstration purposes)
-  const adminCredentials = {
-    username: 'admin',
-    password: 'admin123',
+  // Allowed credentials
+  const credentials = {
+    admin: {
+      username: 'admin',
+      password: 'admin123',
+      redirect: '/admin_page'
+    },
+    user: {
+      username: 'Charlie',
+      password: '123',
+      redirect: '/homepage'
+    }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
+    setError('');
 
-    // Check if credentials match admin credentials
-    if (username === adminCredentials.username && password === adminCredentials.password) {
-      navigate('/admin_page'); // Redirect to admin page
-    } else if (username && password) {
-      navigate('/homepage'); // Redirect to user's home page
-    } else {
-      setError('Invalid username or password'); // Show error message
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Check credentials
+      let validLogin = false;
+      for (const [role, creds] of Object.entries(credentials)) {
+        if (username === creds.username && password === creds.password) {
+          navigate(creds.redirect);
+          validLogin = true;
+          break;
+        }
+      }
+      
+      if (!validLogin) {
+        setError('Wrong username or password');
+      }
+    } catch (err) {
+      setError('Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSignUp = () => {
-    navigate('/register'); // Redirect to the register page
-  };
-
-  // Toggle password visibility
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    navigate('/register');
   };
 
   return (
     <div className="relative flex min-h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       {/* Video Background */}
-      <video
-        autoPlay
-        loop
-        muted
-        className="fixed top-0 left-0 w-full h-full object-cover z-0"
-      >
+      <video autoPlay loop muted className="fixed top-0 left-0 w-full h-full object-cover z-0">
         <source src="src/assets/videos/Smart-City.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
       </video>
 
       {/* Content */}
       <div className="fixed inset-0 z-10 flex items-center justify-center bg-[hsla(180,0%,10%,0.8)]">
-        <div className="bg-[white] bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
-          {error && <p className="text-red-500 text-center mb-4">{error}</p>} {/* Display error message */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username Field */}
-            <div className="form-group">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 text-left">
-                Username:
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                Username
               </label>
-              <div className="relative mt-1">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaUser className="text-gray-400" /> {/* Username icon */}
+                  <FaUser className="text-gray-400" />
                 </div>
                 <input
                   type="text"
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="text-[#111] block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block text-black w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   required
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="form-group">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 text-left">
-                Password:
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
               </label>
-              <div className="relative mt-1">
+              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaLock className="text-gray-400" /> {/* Password icon */}
+                  <FaLock className="text-gray-400" />
                 </div>
                 <input
-                  type={showPassword ? "text" : "password"} // Toggle between text and password
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="text-[#111] block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  className="block text-black w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                   required
                 />
                 <button
                   type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Toggle eye icon */}
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
             </div>
@@ -106,19 +126,34 @@ function Login() {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 cursor-pointer"
+              disabled={loading}
+              className="w-full flex justify-center items-center bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition cursor-pointer"
             >
-              Login
+              {loading ? (
+                <>
+                  <FaSpinner className="animate-spin mr-2" />
+                  Logging in...
+                </>
+              ) : (
+                'Login'
+              )}
             </button>
           </form>
 
           {/* Sign Up Button */}
           <button
-            className="w-full mt-4 bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 cursor-pointer"
             onClick={handleSignUp}
+            className="w-full mt-4 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition cursor-pointer"
           >
             Sign Up
           </button>
+
+          {/* Demo Credentials Hint
+          <div className="mt-6 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
+            <p className="font-medium">Demo accounts:</p>
+            <p>Admin: <span className="font-mono">admin/admin123</span></p>
+            <p>User: <span className="font-mono">Charlie Brown/123</span></p>
+          </div> */}
         </div>
       </div>
     </div>
