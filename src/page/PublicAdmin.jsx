@@ -10,7 +10,7 @@ import NavButton from "@/components/NavButton";
 export default function Dashboard() {
   const [activeModule, setActiveModule] = useState("home");
   const navigate = useNavigate(); // Initialize useNavigate
-  const userRole = "User";
+  const userRole = "Admin";
 
   const modules = {
     home: <HomePage setActiveModule={setActiveModule} />,
