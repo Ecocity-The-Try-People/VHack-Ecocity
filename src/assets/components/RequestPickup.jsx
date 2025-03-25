@@ -135,7 +135,6 @@ const RequestPickup = () => {
         }
     };
 
-    // Dark mode compatible alert
     const showAlert = (title, text, icon) => {
         return Swal.fire({
             title,
@@ -147,7 +146,6 @@ const RequestPickup = () => {
         });
     };
 
-    // Dark mode compatible confirmation
     const showConfirm = (title, html, icon) => {
         return Swal.fire({
             title,

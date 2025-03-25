@@ -2,14 +2,12 @@ import { useState } from "react";
 import { Droplet, Wind, Eye, Thermometer, ChevronDown, ChevronUp, Bell, BellOff } from "lucide-react";
 
 const WeatherBox = () => {
-  // Track expanded state for each location
   const [expandedStates, setExpandedStates] = useState({
     "Kuala Lumpur": false,
     "Selangor": false,
     "Cheras": false
   });
 
-  // Track notification preferences for each location
   const [notificationPrefs, setNotificationPrefs] = useState({
     "Kuala Lumpur": true,
     "Selangor": true,
@@ -18,7 +16,6 @@ const WeatherBox = () => {
 
   const locations = ["Kuala Lumpur", "Selangor", "Cheras"];
 
-  // Sample weather data
   const weatherData = {
     "Kuala Lumpur": {
       temp: 28,
@@ -57,12 +54,11 @@ const WeatherBox = () => {
   };
 
   const toggleNotification = (location, e) => {
-    e.stopPropagation(); // Prevent triggering the expand/collapse
+    e.stopPropagation();
     setNotificationPrefs(prev => ({
       ...prev,
       [location]: !prev[location]
     }));
-    // Here you would typically make an API call to save the preference
   };
 
   return (
@@ -82,7 +78,6 @@ const WeatherBox = () => {
               }`}
             onClick={() => toggleExpand(location)}
           >
-            {/* Clickable Header */}
             <div className="p-4 flex justify-between items-center">
               <h3 className="font-bold text-lg dark:text-white">{location}</h3>
               <div className="flex items-center gap-2">
@@ -108,7 +103,6 @@ const WeatherBox = () => {
               </div>
             </div>
 
-            {/* Weather Condition */}
             <div className="px-4 pb-2 flex items-center">
               <img 
                 src={data.icon} 
@@ -118,7 +112,6 @@ const WeatherBox = () => {
               <span className="ml-2 dark:text-gray-300">{data.condition}</span>
             </div>
 
-            {/* Expandable Details */}
             <div className={`overflow-hidden transition-all duration-300 ${
               isExpanded ? "max-h-96" : "max-h-0"
             }`}>
@@ -136,7 +129,6 @@ const WeatherBox = () => {
   );
 };
 
-// Reusable detail component
 const DetailItem = ({ icon, label, value }) => (
   <div className="flex items-center text-sm">
     <div className="w-4 h-4 mr-2 text-blue-500">

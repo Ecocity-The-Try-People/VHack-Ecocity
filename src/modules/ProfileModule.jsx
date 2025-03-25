@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/Card";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import userProfileImage from "@/assets/png/user.png";
-import SmartCityVideo from "@/assets/videos/Smart-City.mp4"; // Import your video file
+import SmartCityVideo from "@/assets/videos/Smart-City.mp4";
 
 export default function ProfileModule() {
   const [profile, setProfile] = useState({
@@ -56,8 +56,7 @@ export default function ProfileModule() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Video Background - positioned to avoid covering the sidebar */}
-      <div className="fixed inset-0 z-0 overflow-hidden ml-20"> {/* ml-20 matches sidebar width */}
+      <div className="fixed inset-0 z-0 overflow-hidden ml-20">
         <video
           autoPlay
           loop
@@ -69,17 +68,14 @@ export default function ProfileModule() {
         </video>
       </div>
 
-      {/* Semi-transparent overlay to improve text readability */}
       <div className="fixed inset-0 z-0 bg-[hsla(180,0%,10%,0.6)] ml-20" />
 
-      {/* Content - positioned to appear above the video */}
-      <div className="relative z-10 p-4 ml-20"> {/* ml-20 to match sidebar width */}
+      <div className="relative z-10 p-4 ml-20">
         <div className="max-w-2xl mx-auto">
           <Card className="bg-white bg-opacity-90 dark:bg-gray-800 dark:bg-opacity-90 p-8 rounded-lg shadow-lg text-gray-800 dark:text-gray-200">
             <CardContent>
               <h2 className="text-3xl font-bold text-center mb-6">User Profile</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Profile Picture */}
                 <div className="flex flex-col items-center">
                   <div className="w-32 h-32 rounded-full border-3 border-gray-500 overflow-hidden">
                     <img
@@ -104,7 +100,6 @@ export default function ProfileModule() {
                   </button>
                 </div>
 
-                {/* Name Field */}
                 <div className="form-group">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Name:
@@ -119,7 +114,6 @@ export default function ProfileModule() {
                   />
                 </div>
 
-                {/* Date of Birth Field */}
                 <div className="form-group">
                   <label htmlFor="dob" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Date of Birth:
@@ -135,7 +129,6 @@ export default function ProfileModule() {
                   </div>
                 </div>
 
-                {/* Address Field */}
                 <div className="form-group">
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Address:
@@ -150,7 +143,6 @@ export default function ProfileModule() {
                   />
                 </div>
 
-                {/* IC Number Field */}
                 <div className="form-group">
                   <label htmlFor="ic" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     IC Number:
@@ -165,7 +157,6 @@ export default function ProfileModule() {
                   />
                 </div>
 
-                {/* Save Button */}
                 <div className="form-group">
                   <button
                     type="submit"
@@ -180,7 +171,6 @@ export default function ProfileModule() {
         </div>
       </div>
 
-      {/* Custom CSS for DatePicker */}
       <style>
         {`
           .custom-datepicker {

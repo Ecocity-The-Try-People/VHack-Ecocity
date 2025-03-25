@@ -6,7 +6,6 @@ import { systemFeedbacks, userFeedbacks } from "../data";
 import { useToggle } from "../hooks/useToggle";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4";
 
-// Add Charlie Brown's feedback to the initial data
 const initialFeedbacks = [
   ...systemFeedbacks,
   ...userFeedbacks,
@@ -67,7 +66,6 @@ function FeedbackModule({ userRole }) {
 
   return (
     <div className="relative min-h-screen">
-      {/* Video Background */}
       <div className="fixed inset-0 z-0 overflow-hidden ml-20">
         <video
           autoPlay
@@ -79,10 +77,8 @@ function FeedbackModule({ userRole }) {
         </video>
       </div>
 
-      {/* Overlay */}
       <div className="fixed inset-0 z-0 bg-[hsla(180,0%,10%,0.6)] ml-20" />
 
-      {/* Content */}
       <div className="relative z-10 p-4 ml-3">
         <div className="mb-5">
           <Card className="bg-[hsla(180,0%,10%,0.8)] text-white">

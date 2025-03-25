@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Recenter button component matching VehicleMap.jsx style
 const RecenterButton = ({ position }) => {
   const map = useMap();
   
@@ -35,7 +34,6 @@ const MapView = () => {
   const [userPosition, setUserPosition] = useState(null);
   const [garbageTruckPosition, setGarbageTruckPosition] = useState([3.139, 101.686]);
 
-  // Red icon for user location
   const redIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -45,7 +43,6 @@ const MapView = () => {
     shadowSize: [41, 41]
   });
 
-  // Truck icon for garbage truck
   const truckIcon = new L.Icon({
     iconUrl: 'src/assets/png/garbage.png',
     iconSize: [40, 40],

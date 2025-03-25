@@ -9,10 +9,8 @@ export default function HomePage({ setActiveModule }) {
 
   return (
     <div className="p-4">
-      {/* Background Layer */}
-      <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" /> {/* Add `ml-20` to avoid covering the sidebar */}
+      <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" />
       
-      {/* Overview Section */}
       <div className="bg-[hsla(180,0%,10%,0.8)] mb-5 ">
         <Card>
           <CardContent>
@@ -24,14 +22,12 @@ export default function HomePage({ setActiveModule }) {
         </Card>
       </div>
 
-      {/* Statistics Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
           <StatCard key={index} icon={getIcon(stat.category)} title={stat.category} value={stat.value} />
         ))}
       </div>
 
-      {/* Data Visualization - Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
         <Card>
           <CardContent>
@@ -54,13 +50,11 @@ export default function HomePage({ setActiveModule }) {
           </CardContent>
         </Card>
 
-        {/* Feedback Section */}
         <div onClick={() => setActiveModule("feedback")} className="cursor-pointer hover:shadow-lg transition-shadow">
           <Card>
             <CardContent>
               <h3 className="font-semibold mb-2">Latest Feedback & Complaints</h3>
               <div className="bg-[#1e1e1e] p-4 rounded-lg shadow-md">
-                {/* System Feedbacks */}
                 <div className="mb-4">
                   <h2 className="text-lg font-semibold text-red-400 flex items-center">
                     🚨 System Feedbacks
@@ -78,7 +72,6 @@ export default function HomePage({ setActiveModule }) {
                   </div>
                 </div>
 
-                {/* User Feedbacks */}
                 <div>
                   <h2 className="text-lg font-semibold text-blue-400 flex items-center">
                     🗣️ User Feedbacks

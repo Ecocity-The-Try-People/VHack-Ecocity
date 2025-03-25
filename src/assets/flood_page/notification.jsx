@@ -41,7 +41,6 @@ const Notification = () => {
   };
   const clearAll = () => setNotifications([]);
 
-  // Auto-close when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (isOpen && !e.target.closest('.notification-container')) {

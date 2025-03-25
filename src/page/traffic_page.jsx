@@ -7,7 +7,6 @@ import Notification from "../assets/flood_page/notification";
 export default function TrafficPage() {
   return (
     <div className="relative flex min-h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-      {/* Video Background */}
       <div className="fixed inset-0 z-0">
         <video
           autoPlay
@@ -21,12 +20,9 @@ export default function TrafficPage() {
         </video>
       </div>
 
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
       <main className="relative z-10 ml-20 flex-grow p-6 xl:p-8 transition-all duration-300">
-                {/* Header */}
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
             Smart Transportation System
@@ -36,16 +32,13 @@ export default function TrafficPage() {
           </p>
         </header>
 
-        {/* Content Grid */}
         <div className="grid grid-cols-1 gap-6 max-w-7xl mx-auto">
-          {/* Main Map Section */}
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-0 overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700">
             <div className="h-full min-h-[500px]">
               <VehicleMap />
             </div>
           </section>
 
-          {/* Traffic Metrics Section */}
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
               Traffic Overview
@@ -66,7 +59,6 @@ export default function TrafficPage() {
             </div>
           </section>
 
-          {/* Additional Data Section */}
           <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700">
             <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
               Recommended Routes

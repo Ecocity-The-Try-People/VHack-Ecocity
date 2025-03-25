@@ -4,7 +4,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./BusTracker.css";
 
-// Constants
 const GTFS_API_URL = "https://api.data.gov.my/gtfs-realtime/vehicle-position/prasarana?category=rapid-bus-kl";
 const OSRM_ROUTE_API = "https://router.project-osrm.org/route/v1/driving";
 const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
@@ -12,7 +11,6 @@ const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
 // Default KL coordinates
 const DEFAULT_POSITION = [3.0556, 101.7110];
 
-// Icons configuration with orange stop markers
 const ICONS = {
   default: L.icon({
     iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -60,10 +58,8 @@ const ICONS = {
   }),
 };
 
-// Set default icon
 L.Marker.prototype.options.icon = ICONS.default;
 
-// Data
 const staticStops = [
   { id: "bj1", name: "Bukit Jalil LRT Station", type: "LRT", position: [3.0638, 101.6981] },
   { id: "bj2", name: "National Sports Complex", type: "Bus", position: [3.0564, 101.6932] },
@@ -82,7 +78,6 @@ const stations = [
   { id: "ch2", name: "Taman Midah MRT", position: [3.0922, 101.7361], scheduledArrival: "08:45" },
 ];
 
-// Utility functions
 const formatDuration = (seconds) => {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);

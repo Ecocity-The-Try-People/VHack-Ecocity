@@ -1,16 +1,14 @@
 import { useState, useEffect } from "react";
-import useWeatherAlert from "../alert_function"; // Import the alert function hook
-import Toggle_button from "../toggle_button"; // Import the toggle button component
-
+import useWeatherAlert from "../alert_function";
+import Toggle_button from "../toggle_button";
 const weather_api = import.meta.env.VITE_API_KEY;
 
 const Weather_detail = ({ location }) => {
     const [weather, setWeather] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showDetails, setShowDetails] = useState(false); // Controls visibility of additional details
+    const [showDetails, setShowDetails] = useState(false);
 
-    // Fetch weather data
     const fetchWeather = async () => {
         setLoading(true);
         setError(null);
@@ -37,17 +35,14 @@ const Weather_detail = ({ location }) => {
         fetchWeather();
     }, [location]);
 
-    // Toggle additional details visibility
     const toggleDetails = () => {
         setShowDetails((prev) => !prev);
     };
 
-    // Use the weather alert hook
     const alertMessage = useWeatherAlert(weather);
 
     return (
         <div className="max-w-xs mx-auto p-6 border-2 border-gray-200 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-            {/* Loading and Error Messages */}
             {loading && (
                 <p className="text-center text-gray-800 animate-pulse">Loading weather data...</p>
             )}
@@ -63,10 +58,8 @@ const Weather_detail = ({ location }) => {
                 </div>
             )}
 
-            {/* Weather Data */}
             {weather && (
                 <div className="text-center">
-                    {/* Location and Temperature */}
                     <h2 className="text-2xl font-bold text-gray-800">
                         {weather.location.name}, {weather.location.country}
                     </h2>
@@ -84,14 +77,12 @@ const Weather_detail = ({ location }) => {
                         {weather.current.condition.text}
                     </p>
 
-                    {/* Weather Alert */}
                     {alertMessage && (
                         <div className="mt-4 p-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
                             <p>{alertMessage}</p>
                         </div>
                     )}
 
-                    {/* Toggle Button for Additional Details */}
                     <div className="mt-6">
                         <Toggle_button
                             isOn={showDetails}
@@ -100,7 +91,6 @@ const Weather_detail = ({ location }) => {
                         />
                     </div>
 
-                    {/* Additional Weather Details */}
                     {showDetails && (
                         <div className="mt-6 space-y-3">
                             <div className="flex items-center justify-center">

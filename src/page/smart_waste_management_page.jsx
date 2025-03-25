@@ -7,12 +7,9 @@ import EnergyVideo from "../assets/videos/energy.mp4";
 export default function SmartWasteManagementPage() {
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-            {/* Sidebar */}
             <Sidebar />
 
-            {/* Main Content */}
             <div className="ml-20 flex-grow p-6 pl-10 pr-10 relative">
-                {/* Video Background */}
                 <div className="fixed inset-0 z-0 overflow-hidden">
                     <video
                         autoPlay
@@ -26,9 +23,7 @@ export default function SmartWasteManagementPage() {
                     </video>
                 </div>
 
-                {/* Content Container */}
                 <div className="relative z-10 space-y-6">
-                    {/* Page Title */}
                     <div className="text-center mb-8">
                         <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
                             Smart Waste Management
@@ -38,7 +33,6 @@ export default function SmartWasteManagementPage() {
                         </p>
                     </div>
 
-                    {/* MapView Card */}
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
                         <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
                             Waste Collection Map
@@ -46,9 +40,7 @@ export default function SmartWasteManagementPage() {
                         <MapView />
                     </div>
 
-                    {/* Request Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* RequestPickup Card */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
                                 Request Collection
@@ -56,7 +48,6 @@ export default function SmartWasteManagementPage() {
                             <RequestPickup />
                         </div>
 
-                        {/* Stats Card */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
                             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
                                 Waste Collection Stats

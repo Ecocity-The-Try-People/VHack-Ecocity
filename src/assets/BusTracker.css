@@ -32,7 +32,6 @@
     background-color: #0056b3;
   }
 
-  /* Route Planner Container */
 .route-planner {
   background-color: #ffffff;
   padding: 20px;
@@ -42,7 +41,6 @@
   margin: 0 auto;
 }
 
-/* Route Planner Title */
 .route-planner-title {
   font-size: 24px;
   font-weight: 600;
@@ -51,7 +49,6 @@
   text-align: center;
 }
 
-/* Destination Input Container */
 .destination-input {
   display: flex;
   flex-direction: column;
@@ -59,14 +56,12 @@
   margin-bottom: 20px;
 }
 
-/* Destination Label */
 .destination-label {
   font-size: 14px;
   font-weight: 500;
   color: #4a5568;
 }
 
-/* Destination Input Field */
 .destination-field {
   padding: 10px;
   border: 1px solid #e2e8f0;
@@ -81,7 +76,6 @@
   border-color: #3182ce;
 }
 
-/* Search Button */
 .search-button {
   padding: 10px 20px;
   background-color: #3182ce;
@@ -103,7 +97,6 @@
   cursor: not-allowed;
 }
 
-/* Error Message */
 .error-message {
   color: #e53e3e;
   font-size: 14px;
@@ -112,7 +105,6 @@
   text-align: center;
 }
 
-/* Route Details Container */
 .route-details {
   margin-top: 20px;
   padding: 15px;
@@ -121,7 +113,6 @@
   border: 1px solid #e2e8f0;
 }
 
-/* Route Details Title */
 .route-details-title {
   font-size: 18px;
   font-weight: 600;
@@ -129,21 +120,18 @@
   margin-bottom: 10px;
 }
 
-/* Route Description */
 .route-description {
   font-size: 14px;
   color: #4a5568;
   margin-bottom: 10px;
 }
 
-/* Route Info (Distance, Duration, ETA) */
 .route-info {
   font-size: 14px;
   color: #4a5568;
   margin-bottom: 5px;
 }
 
-/* TrafficPage.css */
 .video-background {
   position: absolute;
   top: 0;
@@ -169,7 +157,6 @@
   padding: 1.5rem;
 }
 
-/* Add this to your CSS file */
 .recenter-button,
 .center-to-bus-button {
   position: absolute;
@@ -179,7 +166,7 @@
 }
 
 .center-to-bus-button {
-  bottom: 70px; /* Adjust this value to position the button above the "Recenter to Self" button */
+  bottom: 70px;
 }
   
   @media (max-width: 768px) {
