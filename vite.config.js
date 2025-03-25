@@ -12,7 +12,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  base: "/ecocity",
+  base: "/VHack-Ecocity/",
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
