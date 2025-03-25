@@ -7,9 +7,9 @@ import TransportationVideo from "../assets/videos/transportation.mp4"; // Import
 import EnergyVideo from "../assets/videos/energy.mp4"; // Import the fourth video file
 import Weather_detail from "../assets/flood_page/weather_detail.jsx";
 import { useNavigate } from "react-router-dom";
-import TrafficIntro from "./homepage_section/TrafficIntro.jsx"; 
+import TrafficIntro from "./homepage_section/TrafficIntro.jsx";
 import Sidebar from "../assets/components/Sidebar.jsx";
-import PublicAdminModule from '@/modules/ProfileModule.jsx';
+import ProfileModule from '@/modules/ProfileModule.jsx';
 import FeedbackModule from "../modules/FeedbackModule.jsx";
 import PolicyManagement from "../modules/PolicyManagement.jsx";
 
@@ -51,7 +51,7 @@ export default function SmartCityHome() {
       {/* Sidebar */}
       <Sidebar />
       <div className={`h-6 ${visibleSection === "profile" ? "block" : "hidden"}`}>
-        <PublicAdminModule />
+        <ProfileModule userRole={UserRole} />
       </div>
       <div className="flex-1 ml-20 z-20 relative">
         <div className={`relative min-h-screen ${visibleSection === "policy" ? "block" : "hidden"}`}>
@@ -314,8 +314,8 @@ export default function SmartCityHome() {
 
         {/* Emergency Alerts */}
         {/* <section id="emergency" className="snap-start flex flex-col items-center justify-center h-screen relative z-10 ml-20"> */}
-          {/* Section Content */}
-          {/* <motion.h2
+        {/* Section Content */}
+        {/* <motion.h2
             initial={{ opacity: 0, y: -50 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 1 }}
@@ -330,67 +330,67 @@ export default function SmartCityHome() {
 
         {/* Floating Climate Change Indicators */}
         <div className="fixed bottom-10 right-10 flex flex-col gap-4 z-20">
-  {/* Home Button */}
-  <motion.div
-    whileHover={{ scale: 1.1 }}
-    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-    style={{ backgroundColor: "#205781" }} // Updated background color
-    onClick={() => scrollToSection("home")}
-  >
-    <span role="img" aria-label="home" className="text-2xl">
-      🏠
-    </span>
-    <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Home
-    </div>
-  </motion.div>
+          {/* Home Button */}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
+            style={{ backgroundColor: "#205781" }} // Updated background color
+            onClick={() => scrollToSection("home")}
+          >
+            <span role="img" aria-label="home" className="text-2xl">
+              🏠
+            </span>
+            <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              Home
+            </div>
+          </motion.div>
 
-  {/* Weather Button */}
-  <motion.div
-    whileHover={{ scale: 1.1 }}
-    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-    style={{ backgroundColor: "#4F959D" }} // Updated background color
-    onClick={() => scrollToSection("features")}
-  >
-    <span role="img" aria-label="weather" className="text-2xl">
-      🌧️
-    </span>
-    <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Weather
-    </div>
-  </motion.div>
+          {/* Weather Button */}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
+            style={{ backgroundColor: "#4F959D" }} // Updated background color
+            onClick={() => scrollToSection("features")}
+          >
+            <span role="img" aria-label="weather" className="text-2xl">
+              🌧️
+            </span>
+            <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              Weather
+            </div>
+          </motion.div>
 
-  {/* Transport Button */}
-  <motion.div
-    whileHover={{ scale: 1.1 }}
-    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-    style={{ backgroundColor: "#98D2C0" }} // Updated background color
-    onClick={() => scrollToSection("transportation")}
-  >
-    <span role="img" aria-label="transport" className="text-2xl">
-      🚗
-    </span>
-    <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Transport
-    </div>
-  </motion.div>
+          {/* Transport Button */}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
+            style={{ backgroundColor: "#98D2C0" }} // Updated background color
+            onClick={() => scrollToSection("transportation")}
+          >
+            <span role="img" aria-label="transport" className="text-2xl">
+              🚗
+            </span>
+            <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              Transport
+            </div>
+          </motion.div>
 
-  {/* Waste Collection Button */}
-  <motion.div
-    whileHover={{ scale: 1.1 }}
-    className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
-    style={{ backgroundColor: "#F6F8D5" }} // Updated background color
-    onClick={() => scrollToSection("waste-collection")}
-  >
-    <span role="img" aria-label="waste collection" className="text-2xl">
-      🗑️
-    </span>
-    <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      Waste Collection
-    </div>
-  </motion.div>
-</div>
- </div>
+          {/* Waste Collection Button */}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"
+            style={{ backgroundColor: "#F6F8D5" }} // Updated background color
+            onClick={() => scrollToSection("waste-collection")}
+          >
+            <span role="img" aria-label="waste collection" className="text-2xl">
+              🗑️
+            </span>
+            <div className="absolute -top-10 bg-black text-white text-sm px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              Waste Collection
+            </div>
+          </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

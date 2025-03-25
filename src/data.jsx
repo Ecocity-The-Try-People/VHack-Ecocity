@@ -192,27 +192,47 @@ export const proposalsData = [
 export const currentLoginUser = [
     {
         id: 'user1',
-        name: "Alice Johnson",
-        avatarUrl: "https://ui-avatars.com/api/?name=Alice+Johnson&background=random"
+        name: "Charlie Brown",
+        username: "Charlie",
+        avatarUrl: "https://ui-avatars.com/api/?name=Charlie+Brown&background=random",
+        password: '123',
+        redirect: '/homepage',
+        role: "user",
+        dob: "2004-03-12",
+        address: "123, Jalan XYZ, Taman Bahagia, Kuala Lumpur, Malaysia",
+        icNum: "012345-13-4566"
     },
     {
         id: 'user2',
-        name: "Bob Smith",
-        avatarUrl: "https://ui-avatars.com/api/?name=Bob+Smith&background=random"
-    },
-    {
-        id: 'user3',
-        name: "Charlie Brown",
-        avatarUrl: "https://ui-avatars.com/api/?name=Charlie+Brown&background=random"
-    },
-    {
-        id: 'user4',
-        name: "Diana Prince",
-        avatarUrl: "https://ui-avatars.com/api/?name=Diana+Prince&background=random"
+        name: "admin",
+        username: "admin",
+        avatarUrl: "https://ui-avatars.com/api/?name=Diana+Prince&background=random",
+        password: 'admin123',
+        redirect: '/admin_page',
+        role: "admin",
+        dob: "2000-01-24",
+        address: "123, Jalan XYZ, Taman Bahagia, Kuala Lumpur, Malaysia",
+        icNum: "012345-13-4566"
     },
 ];
 
-export function getRandomUser() {
-    const randomIndex = Math.floor(Math.random() * currentLoginUser.length);
-    return currentLoginUser[randomIndex];
-}
+// export function getRandomUser() {
+//     const randomIndex = Math.floor(Math.random() * currentLoginUser.length);
+//     return currentLoginUser[randomIndex];
+// }
+
+// {
+//     id: 'user1',
+//     name: "Alice Johnson",
+//     avatarUrl: "https://ui-avatars.com/api/?name=Alice+Johnson&background=random"
+// },
+// {
+//     id: 'user2',
+//     name: "Bob Smith",
+//     avatarUrl: "https://ui-avatars.com/api/?name=Bob+Smith&background=random"
+// },
+// {
+//     id: 'user4',
+//     name: "Diana Prince",
+//     avatarUrl: "https://ui-avatars.com/api/?name=Diana+Prince&background=random"
+// },

@@ -2,16 +2,20 @@ import React, { useState, useRef } from "react";
 import { Card, CardContent } from "@/components/Card";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import userProfileImage from "@/assets/png/user.png";
 import SmartCityVideo from "@/assets/videos/Smart-City.mp4";
+import { currentLoginUser } from "../data";
+import { useNotificationContext } from "../context/NotificationContext";
 
-export default function ProfileModule() {
+export default function ProfileModule({ userRole }) {
+  const currentUser = currentLoginUser.find((user) => user.role.toLowerCase() === userRole.toLowerCase()) || {};
+  const { showNotification } = useNotificationContext() || {};
+
   const [profile, setProfile] = useState({
-    name: "",
-    dob: null,
-    address: "",
-    ic: "",
-    profilePicture: userProfileImage,
+    name: currentUser.name,
+    dob: currentUser.dob,
+    address: currentUser.address,
+    ic: currentUser.icNum,
+    profilePicture: currentUser.avatarUrl,
   });
 
   const fileInputRef = useRef(null);
@@ -51,7 +55,7 @@ export default function ProfileModule() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Profile updated successfully!");
+    showNotification("Profile updated successfully!", "success");
   };
 
   return (
@@ -76,6 +80,7 @@ export default function ProfileModule() {
             <CardContent>
               <h2 className="text-3xl font-bold text-center mb-6">User Profile</h2>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Profile Picture */}
                 <div className="flex flex-col items-center">
                   <div className="w-32 h-32 rounded-full border-3 border-gray-500 overflow-hidden">
                     <img
@@ -100,6 +105,7 @@ export default function ProfileModule() {
                   </button>
                 </div>
 
+                {/* Name Field */}
                 <div className="form-group">
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Name:
@@ -114,6 +120,7 @@ export default function ProfileModule() {
                   />
                 </div>
 
+                {/* Date of Birth Field */}
                 <div className="form-group">
                   <label htmlFor="dob" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Date of Birth:
@@ -129,6 +136,7 @@ export default function ProfileModule() {
                   </div>
                 </div>
 
+                {/* Address Field */}
                 <div className="form-group">
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Address:
@@ -143,6 +151,7 @@ export default function ProfileModule() {
                   />
                 </div>
 
+                {/* IC Number Field */}
                 <div className="form-group">
                   <label htmlFor="ic" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     IC Number:
@@ -157,6 +166,7 @@ export default function ProfileModule() {
                   />
                 </div>
 
+                {/* Save Button */}
                 <div className="form-group">
                   <button
                     type="submit"
@@ -170,35 +180,6 @@ export default function ProfileModule() {
           </Card>
         </div>
       </div>
-
-      <style>
-        {`
-          .custom-datepicker {
-            width: 100%;
-            padding: 0.5rem 1rem;
-            border: 1px solid #4b5563;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            background-color: #374151;
-            color: #f3f4f6;
-            transition: all 0.2s ease-in-out;
-          }
-
-          .custom-datepicker:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
-          }
-
-          .react-datepicker-wrapper {
-            width: 100%;
-          }
-
-          .react-datepicker__input-container {
-            width: 100%;
-          }
-        `}
-      </style>
     </div>
   );
 }

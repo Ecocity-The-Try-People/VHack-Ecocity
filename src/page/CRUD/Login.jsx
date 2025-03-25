@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
+import { currentLoginUser } from '../../data';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -9,19 +10,6 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const credentials = {
-    admin: {
-      username: 'admin',
-      password: 'admin123',
-      redirect: '/admin_page'
-    },
-    user: {
-      username: 'Charlie',
-      password: '123',
-      redirect: '/homepage'
-    }
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -32,14 +20,16 @@ function Login() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       let validLogin = false;
-      for (const [role, creds] of Object.entries(credentials)) {
-        if (username === creds.username && password === creds.password) {
-          navigate(creds.redirect);
+
+      for (const user of currentLoginUser) {
+        console.log(user);
+        if (username === user.username && password === user.password) {
+          navigate(user.redirect);
           validLogin = true;
           break;
         }
       }
-      
+
       if (!validLogin) {
         setError('Wrong username or password');
       }
@@ -63,7 +53,7 @@ function Login() {
       <div className="fixed inset-0 z-10 flex items-center justify-center bg-[hsla(180,0%,10%,0.8)]">
         <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
-          
+
           {error && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
               {error}
@@ -109,7 +99,7 @@ function Login() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+                  className="absolute inset-y-0 right-0 pl-3 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
