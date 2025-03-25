@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './page/CRUD/Login';
 import Register from './page/CRUD/Register';
@@ -9,8 +9,20 @@ import Traffic_page from './page/traffic_page';
 import Smart_waste_management_page from './page/smart_waste_management_page';
 import PublicAdminModule from '@/page/PublicAdmin'
 
-function App() {
 
+// Force dark modeimport { useEffect } from 'react';
+// Import all your page components here
+
+function App() {
+  useEffect(() => {
+    // Force dark mode on initial load
+    document.documentElement.classList.add('dark')
+    
+    // Debugging
+    console.log('Dark mode enabled:', 
+      document.documentElement.classList.contains('dark'))
+  }, [])
+  
   return (
     <Router>
       <Routes>
@@ -24,7 +36,6 @@ function App() {
       </Routes>
     </Router>
   );
-
 }
 
 export default App;

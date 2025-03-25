@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import useDarkMode from "../hooks/DarkMode.jsx";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./BusTracker.css";
 
 const GTFS_API_URL = "https://api.data.gov.my/gtfs-realtime/vehicle-position/prasarana?category=rapid-bus-kl";
 const OSRM_ROUTE_API = "https://router.project-osrm.org/route/v1/driving";
@@ -33,11 +33,11 @@ const ICONS = {
     popupAnchor: [0, -40],
   }),
   stop: L.divIcon({
-    className: "custom-marker orange-marker",
+    className: "custom-marker",
     html: `
       <div style="position: relative;">
         <svg width="28" height="28" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#252422" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+          <path fill="#FF6D00" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
         </svg>
       </div>
     `,
@@ -45,11 +45,11 @@ const ICONS = {
     iconAnchor: [14, 28],
   }),
   selectedStop: L.divIcon({
-    className: "custom-marker orange-marker selected",
+    className: "custom-marker selected",
     html: `
       <div style="position: relative;">
         <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#FF6D00" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+          <path fill="#FF9E00" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 10c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
         </svg>
       </div>
     `,
@@ -84,13 +84,13 @@ const formatDuration = (seconds) => {
   return `${hours > 0 ? `${hours} h ` : ''}${minutes} min`;
 };
 
-const RecenterButton = ({ position }) => {
+const RecenterButton = ({ position, isDarkMode }) => {
   const map = useMap();
   const handleRecenter = useCallback(() => map.setView(position, map.getZoom()), [map, position]);
   
   return (
     <button
-      className="recenter-button bg-gray-800 text-white p-2 rounded-full shadow-lg hover:bg-gray-700 transition-colors"
+      className={`recenter-button ${isDarkMode ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700" : "bg-white text-gray-800 border-gray-300 hover:bg-gray-100"} p-2 rounded-full shadow-lg transition-colors border`}
       onClick={handleRecenter}
       aria-label="Recenter Map"
     >
@@ -99,7 +99,7 @@ const RecenterButton = ({ position }) => {
   );
 };
 
-const BusTracker = () => {
+const BusTracker = ({ isDarkMode }) => {
   const [busPosition, setBusPosition] = useState(stations[0].position);
   const [routePath, setRoutePath] = useState([]);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
@@ -162,10 +162,15 @@ const BusTracker = () => {
   return (
     <>
       <Marker position={busPosition} icon={ICONS.vehicle}>
-        <Popup>Bus is here!</Popup>
+        <Popup className={`custom-popup ${isDarkMode ? "bg-gray-800 text-white" : ""}`}>Bus is here!</Popup>
       </Marker>
       {routePath.length > 0 && (
-        <Polyline positions={routePath} color="cyan" weight={4} opacity={0.8} />
+        <Polyline 
+          positions={routePath} 
+          color="#3b82f6" 
+          weight={4} 
+          opacity={0.8} 
+        />
       )}
     </>
   );
@@ -182,6 +187,7 @@ const VehicleMap = () => {
   const [routeDetails, setRouteDetails] = useState({ distance: null, duration: null });
   const [selectedStop, setSelectedStop] = useState(null);
   const mapRef = useRef();
+  const isDarkMode = useDarkMode();
 
   const fetchGTFSData = useCallback(async () => {
     try {
@@ -317,13 +323,13 @@ const VehicleMap = () => {
 
   return (
     <div className="flex justify-center items-center p-4">
-      <div className="flex bg-gray-800 rounded-lg shadow-lg overflow-hidden w-full max-w-6xl h-[650px]">
+      <div className={`flex rounded-lg shadow-lg overflow-hidden w-full max-w-6xl h-[650px] border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
         {/* Sidebar */}
-        <div className="w-96 bg-gray-800 p-6 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6 text-white">Route Planner</h2>
+        <div className={`w-96 p-6 overflow-y-auto border-r ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+          <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-800"}`}>Route Planner</h2>
           
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Destination:</label>
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Destination:</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -334,12 +340,12 @@ const VehicleMap = () => {
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleDestinationSearch()}
                 placeholder="Enter destination"
-                className="flex-grow px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                className={`flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? "bg-gray-700 text-white border-gray-600" : "bg-white text-gray-900 border-gray-300"}`}
               />
               <button
                 onClick={handleDestinationSearch}
                 disabled={isLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+                className={`px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors ${isLoading ? (isDarkMode ? "bg-blue-500" : "bg-blue-400") : ""}`}
               >
                 {isLoading ? "..." : "Go"}
               </button>
@@ -347,15 +353,15 @@ const VehicleMap = () => {
           </div>
 
           {error && (
-            <div className="mb-4 p-2 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div className={`mb-4 p-2 border rounded ${isDarkMode ? "bg-red-900 border-red-700 text-red-200" : "bg-red-100 border-red-400 text-red-700"}`}>
               {error}
             </div>
           )}
 
           {destinationCoords && (
-            <div className="bg-gray-700 p-4 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-2 text-white">Route Details</h3>
-              <div className="space-y-2 text-gray-300">
+            <div className={`p-4 rounded-lg mb-6 border ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-200"}`}>
+              <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>Route Details</h3>
+              <div className={`space-y-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                 <p>From: Your Location</p>
                 <p>To: {destinationQuery}</p>
                 {routeDetails.distance && <p>Distance: {routeDetails.distance} km</p>}
@@ -365,14 +371,20 @@ const VehicleMap = () => {
             </div>
           )}
 
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-white">Nearby Stops</h3>
+          <div className={`p-4 rounded-lg border ${isDarkMode ? "bg-gray-700 border-gray-600" : "bg-gray-100 border-gray-200"}`}>
+            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>Nearby Stops</h3>
             <ul className="space-y-2">
               {staticStops.map(stop => (
                 <li 
                   key={stop.id} 
-                  className={`text-gray-300 hover:text-white cursor-pointer p-2 rounded ${
-                    selectedStop?.id === stop.id ? 'bg-blue-600 text-white' : 'hover:bg-gray-600'
+                  className={`p-2 rounded cursor-pointer transition-colors ${
+                    selectedStop?.id === stop.id 
+                      ? isDarkMode 
+                        ? 'bg-blue-900 text-blue-200' 
+                        : 'bg-blue-100 text-blue-800'
+                      : isDarkMode 
+                        ? 'text-gray-300 hover:bg-gray-600' 
+                        : 'text-gray-700 hover:bg-gray-200'
                   }`}
                   onClick={() => handleStopClick(stop)}
                 >
@@ -406,12 +418,12 @@ const VehicleMap = () => {
               />
               
               <Marker position={userLocation} icon={ICONS.user}>
-                <Popup>Your Location</Popup>
+                <Popup className={`custom-popup ${isDarkMode ? "bg-gray-800 text-white" : ""}`}>Your Location</Popup>
               </Marker>
 
               {vehiclePositions.map(vehicle => (
                 <Marker key={vehicle.id} position={vehicle.position} icon={ICONS.vehicle}>
-                  <Popup>{vehicle.name}</Popup>
+                  <Popup className={`custom-popup ${isDarkMode ? "bg-gray-800 text-white" : ""}`}>{vehicle.name}</Popup>
                 </Marker>
               ))}
 
@@ -427,11 +439,11 @@ const VehicleMap = () => {
                     mouseout: (e) => e.target.closePopup()
                   }}
                 >
-                  <Popup className="custom-popup">
-                    <div className="font-bold text-orange-800">{stop.name}</div>
-                    <div className="text-sm text-gray-600">{stop.type}</div>
+                  <Popup className={`custom-popup ${isDarkMode ? "bg-gray-800" : ""}`}>
+                    <div className={`font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>{stop.name}</div>
+                    <div className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>{stop.type}</div>
                     {stop.scheduledArrival && (
-                      <div className="mt-1 text-xs text-orange-600">
+                      <div className={`mt-1 text-xs ${isDarkMode ? "text-orange-400" : "text-orange-600"}`}>
                         <i className="fas fa-clock mr-1"></i>
                         Next arrival: {stop.scheduledArrival}
                       </div>
@@ -442,21 +454,21 @@ const VehicleMap = () => {
 
               {destinationCoords && (
                 <Marker position={destinationCoords}>
-                  <Popup>Destination: {destinationQuery}</Popup>
+                  <Popup className={`custom-popup ${isDarkMode ? "bg-gray-800 text-white" : ""}`}>Destination: {destinationQuery}</Popup>
                 </Marker>
               )}
 
               {routePath.length > 0 && (
                 <Polyline 
                   positions={routePath} 
-                  color="blue" 
+                  color="#3b82f6" 
                   weight={4} 
                   opacity={0.8} 
                 />
               )}
 
-              <BusTracker />
-              <RecenterButton position={userLocation} />
+              <BusTracker isDarkMode={isDarkMode} />
+              <RecenterButton position={userLocation} isDarkMode={isDarkMode} />
             </MapContainer>
           )}
         </div>

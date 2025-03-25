@@ -1,12 +1,17 @@
 import React from "react";
-import MapView from "../assets/components/MapView";
-import RequestPickup from "../assets/components/RequestPickup";
-import Sidebar from "../assets/components/Sidebar";
+import 
+useDarkMode  from "../hooks/DarkMode.jsx";
+import MapView from "../assets/components/MapView.jsx";
+import RequestPickup from "../assets/components/RequestPickup.jsx";
+import Sidebar from "../assets/components/Sidebar.jsx";
 import EnergyVideo from "../assets/videos/energy.mp4";
 
 export default function SmartWasteManagementPage() {
+    const isDarkMode = useDarkMode();
+
     return (
-        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div className={`flex min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+            {/* Sidebar */}
             <Sidebar />
 
             <div className="ml-20 flex-grow p-6 pl-10 pr-10 relative">
@@ -16,7 +21,7 @@ export default function SmartWasteManagementPage() {
                         loop
                         muted
                         playsInline
-                        className="w-full h-full object-cover opacity-20 dark:opacity-10 transition-opacity duration-500"
+                        className={`w-full h-full object-cover transition-opacity duration-500 ${isDarkMode ? "opacity-10" : "opacity-20"}`}
                     >
                         <source src={EnergyVideo} type="video/mp4" />
                         Your browser does not support the video tag.
@@ -25,45 +30,48 @@ export default function SmartWasteManagementPage() {
 
                 <div className="relative z-10 space-y-6">
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+                        <h1 className={`text-4xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                             Smart Waste Management
                         </h1>
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
                             Monitor and request waste collection services in real-time
                         </p>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                    {/* MapView Card */}
+                    <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                        <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                             Waste Collection Map
                         </h2>
                         <MapView />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
-                            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                        {/* RequestPickup Card */}
+                        <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Request Collection
                             </h2>
                             <RequestPickup />
                         </div>
 
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
-                            <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
+                        {/* Stats Card */}
+                        <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Waste Collection Stats
                             </h2>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                                    <span className="text-gray-600 dark:text-gray-300">Pending Requests</span>
-                                    <span className="font-bold text-blue-600 dark:text-blue-400">12</span>
+                                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}`}>
+                                    <span className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Pending Requests</span>
+                                    <span className={`font-bold ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>12</span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                                    <span className="text-gray-600 dark:text-gray-300">Completed Today</span>
-                                    <span className="font-bold text-green-600 dark:text-green-400">8</span>
+                                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-green-900/20" : "bg-green-50"}`}>
+                                    <span className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Completed Today</span>
+                                    <span className={`font-bold ${isDarkMode ? "text-green-400" : "text-green-600"}`}>8</span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-                                    <span className="text-gray-600 dark:text-gray-300">Recycling Rate</span>
-                                    <span className="font-bold text-amber-600 dark:text-amber-400">67%</span>
+                                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-amber-900/20" : "bg-amber-50"}`}>
+                                    <span className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Recycling Rate</span>
+                                    <span className={`font-bold ${isDarkMode ? "text-amber-400" : "text-amber-600"}`}>67%</span>
                                 </div>
                             </div>
                         </div>

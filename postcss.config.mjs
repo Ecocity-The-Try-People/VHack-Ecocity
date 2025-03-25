@@ -1,16 +1,19 @@
-const config = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+// tailwind.config.mjs
+export default {
+  darkMode: 'class', // This enables class-based dark mode
+  content: [
+    "./index.html",
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
     extend: {
       fontFamily: {
-        roboto: ["Roboto", "sans-serif"], // Custom font
-        sans: ["Roboto", "sans-serif"], // Override the default sans-serif font
+        roboto: ["Roboto", "sans-serif"],
+        sans: ["Roboto", "sans-serif"], 
       },
     },
   },
   plugins: [
-    // Add any Tailwind plugins here
+    // Add Tailwind plugins here if needed
   ],
-};
-
-export default config;
+}

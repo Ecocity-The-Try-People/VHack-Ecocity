@@ -1,19 +1,22 @@
 import React from "react";
+import useDarkMode from "../hooks/DarkMode.jsx";
 import VehicleMap from "../assets/VehicleMap.jsx";
 import Sidebar from "../assets/components/Sidebar.jsx";
 import TransportationVideo from "../assets/videos/transportation.mp4";
 import Notification from "../assets/flood_page/notification";
 
 export default function TrafficPage() {
+  const isDarkMode = useDarkMode();
+
   return (
-    <div className="relative flex min-h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
+    <div className={`relative flex min-h-screen overflow-hidden ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="fixed inset-0 z-0">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-20 dark:opacity-10"
+          className={`w-full h-full object-cover ${isDarkMode ? "opacity-10" : "opacity-20"}`}
         >
           <source src={TransportationVideo} type="video/mp4" />
           Your browser does not support the video tag.
@@ -22,63 +25,63 @@ export default function TrafficPage() {
 
       <Sidebar />
 
-      <main className="relative z-10 ml-20 flex-grow p-6 xl:p-8 transition-all duration-300">
+      <main className={`relative z-10 ml-20 flex-grow p-6 xl:p-8 transition-all duration-300`}>
         <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+          <h1 className={`text-4xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
             Smart Transportation System
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className={`text-lg max-w-2xl mx-auto ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
             Real-time traffic monitoring and route optimization across Malaysia
           </p>
         </header>
 
         <div className="grid grid-cols-1 gap-6 max-w-7xl mx-auto">
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-0 overflow-hidden transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700">
+          <section className={`rounded-xl shadow-lg p-0 overflow-hidden transition-all duration-300 hover:shadow-xl border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
             <div className="h-full min-h-[500px]">
               <VehicleMap />
             </div>
           </section>
 
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+          <section className={`rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
+            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
               Traffic Overview
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
-                <h3 className="font-medium text-blue-800 dark:text-blue-200">Current Congestion</h3>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-300">Moderate</p>
+              <div className={`p-4 rounded-lg ${isDarkMode ? "bg-blue-900/30" : "bg-blue-50"}`}>
+                <h3 className={`font-medium ${isDarkMode ? "text-blue-200" : "text-blue-800"}`}>Current Congestion</h3>
+                <p className={`text-2xl font-bold ${isDarkMode ? "text-blue-300" : "text-blue-600"}`}>Moderate</p>
               </div>
-              <div className="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg">
-                <h3 className="font-medium text-amber-800 dark:text-amber-200">Incidents Reported</h3>
-                <p className="text-2xl font-bold text-amber-600 dark:text-amber-300">2</p>
+              <div className={`p-4 rounded-lg ${isDarkMode ? "bg-amber-900/30" : "bg-amber-50"}`}>
+                <h3 className={`font-medium ${isDarkMode ? "text-amber-200" : "text-amber-800"}`}>Incidents Reported</h3>
+                <p className={`text-2xl font-bold ${isDarkMode ? "text-amber-300" : "text-amber-600"}`}>2</p>
               </div>
-              <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
-                <h3 className="font-medium text-green-800 dark:text-green-200">Public Transport</h3>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-300">On Schedule</p>
+              <div className={`p-4 rounded-lg ${isDarkMode ? "bg-green-900/30" : "bg-green-50"}`}>
+                <h3 className={`font-medium ${isDarkMode ? "text-green-200" : "text-green-800"}`}>Public Transport</h3>
+                <p className={`text-2xl font-bold ${isDarkMode ? "text-green-300" : "text-green-600"}`}>On Schedule</p>
               </div>
             </div>
           </section>
 
-          <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+          <section className={`rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
+            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
               Recommended Routes
             </h2>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                 <div>
                   <h3 className="font-medium">KLCC to Petaling Jaya</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Via Federal Highway</p>
+                  <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Via Federal Highway</p>
                 </div>
-                <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm">
+                <span className={`px-3 py-1 rounded-full text-sm ${isDarkMode ? "bg-green-900 text-green-200" : "bg-green-100 text-green-800"}`}>
                   22 min
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
                 <div>
                   <h3 className="font-medium">Bangsar to Mont Kiara</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Via Sprint Highway</p>
+                  <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Via Sprint Highway</p>
                 </div>
-                <span className="bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-3 py-1 rounded-full text-sm">
+                <span className={`px-3 py-1 rounded-full text-sm ${isDarkMode ? "bg-amber-900 text-amber-200" : "bg-amber-100 text-amber-800"}`}>
                   35 min
                 </span>
               </div>

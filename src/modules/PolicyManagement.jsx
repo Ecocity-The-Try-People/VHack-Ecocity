@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { FaSearch } from "react-icons/fa";
@@ -8,8 +8,10 @@ import { proposalsData } from "../data";
 import { ProposalCard } from "../components/ProposalCard";
 import { PopUpDialog } from "../components/PopUpDialog";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4";
+import useDarkMode from "../hooks/DarkMode.jsx";
 
 export default function PolicyManagement({ userRole }) {
+  const isDarkMode = useDarkMode();
   const [proposals, setProposals] = useState(proposalsData);
   const [openModal, setOpenModal] = useState(false);
   const [newProposal, setNewProposal] = useState({ title: "", description: "", file: null });
@@ -62,13 +64,13 @@ export default function PolicyManagement({ userRole }) {
   );
 
   return (
-    <div className="relative min-h-screen">
-      <div className="fixed inset-0 z-0 overflow-hidden ml-20">
+    <div className={`relative min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+      <div className="fixed inset-0 z-0 overflow-hidden ml-20" style={{ opacity: isDarkMode ? 0.3 : 0.5 }}>
         <video
           autoPlay
           loop
           muted
-          className="w-full h-full object-cover opacity-50"
+          className="w-full h-full object-cover"
         >
           <source src={SmartCityVideo} type="video/mp4" />
           Your browser does not support the video tag.
@@ -79,16 +81,16 @@ export default function PolicyManagement({ userRole }) {
 
       <div className="relative z-10 p-4 ml-3">
         <div className="mb-5">
-          <Card className="bg-[hsla(180,0%,10%,0.8)] text-white">
+          <Card className={`${isDarkMode ? "bg-[hsla(180,0%,10%,0.8]" : "bg-white/90"} ${isDarkMode ? "text-white" : "text-gray-800"}`}>
             <CardContent>
               <h2 className="text-xl font-semibold mb-2">Policy Proposal & Voting</h2>
-              <p className="text-gray-300">Submit new policy proposals, discuss, and vote.</p>
+              <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Submit new policy proposals, discuss, and vote.</p>
             </CardContent>
           </Card>
         </div>
 
         <div className="flex justify-end mb-4">
-          <Button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition" onClick={openDialog}>
+          <Button className={`${isDarkMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-700"} px-4 py-2 rounded transition`}>
             Add Proposal
           </Button>
         </div>
@@ -99,9 +101,9 @@ export default function PolicyManagement({ userRole }) {
             placeholder="Search proposals..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1 p-2 border border-gray-600 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`flex-1 p-2 border ${isDarkMode ? "border-gray-600 bg-gray-700 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"} rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
-          <FaSearch className="text-gray-300" />
+          <FaSearch className={`${isDarkMode ? "text-gray-300" : "text-gray-500"}`} />
         </div>
 
         {openModal && (
@@ -113,12 +115,13 @@ export default function PolicyManagement({ userRole }) {
             closeDialog={() => setOpenModal(false)}
             loading={loading}
             submitted={submitted}
+            isDarkMode={isDarkMode}
           />
         )}
 
-        <Card className="w-full bg-[hsla(180,0%,10%,0.8)] text-white">
+        <Card className={`w-full ${isDarkMode ? "bg-[hsla(180,0%,10%,0.8]" : "bg-white/90"} ${isDarkMode ? "text-white" : "text-gray-800"}`}>
           {!filteredProposals || filteredProposals.length === 0 ? (
-            <div className="text-gray-400 p-4">No proposal found!</div>
+            <div className={`${isDarkMode ? "text-gray-400" : "text-gray-500"} p-4`}>No proposal found!</div>
           ) : (
             filteredProposals.map((proposal) => (
               <motion.div key={proposal.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -127,6 +130,7 @@ export default function PolicyManagement({ userRole }) {
                   proposals={proposals}
                   setProposals={setProposals}
                   role={userRole}
+                  isDarkMode={isDarkMode}
                 />
               </motion.div>
             ))

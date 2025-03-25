@@ -4,8 +4,33 @@ import Map from '../assets/flood_page/map';
 import Sidebar from '../assets/components/Sidebar';
 import React from 'react';
 import FeaturesVideo from "../assets/videos/weather.mp4";
+import { useEffect, useState } from "react";
+
 
 export default function Flood_page() {
+      const [isDarkMode, setIsDarkMode] = useState(
+        document.documentElement.classList.contains("dark")
+      );
+    
+      useEffect(() => {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const darkMode = document.documentElement.classList.contains('dark');
+              setIsDarkMode(darkMode);
+              console.log("weather " + (darkMode ? "on" : "off"));
+            }
+          });
+        });
+    
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['class']
+        });
+    
+        return () => observer.disconnect();
+      }, []);
+    
     return (
         <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
             {/* Sidebar */}
@@ -29,12 +54,12 @@ export default function Flood_page() {
                 </div>
 
                 {/* Weather Box */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 hover:shadow-lg transition-shadow duration-300">
+                <div className={`${isDarkMode ? "bg-gray-900" : "bg-white"} rounded-lg shadow-md p-6 mb-8 hover:shadow-lg transition-shadow duration-300`}>
                     <Weather_box />
                 </div>
 
                 {/* Map */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+                <div className={`${isDarkMode ? "bg-gray-700" : "bg-white"} dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300`}>
                     <Map />
                 </div>
                 {/* Video Background for Features Section */}

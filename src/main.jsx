@@ -4,8 +4,13 @@ import './index.css'
 import App from './App.jsx'
 import { NotificationProvider } from "./context/NotificationContext.jsx"
 
+// Force dark mode on the root HTML element before React renders
+document.documentElement.classList.add('dark')
+
 createRoot(document.getElementById('root')).render(
-  <NotificationProvider>
-    <App />
-  </NotificationProvider>
+  <StrictMode>
+    <NotificationProvider>
+      <App />
+    </NotificationProvider>
+  </StrictMode>
 )

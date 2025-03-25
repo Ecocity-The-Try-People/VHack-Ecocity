@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Home, FileText, Map, Users, LogOut, CloudRain, Car, Recycle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavButton from "@/components/NavButton";
+import useDarkMode from '@/hooks/use_dark_mode';
+import { Sun, Moon } from "lucide-react";
 
 const ROUTE_CONFIG = {
   "/flood_page": "flood_page",
@@ -25,11 +27,19 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [activeSection, setActiveSection] = useState("home");
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(
+        document.documentElement.classList.contains("dark")
+    );
+
+    useEffect(() => {
+        setIsDarkMode(document.documentElement.classList.contains('dark'));
+    }, []);
+    
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [activeSection, setActiveSection] = useState("home");
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const section = ROUTE_CONFIG[location.pathname + location.hash] || 
@@ -61,11 +71,50 @@ export default function Sidebar() {
     `w-6 h-6 ${activeSection === section ? 
       "text-blue-600 dark:text-blue-400" : 
       "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`;
+    useEffect(() => {
+        const path = location.pathname;
+        if (path === "/flood_page") {
+            setActiveSection("flood_page");
+        } else if (path === "/traffic") {
+            setActiveSection("traffic");
+        } else if (path === "/smart_waste_management_page") {
+            setActiveSection("smart_waste_management_page");
+        } else if (path === "/homepage") {
+            setActiveSection("home");
+        } else if (path === "/homepage#policy") {
+            setActiveSection("features");
+        } else if (path === "/homepage#feedback") {
+            setActiveSection("transportation");
+        } else if (path === "/homepage#profile") {
+            setActiveSection("profile");
+        }
+    }, [location.pathname]);
+
+    const handleLogout = () => {
+        const confirmLogout = window.confirm("Are you sure you want to log out?");
+        if (confirmLogout) {
+            localStorage.removeItem("isAuthenticated");
+            navigate("/");
+        }
+    };
+
+    const toggleDarkMode = () => {
+        document.documentElement.classList.add("transition-colors");
+        document.documentElement.classList.add("duration-300");
+        
+        document.documentElement.classList.toggle("dark");
+        setIsDarkMode((prevMode) => !prevMode);
+        
+        setTimeout(() => {
+            document.documentElement.classList.remove("transition-colors");
+            document.documentElement.classList.remove("duration-300");
+        }, 300);
+    };
 
   return (
     <>
     
-      <nav className="w-20 bg-white dark:bg-gray-800 shadow-md flex flex-col items-center py-4 fixed min-h-screen z-30">
+      <nav className={`w-20 ${isDarkMode ? "bg-gray-800":"bg-white"} transition-all duration-300 shadow-md flex flex-col items-center py-4 fixed min-h-screen z-30`}>
         {NAV_ITEMS.map((item) => (
           <NavButton
             key={item.path}
@@ -80,14 +129,27 @@ export default function Sidebar() {
           />
         ))}
 
-        <div className="mt-auto">
-          <NavButton
-            icon={<LogOut className="w-6 h-6 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600" />}
-            onClick={handleLogoutClick}
-            aria-label="Logout"
-            className="hover:bg-gray-100 dark:hover:bg-gray-700"
-          />
-        </div>
+            <div className="mt-auto flex flex-col items-center">
+                <NavButton
+                    icon={
+                        isDarkMode ? (
+                            <Moon className="w-6 h-6 text-gray-500 hover:text-gray-700 transition-colors duration-200" />
+                        ) : (
+                            <Sun className="w-6 h-6 text-yellow-400 hover:text-yellow-500 transition-colors duration-200" />
+                        )
+                    }
+                    onClick={toggleDarkMode}
+                    aria-label="Toggle Dark Mode"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 mb-4"
+                />
+
+                <NavButton
+                    icon={<LogOut className="w-6 h-6 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600" />}
+                    onClick={handleLogoutClick}
+                    aria-label="Logout"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                />
+            </div>
       </nav>
 
       <AnimatePresence>
@@ -173,4 +235,106 @@ export default function Sidebar() {
       </AnimatePresence>
     </>
   );
+    return (
+        <nav className={`w-20 ${isDarkMode ? "bg-gray-800" : "bg-white"} shadow-md flex flex-col items-center py-4 fixed min-h-screen z-20 transition-colors duration-300`}>
+            <NavButton
+                icon={<Home className={`w-6 h-6 ${activeSection === "home" ? "text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/homepage");
+                    setActiveSection("home");
+                }}
+                isActive={activeSection === "home"}
+                aria-label="Home"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <NavButton
+                icon={<FileText className={`w-6 h-6 ${activeSection === "features" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/homepage#policy");
+                    setActiveSection("features");
+                }}
+                isActive={activeSection === "features"}
+                aria-label="Features"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <NavButton
+                icon={<Map className={`w-6 h-6 ${activeSection === "transportation" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/homepage#feedback");
+                    setActiveSection("transportation");
+                }}
+                isActive={activeSection === "transportation"}
+                aria-label="Transportation"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <NavButton
+                icon={<Users className={`w-6 h-6 ${activeSection === "profile" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/homepage#profile");
+                    setActiveSection("profile");
+                }}
+                isActive={activeSection === "profile"}
+                aria-label="Profile"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <NavButton
+                icon={<CloudRain className={`w-6 h-6 ${activeSection === "flood_page" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/flood_page");
+                    setActiveSection("flood_page");
+                }}
+                isActive={activeSection === "flood_page"}
+                aria-label="flood_page"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <NavButton
+                icon={<Car className={`w-6 h-6 ${activeSection === "traffic" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/traffic");
+                    setActiveSection("traffic");
+                }}
+                isActive={activeSection === "traffic"}
+                aria-label="traffic"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <NavButton
+                icon={<Recycle className={`w-6 h-6 ${activeSection === "smart_waste_management_page" ? "text-blue-600 dark:text-blue-400" : "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`} />}
+                onClick={() => {
+                    navigate("/smart_waste_management_page");
+                    setActiveSection("smart_waste_management_page");
+                }}
+                isActive={activeSection === "smart_waste_management_page"}
+                aria-label="smart_waste_management_page"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+            />
+
+            <div className="mt-auto flex flex-col items-center">
+                <NavButton
+                    icon={
+                        isDarkMode ? (
+                            <Moon className="w-6 h-6 text-gray-500 hover:text-gray-700 transition-colors duration-200" />
+                        ) : (
+                            <Sun className="w-6 h-6 text-yellow-400 hover:text-yellow-500 transition-colors duration-200" />
+                        )
+                    }
+                    onClick={toggleDarkMode}
+                    aria-label="Toggle Dark Mode"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 mb-4"
+                />
+
+                <NavButton
+                    icon={<LogOut className="w-6 h-6 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600 transition-colors duration-200" />}
+                    onClick={handleLogout}
+                    aria-label="Logout"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                />
+            </div>
+        </nav>
+    );
 }

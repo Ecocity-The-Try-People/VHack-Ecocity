@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import { Home, FileText, Map, Users, LogOut } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModule from "@/modules/ProfileModule";
@@ -7,6 +7,7 @@ import PolicyManagement from "@/modules/PolicyManagement";
 import FeedbackModule from "@/modules/FeedbackModule";
 import HomePage from "@/modules/HomePage";
 import NavButton from "@/components/NavButton";
+import { Sun, Moon } from "lucide-react";
 
 export default function Dashboard() {
   const [activeModule, setActiveModule] = useState("home");
@@ -14,6 +15,28 @@ export default function Dashboard() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const navigate = useNavigate();
   const userRole = "Admin";
+
+  const [isDarkMode, setIsDarkMode] = useState(
+      document.documentElement.classList.contains("dark")
+  );
+
+  useEffect(() => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+  }, []);
+
+  const toggleDarkMode = () => {
+    document.documentElement.classList.add("transition-colors");
+    document.documentElement.classList.add("duration-300");
+    
+    document.documentElement.classList.toggle("dark");
+    setIsDarkMode((prevMode) => !prevMode);
+    
+    setTimeout(() => {
+        document.documentElement.classList.remove("transition-colors");
+        document.documentElement.classList.remove("duration-300");
+    }, 300);
+};
+
 
   const modules = {
     home: <HomePage setActiveModule={setActiveModule} />,
@@ -42,8 +65,7 @@ export default function Dashboard() {
       "text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-black"}`;
 
   return (
-    <div className="relative flex min-h-dvh bg-gray-100 dark:bg-gray-900 overflow-hidden">
-      {/* Video Background */}
+    <div className={`relative flex min-h-dvh overflow-hidden ${isDarkMode ? "bg-gray-900" : "bg-gray-100"}`}>
       <video
         autoPlay
         loop
@@ -54,41 +76,53 @@ export default function Dashboard() {
         Your browser does not support the video tag.
       </video>
 
-      {/* Sidebar */}
-      <aside className="w-20 bg-white dark:bg-gray-800 shadow-md flex flex-col items-center py-4 fixed min-h-dvh z-20">
-
+      <aside className={`w-20 shadow-md flex flex-col items-center py-4 fixed min-h-dvh z-20 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
         <div className="flex flex-col items-center space-y-4">
           <NavButton
-            icon={<Home className={getIconClass("home")} />}
+            icon={<Home className={`w-6 h-6 ${activeModule === "home" ? (isDarkMode ? "text-blue-400" : "text-blue-600") : (isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}`} />}
             onClick={() => setActiveModule("home")}
             isActive={activeModule === "home"}
             aria-label="Home"
           />
           <NavButton
-            icon={<FileText className={getIconClass("policies")} />}
+            icon={<FileText className={`w-6 h-6 ${activeModule === "policies" ? (isDarkMode ? "text-blue-400" : "text-blue-600") : (isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}`} />}
             onClick={() => setActiveModule("policies")}
             isActive={activeModule === "policies"}
             aria-label="Policies"
           />
           <NavButton
-            icon={<Map className={getIconClass("feedback")} />}
+            icon={<Map className={`w-6 h-6 ${activeModule === "feedback" ? (isDarkMode ? "text-blue-400" : "text-blue-600") : (isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}`} />}
             onClick={() => setActiveModule("feedback")}
             isActive={activeModule === "feedback"}
             aria-label="Feedback"
           />
           <NavButton
-            icon={<Users className={getIconClass("profile")} />}
+            icon={<Users className={`w-6 h-6 ${activeModule === "profile" ? (isDarkMode ? "text-blue-400" : "text-blue-600") : (isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}`} />}
             onClick={() => setActiveModule("profile")}
             isActive={activeModule === "profile"}
             aria-label="Profile"
           />
         </div>
 
-        <div className="mt-auto">
+        <div className="mt-auto flex flex-col items-center">
           <NavButton
-            icon={<LogOut className="w-6 h-6 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-600" />}
+            icon={
+              isDarkMode ? (
+                <Moon className={`w-6 h-6 ${isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700"} transition-colors duration-200`} />
+              ) : (
+                <Sun className={`w-6 h-6 ${isDarkMode ? "text-yellow-400 hover:text-yellow-300" : "text-yellow-500 hover:text-yellow-600"} transition-colors duration-200`} />
+              )
+            }
+            onClick={toggleDarkMode}
+            aria-label="Toggle Dark Mode"
+            className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"} transition-colors duration-200 mb-4`}
+          />
+
+          <NavButton
+            icon={<LogOut className={`w-6 h-6 ${isDarkMode ? "text-gray-400 hover:text-red-400" : "text-gray-500 hover:text-red-600"} transition-colors duration-200`} />}
             onClick={() => setShowLogoutModal(true)}
             aria-label="Logout"
+            className={`${isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-100"} transition-colors duration-200`}
           />
         </div>
       </aside>

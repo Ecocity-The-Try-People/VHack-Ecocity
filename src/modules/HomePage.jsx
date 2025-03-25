@@ -3,9 +3,11 @@ import { LineChart, BarChart, PieChart } from "@/components/Charts";
 import { AlertTriangle, CheckCircle, Trash2, TrafficCone } from "lucide-react";
 import { chartData, statsData, systemFeedbacks, userFeedbacks } from "../data";
 import { StatCard } from "../components/Card";
+import useDarkMode from "../hooks/DarkMode";
 
 export default function HomePage({ setActiveModule }) {
   const stats = statsData;
+  const isDarkMode = useDarkMode;
 
   return (
     <div className="p-4">
@@ -50,46 +52,65 @@ export default function HomePage({ setActiveModule }) {
           </CardContent>
         </Card>
 
-        <div onClick={() => setActiveModule("feedback")} className="cursor-pointer hover:shadow-lg transition-shadow">
+        {/* Feedback Section */}
+        <div 
+            onClick={() => setActiveModule("feedback")} 
+            className={`
+             ${isDarkMode ? "bg-gray-800 bg-gray-700" : "bg-white bg-gray-200"}
+              cursor-pointer 
+              hover:shadow-lg 
+              transition-shadow 
+              duration-200 
+              p-4 
+              rounded-lg
+            `}
+          >          
           <Card>
-            <CardContent>
-              <h3 className="font-semibold mb-2">Latest Feedback & Complaints</h3>
-              <div className="bg-[#1e1e1e] p-4 rounded-lg shadow-md">
-                <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-red-400 flex items-center">
-                    🚨 System Feedbacks
-                  </h2>
-                  <div className="text-gray-100 border-l-4 border-red-500 pl-3 mt-2 space-y-2">
-                    {systemFeedbacks.length > 0 ? (
-                      systemFeedbacks.slice(-3).reverse().map((feedback, index) => (
-                        <div key={index} className="bg-red-900 bg-opacity-50 p-2 rounded">
-                          {feedback.message}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-400">No system feedback available.</p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h2 className="text-lg font-semibold text-blue-400 flex items-center">
-                    🗣️ User Feedbacks
-                  </h2>
-                  <div className="text-gray-100 border-l-4 border-blue-500 pl-3 mt-2 space-y-2">
-                    {userFeedbacks.length > 0 ? (
-                      userFeedbacks.slice(-3).reverse().map((feedback, index) => (
-                        <div key={index} className="bg-blue-900 bg-opacity-50 p-2 rounded">
-                          {feedback.message}
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-400">No user feedback available.</p>
-                    )}
-                  </div>
+          <CardContent>
+            <h3 className="font-semibold mb-2">Latest Feedback & Complaints</h3>
+            <div className={`p-4 rounded-lg shadow-md bg-gray-700`}>              
+              <div className="mb-4">
+                <h2 className={`text-lg font-semibold flex items-center ${isDarkMode ? "text-red-400" : "text-red-600"}`}>
+                  🚨 System Feedbacks
+                </h2>
+                <div className={`border-l-4 pl-3 mt-2 space-y-2 ${isDarkMode ? "text-gray-100 border-red-500" : "text-gray-800 border-red-500"}`}>
+                  {systemFeedbacks.length > 0 ? (
+                    systemFeedbacks.slice(-3).reverse().map((feedback, index) => (
+                      <div 
+                        key={index} 
+                        className={`p-2 rounded ${isDarkMode ? "bg-red-900 bg-opacity-50" : "bg-red-100"}`}
+                      >
+                        {feedback.message}
+                      </div>
+                    ))
+                  ) : (
+                    <p className={`${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>No system feedback available.</p>
+                  )}
                 </div>
               </div>
-            </CardContent>
+
+              {/* User Feedbacks */}
+              <div>
+                <h2 className={`text-lg font-semibold flex items-center ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+                  🗣️ User Feedbacks
+                </h2>
+                <div className={`border-l-4 pl-3 mt-2 space-y-2 ${isDarkMode ? "text-gray-100 border-blue-500" : "text-gray-800 border-blue-500"}`}>
+                  {userFeedbacks.length > 0 ? (
+                    userFeedbacks.slice(-3).reverse().map((feedback, index) => (
+                      <div 
+                        key={index} 
+                        className={`p-2 rounded ${isDarkMode ? "bg-blue-900 bg-opacity-50" : "bg-blue-100"}`}
+                      >
+                        {feedback.message}
+                      </div>
+                    ))
+                  ) : (
+                    <p className={`${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>No user feedback available.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
           </Card>
         </div>
       </div>
