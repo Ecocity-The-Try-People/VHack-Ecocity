@@ -38,7 +38,6 @@ The **Smart City Management System** is an innovative solution designed to enhan
   - Review and address user-reported issues.
   - Monitor and resolve system and public complaints.
   - Propose policies, manage discussions, and review community feedback.
-  - Delete comments violating community guidelines.
 
 - **📜 Policy & Proposal Management**
 
@@ -53,10 +52,10 @@ The **Smart City Management System** is an innovative solution designed to enhan
 
 ## 🛠️ Technology Stack
 
-- **Frontend:** React.js (Vite.js), Tailwind CSS
-- **Mapping & Geolocation:** Leaflet.js / Google Maps API
+- **Frontend:** React.js (Vite.js), Tailwind CSS, Framer Motion
+- **Mapping & Geolocation:** Leaflet.js / Open Weather API
 
-## 📬 Contact & Support
+## 📬 References & Support
 
-🌐 **Website:** [smartcity.com](https://smartcity.com)\
+🌐 **Website:** [smartcity.com](https://github.com/jiayin04/VHack-Ecocity.com)\
 🐞 **GitHub Issues:** [Report Issues](https://github.com/jiayin04/VHack-Ecocity/issues)
