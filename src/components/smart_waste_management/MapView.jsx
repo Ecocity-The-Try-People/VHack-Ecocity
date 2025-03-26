@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import garbage from "../../assets/png/garbage.png";
 
 const RecenterButton = ({ position }) => {
   const map = useMap();
@@ -44,7 +45,7 @@ const MapView = () => {
   });
 
   const truckIcon = new L.Icon({
-    iconUrl: 'src/assets/png/garbage.png',
+    iconUrl: garbage,
     iconSize: [40, 40],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32]
