@@ -21,9 +21,9 @@ jobs:
         with:
           node-version: 18 
 
-      # - name: Remove Node Modules and Cache
-      #   run: |
-      #     rm -rf node_modules package-lock.json
+      - name: Remove Node Modules and Cache
+        run: |
+          rm -rf node_modules package-lock.json
 
       - name: Install Dependencies
         run: npm install
