@@ -3,6 +3,7 @@ import useDarkMode from "../hooks/DarkMode.jsx";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import busPic from "../assets/png/front-of-bus.png";
 
 const GTFS_API_URL = "https://api.data.gov.my/gtfs-realtime/vehicle-position/prasarana?category=rapid-bus-kl";
 const OSRM_ROUTE_API = "https://router.project-osrm.org/route/v1/driving";
@@ -27,7 +28,8 @@ const ICONS = {
     popupAnchor: [0, -32],
   }),
   vehicle: L.icon({
-    iconUrl: "src/assets/png/front-of-bus.png",
+    // src/assets/png/front-of-bus.png
+    iconUrl: busPic,
     iconSize: [40, 40],
     iconAnchor: [20, 40],
     popupAnchor: [0, -40],
