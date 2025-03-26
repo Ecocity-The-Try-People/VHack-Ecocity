@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
 import { currentLoginUser } from '../../data';
+import videoSrc from '../../assets/videos/Smart-City.mp4';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -47,7 +48,7 @@ function Login() {
   return (
     <div className="relative flex min-h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden">
       <video autoPlay loop muted className="fixed top-0 left-0 w-full h-full object-cover z-0">
-        <source src="src/assets/videos/Smart-City.mp4" type="video/mp4" />
+        <source src={videoSrc} type="video/mp4" />
       </video>
 
       <div className="fixed inset-0 z-10 flex items-center justify-center bg-[hsla(180,0%,10%,0.8)]">
@@ -129,12 +130,6 @@ function Login() {
             Sign Up
           </button>
 
-          {/* Demo Credentials Hint
-          <div className="mt-6 p-3 bg-blue-50 rounded-lg text-sm text-blue-800">
-            <p className="font-medium">Demo accounts:</p>
-            <p>Admin: <span className="font-mono">admin/admin123</span></p>
-            <p>User: <span className="font-mono">Charlie Brown/123</span></p>
-          </div> */}
         </div>
       </div>
     </div>

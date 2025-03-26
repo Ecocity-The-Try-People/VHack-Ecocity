@@ -18,7 +18,7 @@ function App() {
   }, [])
 
   return (
-    <Router>
+    <Router basename="/VHack-Ecocity">
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -27,6 +27,7 @@ function App() {
         <Route path="/flood_page" element={<Flood_page />} />
         <Route path="/smart_waste_management_page" element={<Smart_waste_management_page />} />
         <Route path="/admin_page" element={<PublicAdminModule />} />
+        
       </Routes>
     </Router>
   );
