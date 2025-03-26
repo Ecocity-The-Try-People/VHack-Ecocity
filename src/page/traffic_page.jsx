@@ -66,7 +66,7 @@ export default function TrafficPage() {
               Recommended Routes
             </h2>
             <div className="space-y-3">
-              <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
+              <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50 text-gray-800"}`}>
                 <div>
                   <h3 className="font-medium">KLCC to Petaling Jaya</h3>
                   <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Via Federal Highway</p>
@@ -75,7 +75,7 @@ export default function TrafficPage() {
                   22 min
                 </span>
               </div>
-              <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50"}`}>
+              <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50 text-gray-800"}`}>
                 <div>
                   <h3 className="font-medium">Bangsar to Mont Kiara</h3>
                   <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>Via Sprint Highway</p>

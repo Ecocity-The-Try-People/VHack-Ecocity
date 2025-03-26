@@ -176,7 +176,7 @@ const RequestPickup = () => {
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                             placeholder="Enter address or coordinates"
-                            className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                            className={`flex-1 border ${isDarkMode? "border-gray-600 bg-gray-700 text-white" : "border-gray-300 bg-white text-black"} transition-all duration-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                             disabled={isUsingCurrentLocation}
                         />
                         <button
@@ -204,7 +204,7 @@ const RequestPickup = () => {
                     <select
                         value={type}
                         onChange={(e) => setType(e.target.value)}
-                        className={`w-full border ${isDarkMode ? "bg-gray-800 text-white": "bg-white text-black"} transition-all duration-300 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                        className={`w-full border ${isDarkMode ? "bg-gray-800 text-white": "bg-white text-gray-700"} transition-all duration-300 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                     >
                         <option value="Plastic">Plastic</option>
                         <option value="Paper">Paper</option>
