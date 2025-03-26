@@ -12,11 +12,11 @@ import PublicAdminModule from '@/page/PublicAdmin'
 function App() {
   useEffect(() => {
     document.documentElement.classList.add('dark')
-    
-    console.log('Dark mode enabled:', 
+
+    console.log('Dark mode enabled:',
       document.documentElement.classList.contains('dark'))
   }, [])
-  
+
   return (
     <Router>
       <Routes>

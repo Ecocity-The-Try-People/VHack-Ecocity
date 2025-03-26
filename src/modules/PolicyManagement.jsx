@@ -90,7 +90,7 @@ export default function PolicyManagement({ userRole }) {
         </div>
 
         <div className="flex justify-end mb-4">
-          <Button className={`${isDarkMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-700"} px-4 py-2 rounded transition`}>
+          <Button className={`${isDarkMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-700"} px-4 py-2 rounded transition` } onClick={openDialog}>
             Add Proposal
           </Button>
         </div>

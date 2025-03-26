@@ -8,8 +8,8 @@ document.documentElement.classList.add('dark')
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <NotificationProvider>
-      <App />
-    </NotificationProvider>
+      <NotificationProvider>
+        <App />
+      </NotificationProvider>
   </StrictMode>
 )
