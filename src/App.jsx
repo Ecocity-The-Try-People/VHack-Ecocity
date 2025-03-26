@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './page/CRUD/Login';
 import Register from './page/CRUD/Register';
 import './App.css';
@@ -18,7 +18,8 @@ function App() {
   }, [])
 
   return (
-    <Router basename="/VHack-Ecocity">
+    //  basename="/VHack-Ecocity"
+    <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -27,7 +28,7 @@ function App() {
         <Route path="/flood_page" element={<Flood_page />} />
         <Route path="/smart_waste_management_page" element={<Smart_waste_management_page />} />
         <Route path="/admin_page" element={<PublicAdminModule />} />
-        
+  
       </Routes>
     </Router>
   );

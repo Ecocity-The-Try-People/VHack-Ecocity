@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaUser, FaCalendarAlt, FaHome, FaIdCard, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
 import DatePicker from 'react-datepicker'; 
 import 'react-datepicker/dist/react-datepicker.css'; 
+import videoSrc from '../../assets/videos/Smart-City.mp4';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -15,7 +16,7 @@ function Register() {
   });
 
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);y
+  const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
 
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ function Register() {
         muted
         className="fixed top-0 left-0 w-full h-full object-cover z-0"
       >
-        <source src="src/assets/videos/Smart-City.mp4" type="video/mp4" />
+        <source src={videoSrc} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
