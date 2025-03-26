@@ -15,7 +15,7 @@ const Weather_detail = ({ location }) => {
 
         try {
             const response = await fetch(
-                `http://api.weatherapi.com/v1/current.json?key=${weather_api}&q=${location}&aqi=no`
+                `https://api.weatherapi.com/v1/current.json?key=${weather_api}&q=${location}&aqi=no`
             );
 
             if (!response.ok) {
