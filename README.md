@@ -57,5 +57,10 @@ The **Smart City Management System** is an innovative solution designed to enhan
 
 ## 📬 References & Support
 
+## Login Access 
+-**register page is for demo only, kindly use mock data to login**
+- **Admins:** `admin` / `admin123`
+- **Users:** `Charlie` / `123`
+
 🌐 **Website:** [smartcity.com](https://github.com/jiayin04/VHack-Ecocity.com)\
 🐞 **GitHub Issues:** [Report Issues](https://github.com/jiayin04/VHack-Ecocity/issues)
