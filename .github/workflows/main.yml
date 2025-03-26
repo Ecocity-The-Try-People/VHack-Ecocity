@@ -21,16 +21,16 @@ jobs:
         with:
           node-version: 18 
 
-      - name: Remove Node Modules and Cache
-        run: |
-          rm -rf node_modules package-lock.json
+      # - name: Remove Node Modules and Cache
+      #   run: |
+      #     rm -rf node_modules package-lock.json
 
       - name: Install Dependencies
         run: npm install
 
 
       - name: Create .env File
-        run: echo "VITE_API_KEY=${{ secrets.VITE_API_KEY }}" > .env
+        #run: echo "VITE_API_KEY=${{ secrets.VITE_API_KEY }}" > .env
 
       - name: Build Project
         run: npm run build
