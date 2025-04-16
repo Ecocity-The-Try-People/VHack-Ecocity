@@ -7,7 +7,7 @@ import TransportationVideo from "../assets/videos/transportation.mp4"; // Import
 import EnergyVideo from "../assets/videos/energy.mp4"; // Import the fourth video file
 import Weather_detail from "../components/weatherPage/weather_detail.jsx";
 import { useNavigate } from "react-router-dom";
-import TrafficIntro from "../components/TrafficIntro.jsx";
+import TrafficIntro from "../components/traffic_management/TrafficIntro.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import ProfileModule from '@/modules/ProfileModule.jsx';
 import FeedbackModule from "../modules/FeedbackModule.jsx";

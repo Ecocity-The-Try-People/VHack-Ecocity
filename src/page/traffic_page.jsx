@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import useDarkMode from "../hooks/DarkMode.jsx";
-import TrafficMap from "../components/TrafficMap.jsx";
+import TrafficMap from "../components/traffic_management/TrafficMap.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import TransportationVideo from "../assets/videos/transportation.mp4";
 import { db } from "../firebase_db/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc } from "firebase/firestore";
 
 export default function TrafficPage() {
 
-  const [vehicleData, setVehicleData] = useState([]);
-  const [trafficImages, setTrafficImages] = useState([]);
   const [trafficData, setTrafficData] = useState([]);
   const [selectedTraffic, setSelectedTraffic] = useState(null);
   const isDarkMode = useDarkMode();
@@ -19,45 +17,38 @@ export default function TrafficPage() {
     high: "text-red-500",
   };
 
-  // Fetch vehicle data
   useEffect(() => {
-    const unsubscribeVehicleData = onSnapshot(collection(db, "vehicle_data"), (snapshot) => {
-      const vehicles = snapshot.docs.map((doc) => ({
-        id: doc.id, // Include document ID
-        ...doc.data(),
+    const fetchTrafficData = async () => {
+      const snapshot = await getDocs(collection(db, "locations"));
+      const locationDocs = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
       }));
-      setVehicleData(vehicles);
-    });
 
-    return () => unsubscribeVehicleData();
-  }, [db]);
-
-  // Fetch traffic images data
-  useEffect(() => {
-    const unsubscribeTrafficImages = onSnapshot(collection(db, "traffic_image"), (snapshot) => {
-      const images = snapshot.docs.map((doc) => doc.data());
-      setTrafficImages(images);
-    });
-
-    return () => unsubscribeTrafficImages();
-  }, [db]);
-
-  // Merge vehicle data and traffic images
-  useEffect(() => {
-    if (vehicleData.length > 0 && trafficImages.length > 0) {
-      const mergedData = vehicleData.map((vehicle) => {
-        const matchedImage = trafficImages.find(
-          (image) => image.vehicleData_DocId === vehicle.id
-        );
+      const trafficInfo = await Promise.all(locationDocs.map(async loc => {
+        const [vehicleSnap, imageSnap] = await Promise.all([
+          getDoc(doc(db, "vehicle_data", loc.latest_vehicleData_DocId)),
+          getDoc(doc(db, "traffic_image", loc.latest_trafficImage_DocId))
+        ]);
 
         return {
-          ...vehicle,
-          traffic_img_url: matchedImage ? matchedImage.traffic_img_url : null,
+          locationName: loc.name,
+          lat: loc.lat,
+          lon: loc.lon,
+          lastUpdated: loc.lastUpdated,
+          vehicleNum: vehicleSnap.data()?.vehicleNum ?? 0,
+          suggestion: vehicleSnap.data()?.suggestion ?? "No suggestion",
+          congestionLevel: vehicleSnap.data()?.congestionLevel ?? "Unknown",
+          traffic_img_url: imageSnap.data()?.traffic_img_url ?? null,
         };
-      });
-      setTrafficData(mergedData);
-    }
-  }, [vehicleData, trafficImages]);
+      }));
+
+      setTrafficData(trafficInfo);
+    };
+
+    fetchTrafficData();
+
+  }, []);
 
   return (
     <div className={`relative flex min-h-screen overflow-hidden ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -79,7 +70,7 @@ export default function TrafficPage() {
         <div className="grid grid-cols-1 gap-6 max-w-5xl mx-auto">
           <section className={`rounded-xl shadow-lg p-0 overflow-hidden transition-all duration-300 hover:shadow-xl border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
             <div className="h-full min-h-[500px]">
-              <TrafficMap trafficData={trafficData} onSelectTraffic={setSelectedTraffic} />
+              <TrafficMap trafficData={trafficData} onSelectTraffic={setSelectedTraffic} isDarkMode={isDarkMode} />
             </div>
           </section>
 
@@ -123,8 +114,8 @@ export default function TrafficPage() {
 
           <section className={`rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}>
             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-800"}`}>CCTV Camera Feed</h2>
-            <div className="space-y-3">
-              {selectedTraffic?.traffic_img_url ? (
+            <div className="space-y-3"> 
+            {selectedTraffic?.traffic_img_url ? (
                 <div className="w-full">
                   <img
                     src={selectedTraffic.traffic_img_url}
@@ -136,8 +127,9 @@ export default function TrafficPage() {
                 <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-gray-700" : "bg-gray-50 text-gray-800"}`}>
                   <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>No images available</p>
                 </div>
-              )}
-            </div>
+              )}  </div>
+               
+
           </section>
         </div>
       </main>
