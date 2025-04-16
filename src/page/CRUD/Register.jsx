@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate } from 'react-router-dom';
 import { FaUser, FaCalendarAlt, FaHome, FaIdCard, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa'; // Import icons
 import DatePicker from 'react-datepicker'; 
 import 'react-datepicker/dist/react-datepicker.css'; 
 import videoSrc from '../../assets/videos/Smart-City.mp4';
+import { auth, db } from '../../../config/firebase'; // Import Firebase services
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -36,12 +40,41 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
+    }
+        try {
+      // 1. Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      // 2. Save additional user data to Firestore
+      await setDoc(doc(db, "users", userCredential.user.uid), {
+        name: formData.name,
+        dob: formData.dob,
+        address: formData.address,
+        ic_number: formData.icNumber,
+        email: formData.email,
+        createdAt: new Date(),
+        role: "user",
+        avatar_url: null,
+        redirect: '/homepage'
+      });
+
+      // 3. Navigate after successful registration
+      navigate('/homepage'); // Change to your desired success route
+    } catch (error) {
+      console.error("Registration error:", error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
 
     setError('');
@@ -52,6 +85,7 @@ function Register() {
       Date of Birth: ${formData.dob}\n
       Address: ${formData.address}\n
       IC Number: ${formData.icNumber}
+      
     `);
   };
 
@@ -98,6 +132,25 @@ function Register() {
                   id="name"
                   name="name"
                   value={formData.name}
+                  onChange={handleChange}
+                  className="text-[#111] block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 text-left">
+                Email:
+              </label>
+              <div className="relative mt-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaUser className="text-gray-400" /> {/* Name icon */}
+                </div>
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   className="text-[#111] block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
                   required

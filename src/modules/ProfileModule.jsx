@@ -1,23 +1,57 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/Card";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import userProfileImage from "@/assets/png/user.png";
 import SmartCityVideo from "@/assets/videos/Smart-City.mp4";
 import useDarkMode from "@/hooks/DarkMode.jsx";
-import { currentLoginUser } from "../data";
 import { useNotificationContext } from "../context/NotificationContext";
+import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db } from "../../config/firebase";
+import { auth } from "../../config/firebase";
 
 export default function ProfileModule({ userRole }) {
-  const currentUser = currentLoginUser.find((user) => user.role.toLowerCase() === userRole.toLowerCase()) || {};
-  const { showNotification } = useNotificationContext() || {};
+  const user_collection = collection(db, "users");
+  const [user, setUser] = useState({});
 
+  useEffect(() => {
+    let ignore = false;
+    const get_user = async() => {
+      try{
+        const user_data = await getDocs(user_collection);
+        if(!ignore){
+        const filteredData = user_data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        filteredData.forEach(user => {
+          if(user.id === auth.currentUser.uid){
+            setUser(user);
+            setProfile({
+              name: user.name || '',
+              dob: user.dob?.toDate() || null,
+              address: user.address || '',
+              ic_number: user.ic_number || '',
+              avatar_url: user.avatar_url,
+            });
+          }
+        });
+      }
+      }catch (err){
+        console.log(err);
+      }
+    };
+    get_user();
+    return ()=> {ignore = true};
+  },[]);
+  // const currentUser = currentLoginUser.find((user) => user.role.toLowerCase() === userRole.toLowerCase()) || {};
+  const { showNotification } = useNotificationContext() || {};
   const [profile, setProfile] = useState({
-    name: currentUser.name,
-    dob: currentUser.dob,
-    address: currentUser.address,
-    ic: currentUser.icNum,
-    profilePicture: currentUser.avatarUrl,
+    name: user?.name,
+    dob: user?.dob,
+    address: user?.address,
+    ic_number: user?.ic_number,
+    avatar_url: user?.avatar_url,
   });
 
   const fileInputRef = useRef(null);
@@ -45,7 +79,7 @@ export default function ProfileModule({ userRole }) {
       reader.onloadend = () => {
         setProfile({
           ...profile,
-          profilePicture: reader.result,
+          avatar_url: reader.result,
         });
       };
       reader.readAsDataURL(file);
@@ -56,8 +90,11 @@ export default function ProfileModule({ userRole }) {
     fileInputRef.current.click();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const userRef = doc(db, "users", auth.currentUser.uid);
+    await updateDoc(userRef,profile);
+
     showNotification("Profile updated successfully!", "success");
   };
 
@@ -88,7 +125,7 @@ export default function ProfileModule({ userRole }) {
                 <div className="flex flex-col items-center">
                   <div className={`w-32 h-32 rounded-full border-4 overflow-hidden shadow-md ${isDarkMode ? "border-gray-600" : "border-gray-300"}`}>
                     <img
-                      src={profile.profilePicture}
+                      src={profile.avatar_url}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
@@ -160,8 +197,8 @@ export default function ProfileModule({ userRole }) {
                   </label>
                   <input
                     type="text"
-                    name="ic"
-                    value={profile.ic}
+                    name="ic_number"
+                    value={profile.ic_number}
                     onChange={handleInputChange}
                     className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ${isDarkMode ? "bg-gray-700/90 text-gray-200 placeholder-gray-500 border-gray-600" : "bg-white/90 text-gray-900 placeholder-gray-400 border-gray-300"}`}
                     required

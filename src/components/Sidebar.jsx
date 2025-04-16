@@ -4,6 +4,8 @@ import { Home, FileText, Map, Users, LogOut, CloudRain, Car, Recycle, Sun, Moon 
 import { motion, AnimatePresence } from "framer-motion";
 import NavButton from "@/components/NavButton";
 import { useDarkMode } from '@/hooks/use_dark_mode.jsx';
+import { auth } from "../../config/firebase";
+import { signOut } from "firebase/auth";
 
 const ROUTE_CONFIG = {
   "/flood_page": "flood_page",
@@ -44,7 +46,8 @@ export default function Sidebar() {
     setShowLogoutModal(true);
   };
 
-  const handleConfirmLogout = () => {
+  const handleConfirmLogout = async () => {
+    await signOut(auth);
     setIsLoggingOut(true);
     setTimeout(() => {
       localStorage.removeItem("isAuthenticated");
