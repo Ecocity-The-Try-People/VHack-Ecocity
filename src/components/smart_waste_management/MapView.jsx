@@ -64,9 +64,13 @@ const MapView = ({ bins }) => {
         {/* Waste bins */}
         {bins.map(bin => (
           <Marker 
-            key={`bin-${bin.id}`} 
-            position={bin.coordinates || [3.1390, 101.6869]}
-            icon={binIcon}
+          key={`bin-${bin.id}`} 
+          position={
+            bin.coordinates && typeof bin.coordinates.latitude === 'number' 
+              ? [bin.coordinates.latitude, bin.coordinates.longitude]  // GeoPoint → [lat, lng]
+              : [3.1390, 101.6869]  // Fallback to default (Kuala Lumpur)
+          }
+          icon={binIcon}
           >
             <Popup>
               <div className="font-medium">{bin.location}</div>
