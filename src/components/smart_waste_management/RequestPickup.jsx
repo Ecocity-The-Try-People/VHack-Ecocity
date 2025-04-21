@@ -126,7 +126,7 @@ const RequestPickup = () => {
 
         const result = await showConfirm(
             "Clear All Requests?",
-            "Are you sure you want to delete all ${requests.length} requests? This action cannot be undone.",
+            `Are you sure you want to delete all ${requests.length} requests? This action cannot be undone.`,
             "warning"
         );
 
@@ -142,8 +142,8 @@ const RequestPickup = () => {
             title,
             text,
             icon,
-            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#1f2937',
+            background: isDarkMode ? '#1f2937' : '#ffffff',
+            color: isDarkMode ? '#ffffff' : '#1f2937',
             confirmButtonColor: '#3b82f6',
         });
     };
@@ -153,11 +153,11 @@ const RequestPickup = () => {
             title,
             html,
             icon,
-            background: document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff',
-            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#1f2937',
+            background: isDarkMode ? '#1f2937' : '#ffffff',
+            color: isDarkMode ? '#ffffff' : '#1f2937',
             showCancelButton: true,
             confirmButtonColor: '#3b82f6',
-            cancelButtonColor: document.documentElement.classList.contains('dark') ? '#6b7280' : '#9ca3af',
+            cancelButtonColor: isDarkMode ? '#6b7280' : '#9ca3af',
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'Cancel'
         });
@@ -167,7 +167,7 @@ const RequestPickup = () => {
         <div className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                         Collection Location
                     </label>
                     <div className="flex space-x-2">
@@ -176,14 +176,20 @@ const RequestPickup = () => {
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
                             placeholder="Enter address or coordinates"
-                            className={`flex-1 border ${isDarkMode? "border-gray-600 bg-gray-700 text-white" : "border-gray-300 bg-white text-black"} transition-all duration-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                            className={`flex-1 border ${
+                                isDarkMode ? "border-gray-600 bg-gray-700 text-white" : "border-gray-300 bg-white text-black"
+                            } transition-all duration-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                             disabled={isUsingCurrentLocation}
                         />
                         <button
                             type="button"
                             onClick={handleLocation}
                             disabled={isLoading}
-                            className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition-colors"
+                            className={`cursor-pointer flex items-center justify-center px-4 py-2 rounded-lg transition-colors ${
+                                isLoading 
+                                    ? "bg-blue-400 cursor-not-allowed" 
+                                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                            }`}
                         >
                             {isLoading ? (
                                 <span className="animate-pulse">...</span>
@@ -198,26 +204,34 @@ const RequestPickup = () => {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
                         Waste Type
                     </label>
                     <select
                         value={type}
                         onChange={(e) => setType(e.target.value)}
-                        className={`w-full border ${isDarkMode ? "bg-gray-700 text-gray-400 border-gray-600": "bg-white text-gray-500 border-gray-300"} transition-all duration-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                        className={`cursor-pointer w-full border ${
+                            isDarkMode ? "bg-gray-700 text-gray-100 border-gray-600" : "bg-white text-gray-800 border-gray-300"
+                        } transition-all duration-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                     >
                         <option value="Plastic">Plastic</option>
                         <option value="Paper">Paper</option>
                         <option value="Metal">Metal</option>
                         <option value="Glass">Glass</option>
                         <option value="Organic">Organic</option>
+                        <option value="Electronic">Electronic</option>
+                        <option value="Hazardous">Hazardous</option>
                     </select>
                 </div>
 
                 <button
                     type="submit"
                     disabled={!location || !coords}
-                    className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                    className={`cursor-pointer w-full py-3 px-4 font-medium rounded-lg transition-colors flex items-center justify-center ${
+                        !location || !coords
+                            ? `${isDarkMode ? "bg-gray-600" : "bg-gray-400"} cursor-not-allowed`
+                            : "bg-green-600 hover:bg-green-700 text-white"
+                    } `}
                 >
                     <Check className="w-5 h-5 mr-2" />
                     Submit Pickup Request
@@ -227,13 +241,13 @@ const RequestPickup = () => {
             {requests.length > 0 && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <div className="flex justify-between items-center mb-3">
-                        <h3 className="flex items-center text-lg font-semibold text-gray-700 dark:text-gray-200">
+                        <h3 className={`flex items-center text-lg font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                             <Clock className="w-5 h-5 mr-2 text-amber-500" />
                             Recent Requests ({requests.length})
                         </h3>
                         <button
                             onClick={handleClearAll}
-                            className="flex items-center text-sm text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                            className="cursor-pointer flex items-center text-sm transition-colors text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                         >
                             <Trash className="w-4 h-4 mr-1" />
                             Clear All
@@ -241,20 +255,29 @@ const RequestPickup = () => {
                     </div>
                     <div className="space-y-3">
                         {requests.slice(0, 3).map((request) => (
-                            <div key={request.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div 
+                                key={request.id} 
+                                className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+                                    isDarkMode ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-50 hover:bg-gray-100"
+                                }`}
+                            >
                                 <div>
-                                    <p className="font-medium text-gray-800 dark:text-gray-100 flex items-center">
+                                    <p className={`font-medium ${isDarkMode ? "text-gray-100" : "text-gray-800"} flex items-center`}>
                                         <MapPin className="w-4 h-4 mr-2 text-blue-500" />
                                         {request.location}
                                     </p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center mt-1">
+                                    <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"} flex items-center mt-1`}>
                                         <Trash2 className="w-4 h-4 mr-2 text-amber-500" />
                                         {request.type} • {new Date(request.timestamp).toLocaleString()}
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => handleDeleteRequest(request.id)}
-                                    className="p-2 text-gray-500 hover:text-red-500 dark:hover:text-red-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    className={`cursor-pointer p-2 rounded-full transition-colors ${
+                                        isDarkMode 
+                                            ? "hover:bg-gray-600 text-gray-300 hover:text-red-400" 
+                                            : "hover:bg-gray-200 text-gray-500 hover:text-red-500"
+                                    }`}
                                     aria-label="Delete request"
                                 >
                                     <X className="w-5 h-5" />
