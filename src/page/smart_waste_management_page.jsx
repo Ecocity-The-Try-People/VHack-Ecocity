@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import EnergyVideo from "../assets/videos/energy.mp4";
-import BinSensors from '../components/smart_waste_management/BinSensors';
-import RouteOptimizer from '../components/smart_waste_management/RouteOptimizer';
-import EquipmentHealth from '../components/smart_waste_management/EquipmentHealth';
 import CitizenRewards from '../components/smart_waste_management/CitizenRewards';
 import RequestPickup from '../components/smart_waste_management/RequestPickup';
 import MapView from '../components/smart_waste_management/MapView';
+import { db } from '../../config/firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function SmartWasteManagementPage() {
     const isDarkMode = useDarkMode();
@@ -16,6 +15,25 @@ export default function SmartWasteManagementPage() {
         { id: 1, status: 'pending', location: 'Main Square', type: 'Plastic' },
         { id: 2, status: 'completed', location: 'Central Park', type: 'Organic' }
     ]);
+
+    // Fetch bin data from Firebase
+    useEffect(() => {
+        const unsubscribe = onSnapshot(
+            collection(db, 'bins'),
+            (snapshot) => {
+                const binsData = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setBins(binsData);
+            },
+            (err) => {
+                console.error("Failed to fetch bin data:", err);
+            }
+        );
+
+        return () => unsubscribe();
+    }, []);
 
     return (
         <div className={`flex min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -47,34 +65,17 @@ export default function SmartWasteManagementPage() {
                         </p>
                     </div>
 
-                    {/* IoT Sensor Grid */}
-                    {/* <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                    {/* Map Section (now the primary component) */}
+                    <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                         <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                            Live Bin Monitoring
-                        </h2> */}
-                        <BinSensors onUpdate={setBins} />
-                    {/* </div> */}
-
-                    {/* Map and Route Optimization */}
-                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-                        <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                                Collection Map & Truck Tracker
-                            </h2>
-                            <div className="h-96 w-full">
-                                <MapView bins={bins} />
-                            </div>
+                            Waste Collection Overview
+                        </h2>
+                        <div className="h-96 w-full">
+                            <MapView bins={bins} />
                         </div>
-
-                        {/* <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                                Route Optimization
-                            </h2>
-                            <RouteOptimizer bins={bins} />
-                        </div> */}
                     </div>
 
-                    {/* Request and Equipment */}
+                    {/* Request and Community Sections */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
@@ -89,48 +90,7 @@ export default function SmartWasteManagementPage() {
                             </h2>
                             <CitizenRewards />
                         </div>
-
-                        {/* <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                                Equipment Health
-                            </h2>
-                            <EquipmentHealth />
-                        </div> */}
                     </div>
-
-                    {/* Community and Stats */}
-                    {/* <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-                        <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                                Community Rewards
-                            </h2>
-                            <CitizenRewards />
-                        </div> */}
-
-                        {/* <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                                Collection Statistics
-                            </h2>
-                            <div className="space-y-4">
-                                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}`}>
-                                    <span className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Pending Requests</span>
-                                    <span className={`font-bold ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
-                                        {requests.filter(r => r.status === 'pending').length}
-                                    </span>
-                                </div>
-                                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-green-900/20" : "bg-green-50"}`}>
-                                    <span className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Completed Today</span>
-                                    <span className={`font-bold ${isDarkMode ? "text-green-400" : "text-green-600"}`}>
-                                        {requests.filter(r => r.status === 'completed').length}
-                                    </span>
-                                </div>
-                                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? "bg-amber-900/20" : "bg-amber-50"}`}>
-                                    <span className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>Recycling Rate</span>
-                                    <span className={`font-bold ${isDarkMode ? "text-amber-400" : "text-amber-600"}`}>67%</span>
-                                </div>
-                            </div>
-                        </div> */}
-                    {/* </div> */}
                 </div>
             </div>
         </div>
