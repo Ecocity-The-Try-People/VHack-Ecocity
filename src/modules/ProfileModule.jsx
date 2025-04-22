@@ -77,6 +77,11 @@ export default function ProfileModule({ userRole }) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
+        const imageUrl = reader.result;
+        if (imageUrl.length > 1_000_000) { // 1MB in characters (approx.)
+          setError("Image URL is too large. Please choose a smaller image.");
+          return;
+        }
         setProfile({
           ...profile,
           avatar_url: reader.result,

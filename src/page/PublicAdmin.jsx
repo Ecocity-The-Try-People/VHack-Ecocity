@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; 
-import { Home, FileText, Map, Users, LogOut } from "lucide-react";
+import { Home, FileText, Map, Users, LogOut, Recycle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfileModule from "@/modules/ProfileModule";
 import PolicyManagement from "@/modules/PolicyManagement";
 import FeedbackModule from "@/modules/FeedbackModule";
+import RecyclePage from "../modules/RecyclePage";
 import HomePage from "@/modules/admin_homePage";
 import NavButton from "@/components/NavButton";
 import { Sun, Moon } from "lucide-react";
@@ -43,6 +44,7 @@ export default function Dashboard() {
     policies: <PolicyManagement userRole={userRole} />,
     feedback: <FeedbackModule userRole={userRole} />,
     profile: <ProfileModule userRole={userRole} />,
+    recycle: <RecyclePage userRole={userRole} />,
   };
 
   const handleConfirmLogout = () => {
@@ -101,6 +103,12 @@ export default function Dashboard() {
             onClick={() => setActiveModule("profile")}
             isActive={activeModule === "profile"}
             aria-label="Profile"
+          />
+          <NavButton
+            icon={<Recycle className={`w-6 h-6 ${activeModule === "recycle" ? (isDarkMode ? "text-blue-400" : "text-blue-600") : (isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}`} />}
+            onClick={() => setActiveModule("recycle")}
+            isActive={activeModule === "recycle"}
+            aria-label="recycle"
           />
         </div>
 

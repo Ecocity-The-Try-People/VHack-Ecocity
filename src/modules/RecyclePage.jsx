@@ -2,43 +2,37 @@ import React, { useState } from "react";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import Sidebar from "../components/Sidebar.jsx";
 import EnergyVideo from "../assets/videos/energy.mp4";
-import BinSensors from '../components/smart_waste_management/BinSensors';
+import BinSensors from "../components/smart_waste_management/BinSensors_admin.jsx";
 import RouteOptimizer from '../components/smart_waste_management/RouteOptimizer';
 import EquipmentHealth from '../components/smart_waste_management/EquipmentHealth';
 import CitizenRewards from '../components/smart_waste_management/CitizenRewards';
 import RequestPickup from '../components/smart_waste_management/RequestPickup';
 import MapView from '../components/smart_waste_management/MapView';
 
-export default function SmartWasteManagementPage() {
+export default function SmartWasteManagementPage({userRole}) {
     const isDarkMode = useDarkMode();
     const [bins, setBins] = useState([]);
     const [requests, setRequests] = useState([
         { id: 1, status: 'pending', location: 'Main Square', type: 'Plastic' },
         { id: 2, status: 'completed', location: 'Central Park', type: 'Organic' }
     ]);
+    const handleClearBin = (binId) => {
+        console.log(`clearing bin ${binId}`)
+    }
+    const handleReplaceBattery = (binId) => {
+        console.log(`Replacing battery for bin ${binId}`);
+    };
 
     return (
-        <div className={`flex min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
-            <Sidebar />
-
-            <div className="ml-20 flex-grow p-6 pl-10 pr-10 relative">
-                {/* Background Video */}
-                <div className="fixed inset-0 z-0 overflow-hidden">
-                    <video
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className={`w-full h-full object-cover transition-opacity duration-500 ${isDarkMode ? "opacity-10" : "opacity-20"}`}
-                    >
-                        <source src={EnergyVideo} type="video/mp4" />
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-
-                <div className="relative z-10 space-y-6">
+        <div className="relative h-full">
+            {/* Fixed background */}
+            <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" />
+            
+            {/* Scrollable content container */}
+            <div className="p-4 h-screen overflow-y-auto">
+                <div className="space-y-6 max-w-7xl mx-auto">
                     {/* Header */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-8 pt-4">
                         <h1 className={`text-4xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
                             Smart Waste Management
                         </h1>
@@ -48,32 +42,36 @@ export default function SmartWasteManagementPage() {
                     </div>
 
                     {/* IoT Sensor Grid */}
-                    {/* <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                    <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                         <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                             Live Bin Monitoring
-                        </h2> */}
-                        <BinSensors onUpdate={setBins} />
-                    {/* </div> */}
+                        </h2>
+                        <BinSensors 
+                            onUpdate={setBins} 
+                            onReplaceBattery={handleReplaceBattery}
+                            onClearBin={handleClearBin}
+                        />
+                    </div>
 
                     {/* Map and Route Optimization */}
-                    <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Collection Map & Truck Tracker
                             </h2>
                             <div className="h-96 w-full">
-                                <MapView bins={bins} />
+                                <MapView bins={bins}/>
                             </div>
                         </div>
 
-                        {/* <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                        <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Route Optimization
                             </h2>
                             <RouteOptimizer bins={bins} />
-                        </div> */}
+                        </div>
                     </div>
-
+                    
                     {/* Request and Equipment */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className={`rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
@@ -85,29 +83,22 @@ export default function SmartWasteManagementPage() {
 
                         <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
-                                Community Rewards
-                            </h2>
-                            <CitizenRewards />
-                        </div>
-
-                        {/* <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-                            <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Equipment Health
                             </h2>
                             <EquipmentHealth />
-                        </div> */}
+                        </div>
                     </div>
 
                     {/* Community and Stats */}
-                    {/* <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6"> {/* Added pb-6 for bottom padding */}
                         <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Community Rewards
                             </h2>
                             <CitizenRewards />
-                        </div> */}
+                        </div>
 
-                        {/* <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+                        <div className={`rounded-xl shadow-lg p-6 border transition-all duration-300 ${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
                             <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
                                 Collection Statistics
                             </h2>
@@ -129,8 +120,8 @@ export default function SmartWasteManagementPage() {
                                     <span className={`font-bold ${isDarkMode ? "text-amber-400" : "text-amber-600"}`}>67%</span>
                                 </div>
                             </div>
-                        </div> */}
-                    {/* </div> */}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
