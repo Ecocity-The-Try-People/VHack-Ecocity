@@ -4,6 +4,7 @@ import L from 'leaflet';
 import 'leaflet-routing-machine';
 import { DestinationInput } from "./DestinationInput";
 import { Routing } from "./Routing";
+import RecenterButton from "../smart_waste_management/RecenterButton"
 
 const congestionColors = {
     Low: "green",
@@ -12,20 +13,21 @@ const congestionColors = {
 };
 
 const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
-
-    const [userLocation, setUserLocation] = useState({ lat: 3.139, lng: 101.6869 }); // Default to Kuala Lumpur
+    const [centerPosition, setCenterPosition] = useState([3.109351, 101.7331131]); // Add this line
+    const [userLocation, setUserLocation] = useState({ lat: 3.139, lng: 101.6869 });
     const [destination, setDestination] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
-        // Get user's current location if possible
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    setUserLocation({
+                    const newPos = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
-                    });
+                    };
+                    setUserLocation(newPos);
+                    setCenterPosition([newPos.lat, newPos.lng]); // Update center position
                 },
                 (error) => {
                     console.error(error);
@@ -54,6 +56,7 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
         const location = await geocodeLocation(destinationName);
         if (location) {
             setDestination(location);
+            setCenterPosition([location.lat, location.lng]); // Update center position
             setErrorMessage('');
         } else {
             setErrorMessage('Destination not found. Please check the address.');
@@ -68,10 +71,7 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
                 errorMessage={errorMessage}
                 isDarkMode={isDarkMode}
             />
-            {/* // 3.1067023,101.7243126
-            // 3.1189949, 101.715
-            // 3.1094367,101.7241867,14z */}
-            <MapContainer center={[3.109351, 101.7331131]} zoom={14.25} style={{ height: "50vh", width: "100%" }}>
+            <MapContainer center={centerPosition} zoom={14.25} style={{ height: "50vh", width: "100%" }}>
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 {trafficData.map((d, i) => (
                     <Marker
@@ -99,15 +99,15 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
                                 <p className="text-sm font-medium text-gray-800">{d.locationName}</p>
                             </div>
                         </Popup>
-
                     </Marker>
                 ))}
 
-                {/* User's location marker */}
+                <RecenterButton position={centerPosition} />
+
                 <Marker position={[userLocation.lat, userLocation.lng]}>
                     <Popup>Your Location</Popup>
                 </Marker>
-                {/* Routing */}
+                
                 {destination.lat && destination.lng && <Routing from={userLocation} to={destination} />}
             </MapContainer>
         </div>
@@ -115,4 +115,3 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
 };
 
 export default TrafficMap;
-
