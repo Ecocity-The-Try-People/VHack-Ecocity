@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import useDarkMode from "../hooks/DarkMode.jsx";
-import Sidebar from "../components/Sidebar.jsx";
+// import Sidebar from "../components/Sidebar.jsx";
 import EnergyVideo from "../assets/videos/energy.mp4";
 import BinSensors from "../components/smart_waste_management/BinSensors_admin.jsx";
 import RouteOptimizer from '../components/smart_waste_management/RouteOptimizer';
@@ -28,9 +28,7 @@ export default function SmartWasteManagementPage({userRole}) {
             {/* Fixed background */}
             <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" />
             
-            {/* Scrollable content container */}
-            <div className="p-4 h-screen overflow-y-auto">
-                <div className="space-y-6 max-w-7xl mx-auto">
+                <div className="space-y-6">
                     {/* Header */}
                     <div className="text-center mb-8 pt-4">
                         <h1 className={`text-4xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
@@ -123,7 +121,6 @@ export default function SmartWasteManagementPage({userRole}) {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     );
 }

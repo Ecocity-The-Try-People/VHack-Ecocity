@@ -1,6 +1,6 @@
 import Weather_box from '../components/weatherPage/weather_box';
 import Notification from '../components/weatherPage/notification';
-import Map from '../components/weatherPage/map';
+import WeatherFloodMap from '../components/weatherPage/map';
 import Sidebar from '../components/Sidebar';
 import React from 'react';
 import FeaturesVideo from "../assets/videos/weather.mp4";
@@ -32,7 +32,7 @@ export default function Flood_page() {
       }, []);
     
     return (
-        <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className={`flex min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
             {/* Sidebar */}
             <Sidebar />
 
@@ -57,8 +57,8 @@ export default function Flood_page() {
                 </div>
 
                 {/* Map */}
-                <div className={`${isDarkMode ? "bg-gray-700" : "bg-white"} dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300`}>
-                    <Map />
+                <div className={`${isDarkMode ? "bg-gray-900" : "bg-white"} rounded-lg shadow-md p-6`}>
+                    <WeatherFloodMap />
                 </div>
             </div>
             <div className="fixed inset-0 z-0 overflow-hidden">
