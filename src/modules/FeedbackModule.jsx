@@ -144,6 +144,7 @@ function FeedbackModule({ userRole }) {
               <input
                 type="text"
                 placeholder="Name"
+                readOnly
                 value={profile.name}
                 onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })}
                 className={`w-full p-2 border rounded mb-3 ${isDarkMode ? "bg-gray-700 text-white placeholder-gray-400" : "bg-white/90 text-gray-900 placeholder-gray-500"} ${
@@ -155,6 +156,7 @@ function FeedbackModule({ userRole }) {
               <input
                 type="email"
                 placeholder="Email"
+                readOnly
                 value={auth.currentUser?.email}
                 onChange={(e) => setNewFeedback({ ...newFeedback, email: e.target.value })}
                 className={`w-full p-2 border rounded mb-3 ${isDarkMode ? "bg-gray-700 text-white placeholder-gray-400" : "bg-white/90 text-gray-900 placeholder-gray-500"} ${
