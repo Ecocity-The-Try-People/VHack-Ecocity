@@ -1,87 +1,148 @@
 import { useState, useRef, useEffect } from "react";
 import { CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
-import { Reply } from "lucide-react";
+import { Reply, Trash2, ThumbsUp } from "lucide-react";
 import { useToggle } from "../hooks/useToggle";
 import { ConfirmDialog } from "../components/ConfirmationDialog";
 import { useConfirmationDialog } from "../hooks/useConfirmationDialog";
-import { currentLoginUser } from "../data";
 import useDarkMode from "../hooks/DarkMode.jsx";
+import { db } from "../../config/firebase";
+import { doc, updateDoc, arrayUnion, arrayRemove,getDocs, collection } from "firebase/firestore";
+import { auth } from "../../config/firebase";
 
-export function ProposalCard({ proposal, proposals, setProposals, role }) {
+export function ProposalCard({ proposal, role, isDarkMode }) {
+  const user_collection = collection(db, "users");
   const [comment, setComment] = useState("");
   const [commentReply, setCommentReply] = useState({ parentIndex: null, text: "" });
-  const [vote, toggleVote] = useToggle();
-  const replyInputRef = useRef(null);
   const { isOpen, openDialog, closeDialog, confirm } = useConfirmationDialog();
-  const isDarkMode = useDarkMode();
+  const replyInputRef = useRef(null);
+  const [user, setUser] = useState({});
+  const [profile, setProfile] = useState({
+    name: user?.name,
+    dob: user?.dob,
+    address: user?.address,
+    ic_number: user?.ic_number,
+    avatar_url: user?.avatar_url,
+  });
 
-  const { id, name, avatarUrl } = currentLoginUser.find(user => user.role.toLowerCase() === role.toLowerCase()) || {};
-  const currentUser = { id, name, avatarUrl };
+  const handleVote = async () => {
+    try {
+      const proposalRef = doc(db, "proposals", proposal.id);
+      if (proposal.votedUsers?.includes(auth.currentUser.uid)) {
+        // User already voted - remove vote
+        await updateDoc(proposalRef, {
+          votes: proposal.votes - 1,
+          votedUsers: arrayRemove(auth.currentUser.uid)
+        });
+      } else {
+        // User hasn't voted - add vote
+        await updateDoc(proposalRef, {
+          votes: proposal.votes + 1,
+          votedUsers: arrayUnion(auth.currentUser.uid)
+        });
+      }
+    } catch (error) {
+      console.error("Error updating vote: ", error);
+    }
+  };
 
-  function handleVote() {
-    toggleVote();
-    setProposals(
-      proposals.map((p) =>
-        p.id === proposal.id
-          ? { ...p, votes: vote ? p.votes - 1 : p.votes + 1 }
-          : p
-      )
-    );
-  }
-
-  function addComment() {
-    if (comment.trim() === "") return;
-    const newComment = {
-      user: currentUser,
-      text: comment,
-      timestamp: new Date().toLocaleString(),
-      replies: [],
+  useEffect(() => {
+    let ignore = false;
+    const get_user = async() => {
+      try{
+        const user_data = await getDocs(user_collection);
+        if(!ignore){
+        const filteredData = user_data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        filteredData.forEach(user => {
+          console.log("inside useeffect");
+          if(user.id === auth.currentUser.uid){
+            setUser(user);
+            setProfile({
+              name: user.name || '',
+              dob: user.dob?.toDate() || null,
+              address: user.address || '',
+              ic_number: user.ic_number || '',
+              avatar_url: user.avatar_url,
+            });
+          }
+        });
+      }
+      }catch (err){
+        console.log(err);
+      }
     };
-    setProposals(
-      proposals.map((p) =>
-        p.id === proposal.id
-          ? { ...p, comments: [...p.comments, newComment] }
-          : p
-      )
-    );
-    setComment("");
-  }
+    get_user();
+    return ()=> {ignore = true};
+  },[]);
 
-  function deleteComment(index) {
-    openDialog();
-    const updatedComment = proposal.comments.filter((_, i) => i !== index);
-    setProposals(
-      proposals.map((p) =>
-        p.id === proposal.id
-          ? { ...p, comments: updatedComment }
-          : p
-      )
-    );
-  }
+  const addComment = async () => {
+    if (comment.trim() === "") return;
+    
+    const newComment = {
+      userId: auth.currentUser.uid,
+      userName: profile.name,
+      userAvatar: profile.avatar_url,
+      text: comment,
+      timestamp: new Date().toISOString(),
+      replies: []
+    };
 
-  function addReply() {
-    if (commentReply.text.trim() === "" || commentReply.parentIndex === null) return;
+    try {
+      const proposalRef = doc(db, "proposals", proposal.id);
+      await updateDoc(proposalRef, {
+        comments: arrayUnion(newComment)
+      });
+      setComment("");
+    } catch (error) {
+      console.error("Error adding comment: ", error);
+    }
+  };
+
+  const deleteComment = async (commentToDelete) => {
+    try {
+      const proposalRef = doc(db, "proposals", proposal.id);
+      await updateDoc(proposalRef, {
+        comments: arrayRemove(commentToDelete)
+      });
+    } catch (error) {
+      console.error("Error deleting comment: ", error);
+    }
+  };
+
+  const addReply = async (parentComment) => {
+    if (commentReply.text.trim() === "") return;
 
     const newReply = {
-      user: currentUser,
+      userId: auth.currentUser.uid,
+      userName: profile.name,
+      userAvatar: profile.avatar_url,
       text: commentReply.text.trim(),
-      timestamp: new Date().toLocaleString(),
+      timestamp: new Date().toISOString()
     };
 
-    setProposals(proposals.map((p) => {
-      if (p.id === proposal.id) {
-        const updatedComments = p.comments.map((c, index) =>
-          index === commentReply.parentIndex
-            ? { ...c, replies: [...c.replies, newReply] }
-            : c
-        );
-        return { ...p, comments: updatedComments };
-      }
-      return p;
-    }));
-    setCommentReply({ parentIndex: null, text: "" });
-  }
+    try {
+      const proposalRef = doc(db, "proposals", proposal.id);
+      const updatedComments = proposal.comments.map(comment => {
+        if (comment === parentComment) {
+          return {
+            ...comment,
+            replies: [...comment.replies, newReply]
+          };
+        }
+        return comment;
+      });
+
+      await updateDoc(proposalRef, {
+        comments: updatedComments
+      });
+      setCommentReply({ parentIndex: null, text: "" });
+    } catch (error) {
+      console.error("Error adding reply: ", error);
+    }
+  };
 
   const handleKeyDownComment = (e) => {
     if (e.key === "Enter") {
@@ -91,7 +152,8 @@ export function ProposalCard({ proposal, proposals, setProposals, role }) {
 
   const handleKeyDownReply = (e) => {
     if (e.key === "Enter") {
-      addReply();
+      const parentComment = proposal.comments[commentReply.parentIndex];
+      addReply(parentComment);
     }
   };
 
@@ -106,50 +168,67 @@ export function ProposalCard({ proposal, proposals, setProposals, role }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+
+console.log(proposal);
+  const hasVoted = proposal.votedUsers?.includes(auth.currentUser.uid);
+
   return (
     <div className="mb-5">
       <CardContent>
         <div className={`p-4 ${isDarkMode ? "bg-gray-700" : "bg-gray-100"} rounded-lg`}>
-          <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>{proposal.title}</h3>
-          <p className={`mb-3 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>{proposal.description}</p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+                {proposal.title}
+              </h3>
+              <p className={`mb-3 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+                {proposal.description}
+              </p>
+            </div>
+            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-700"}`}>
+              {proposal.status || "pending"}
+            </span>
+          </div>
 
           {proposal.file && (
             <div className="mb-3">
               <span className={`font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>Attached File: </span>
-              {typeof proposal.file === "string" ? (
-                <a href={proposal.file} download className="text-blue-500 underline cursor-pointer">
-                  {proposal.file.split("/").pop() || "Download"}
-                </a>
-              ) : (
-                <span
-                  className="text-blue-500 underline cursor-pointer"
-                  onClick={() => {
-                    const url = URL.createObjectURL(proposal.file);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = proposal.file.name;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                  }}
-                >
-                  {proposal.file.name || "Download"}
-                </span>
-              )}
+              <a 
+                href={proposal.file} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 underline cursor-pointer hover:text-blue-600"
+              >
+                {proposal.file.split("/").pop() || "View File"}
+              </a>
             </div>
           )}
 
-          <div className="flex justify-between items-center">
-            <span className={`text-lg font-bold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>Votes: {proposal.votes}</span>
-            <Button className={`${vote ? "bg-red-500" : "bg-green-500"} text-white px-4 py-2 rounded`} onClick={handleVote}>
-              {vote ? "Unvote" : "Vote"}
+          <div className="flex justify-between items-center mt-4">
+            <div className="flex items-center">
+              <ThumbsUp 
+                className={`w-5 h-5 mr-1 ${hasVoted ? "text-blue-500" : isDarkMode ? "text-gray-400" : "text-gray-600"}`} 
+              />
+              <span className={`text-lg font-bold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+                {proposal.votes || 0} votes
+              </span>
+            </div>
+            <Button 
+              className={`flex items-center gap-2 px-4 py-2 rounded ${hasVoted 
+                ? "bg-blue-600 hover:bg-blue-700" 
+                : "bg-gray-600 hover:bg-gray-700"} text-white`} 
+              onClick={handleVote}
+            >
+              {hasVoted ? "Voted" : "Vote"}
             </Button>
           </div>
 
           <div className={`mt-6 p-4 ${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg shadow-md`}>
-            <h4 className={`font-semibold text-lg mb-3 ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>Discussion</h4>
+            <h4 className={`font-semibold text-lg mb-3 ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+              Discussion ({proposal.comments?.length || 0})
+            </h4>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-4">
               <input
                 type="text"
                 className={`flex-1 p-2 border rounded-lg ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100"} focus:outline-none focus:ring-2 focus:ring-blue-500`}
@@ -158,73 +237,106 @@ export function ProposalCard({ proposal, proposals, setProposals, role }) {
                 onChange={(e) => setComment(e.target.value)}
                 onKeyDown={handleKeyDownComment}
               />
-              <Button className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition" onClick={addComment}>
-                <Reply size={20} /> Comment
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition" 
+                onClick={addComment}
+              >
+                <Reply size={16} /> Comment
               </Button>
             </div>
 
-            <div className="mt-4">
-              {proposal.comments.map((c, index) => (
-                <div key={index} className={`mt-3 p-3 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"} rounded-lg shadow-sm`}>
-                  <div className="flex items-center">
-                    <img src={c.user.avatarUrl} alt={c.user.name} className="w-8 h-8 rounded-full mr-2" />
-                    <p className={`text-sm font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>{c.user.name}</p>
-                    <span className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"} ml-2`}>{c.timestamp}</span>
-                  </div>
-                  <p className={`text-sm font-semibold ml-10 mt-1 ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}> {c.text}</p>
-                  <div className="flex flex-row justify-end gap-3">
-                    <button
-                      className="top-2 right- text-blue-500 text-xs hover:underline cursor-pointer"
-                      onClick={() =>
-                        setCommentReply((prev) =>
-                          prev.parentIndex === index ? { parentIndex: null, text: "" } : { parentIndex: index, text: "" }
-                        )
-                      }
-                    >
-                      Reply
-                    </button>
-                    {role === "Admin" ? (
-                      <button className="top-2 right-3 text-red-400 text-xs hover:underline cursor-pointer" onClick={() => openDialog(() => deleteComment(index))}>
-                        Delete
+            <div className="space-y-4">
+              {proposal.comments?.map((comment, index) => (
+                <div key={index} className={`p-3 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"} rounded-lg shadow-sm`}>
+                  <div className="flex items-start">
+                    <img 
+                      src={comment.userAvatar || "/default-avatar.png"} 
+                      alt={comment.userName} 
+                      className="w-8 h-8 rounded-full mr-3" 
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className={`font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+                            {comment.userName}
+                          </p>
+                          <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                            {new Date(comment.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                        {role === "Admin" && (
+                          <button 
+                            className="text-red-400 hover:text-red-500 transition"
+                            onClick={() => openDialog(() => deleteComment(comment))}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                      <p className={`mt-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                        {comment.text}
+                      </p>
+                      
+                      <button
+                        className="mt-2 text-blue-500 hover:text-blue-600 text-xs flex items-center gap-1 transition"
+                        onClick={() => setCommentReply({ parentIndex: index, text: "" })}
+                      >
+                        <Reply size={14} /> Reply
                       </button>
-                    ) : ""}
+                    </div>
                   </div>
-
-                  <ConfirmDialog
-                    open={isOpen}
-                    onClose={closeDialog}
-                    onConfirm={confirm}
-                    message="Are you sure you want to delete this comment?"
-                  />
 
                   {/* Reply Input */}
                   {commentReply.parentIndex === index && (
-                    <div ref={replyInputRef} className={`mt-2 p-2 ${isDarkMode ? "bg-gray-700" : "bg-gray-100"} rounded-lg`}>
+                    <div ref={replyInputRef} className="mt-3 pl-11">
                       <input
                         type="text"
                         value={commentReply.text}
                         onChange={(e) => setCommentReply({ ...commentReply, text: e.target.value })}
-                        className={`border px-2 py-1 text-sm w-full rounded-md ${isDarkMode ? "bg-gray-800 text-white" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                        className={`w-full p-2 border rounded-md ${isDarkMode ? "bg-gray-800 text-white" : "bg-white"} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         placeholder="Write a reply..."
                         onKeyDown={handleKeyDownReply}
                       />
-                      <button
-                        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-xs rounded-md transition cursor-pointer"
-                        onClick={addReply}
-                      >
-                        Submit
-                      </button>
+                      <div className="flex justify-end gap-2 mt-2">
+                        <Button 
+                          variant="outline" 
+                          onClick={() => setCommentReply({ parentIndex: null, text: "" })}
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          onClick={() => addReply(comment)}
+                          disabled={!commentReply.text.trim()}
+                        >
+                          Post Reply
+                        </Button>
+                      </div>
                     </div>
                   )}
 
-                  {c.replies && c.replies.length > 0 && (
-                    <div className={`mt-2 space-y-2 pl-4 border-l-2 ${isDarkMode ? "border-gray-600" : "border-gray-300"}`}>
-                      {c.replies.map((reply, rIndex) => (
-                        <div key={rIndex} className="flex items-center">
-                          <img src={reply.user.avatarUrl} alt={reply.user.name} className="w-6 h-6 rounded-full mr-2" />
-                          <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                            {reply.user.name} <span className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>{reply.timestamp}</span>: {reply.text}
-                          </p>
+                  {/* Replies */}
+                  {comment.replies?.length > 0 && (
+                    <div className={`mt-3 space-y-3 pl-11 border-l-2 ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
+                      {comment.replies.map((reply, replyIndex) => (
+                        <div key={replyIndex} className="pt-3">
+                          <div className="flex items-start">
+                            <img 
+                              src={reply.userAvatar || "/default-avatar.png"} 
+                              alt={reply.userName} 
+                              className="w-6 h-6 rounded-full mr-2" 
+                            />
+                            <div>
+                              <p className={`text-sm font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+                                {reply.userName}
+                              </p>
+                              <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                {new Date(reply.timestamp).toLocaleString()}
+                              </p>
+                              <p className={`mt-1 text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                                {reply.text}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -234,6 +346,14 @@ export function ProposalCard({ proposal, proposals, setProposals, role }) {
             </div>
           </div>
         </div>
+
+        <ConfirmDialog
+          open={isOpen}
+          onClose={closeDialog}
+          onConfirm={confirm}
+          title="Delete Comment"
+          message="Are you sure you want to delete this comment? This action cannot be undone."
+        />
       </CardContent>
     </div>
   );

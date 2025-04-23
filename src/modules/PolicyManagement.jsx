@@ -4,21 +4,76 @@ import { Button } from "@/components/Button";
 import { FaSearch } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNotificationContext } from "../context/NotificationContext";
-import { proposalsData } from "../data";
-import { ProposalCard } from "../components/ProposalCard";
 import { PopUpDialog } from "../components/PopUpDialog";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4";
 import useDarkMode from "../hooks/DarkMode.jsx";
+import { db } from "../../config/firebase";
+import { collection, addDoc, onSnapshot, query, where } from "firebase/firestore";
+import { ProposalCard } from "../components/ProposalCard.jsx";
 
 export default function PolicyManagement({ userRole }) {
   const isDarkMode = useDarkMode();
-  const [proposals, setProposals] = useState(proposalsData);
+  const [proposals, setProposals] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [newProposal, setNewProposal] = useState({ title: "", description: "", file: null });
+  const [newProposal, setNewProposal] = useState({ 
+    title: "", 
+    description: "", 
+    file: null,
+    votes: 0,
+    comments: [],
+    createdAt: new Date(),
+    createdBy: userRole // or user ID if available
+  });
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { showNotification } = useNotificationContext() || {};
   const [submitted, setSubmitted] = useState(false);
+
+  // Fetch proposals from Firestore
+  useEffect(() => {
+    const proposalsRef = collection(db, "proposals");
+    const q = query(proposalsRef);
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const proposalsData = [];
+      querySnapshot.forEach((doc) => {
+        proposalsData.push({ id: doc.id, ...doc.data() });
+      });
+      setProposals(proposalsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const proposalsRef = collection(db, "proposals");
+    const q = query(proposalsRef);
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const proposalsData = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        // Validate required fields
+        if (data.title && data.description) {
+          proposalsData.push({ 
+            id: doc.id, 
+            title: data.title || '',
+            description: data.description || '',
+            votes: data.votes || 0,
+            votedUsers:data.votedUsers || [],
+            comments: data.comments || [],
+            createdAt: data.createdAt?.toDate() || new Date(),
+            createdBy: data.createdBy || 'anonymous',
+            status: data.status || 'pending',
+            file: data.file || null
+          });
+        }
+      });
+      setProposals(proposalsData);
+    });
+  
+    return () => unsubscribe();
+  }, []);
 
   function openDialog() {
     setOpenModal(true);
@@ -35,32 +90,45 @@ export default function PolicyManagement({ userRole }) {
     }
   }
 
-  function addProposal() {
+  async function addProposal() {
     setSubmitted(true);
     if (!newProposal.title || !newProposal.description || !newProposal.file) {
       showNotification("Please provide all fields including a document.", "error");
       return;
     }
 
-    setProposals([
-      ...proposals,
-      {
-        id: proposals.length + 1,
+    try {
+      const proposalsRef = collection(db, "proposals");
+      await addDoc(proposalsRef, {
         title: newProposal.title,
         description: newProposal.description,
-        file: newProposal.file,
+        file: newProposal.file.name, // Store file name or upload to storage and store URL
         votes: 0,
         comments: [],
-      },
-    ]);
+        createdAt: new Date(),
+        createdBy: userRole, // or user ID if available
+        status: "pending"
+      });
 
-    showNotification("Proposal submitted successfully!", "success");
-    setOpenModal(false);
-    setNewProposal({ title: "", description: "", file: null });
+      showNotification("Proposal submitted successfully!", "success");
+      setOpenModal(false);
+      setNewProposal({ 
+        title: "", 
+        description: "", 
+        file: null,
+        votes: 0,
+        comments: [],
+        createdAt: new Date(),
+        createdBy: userRole
+      });
+    } catch (error) {
+      console.error("Error adding proposal: ", error);
+      showNotification("Failed to submit proposal", "error");
+    }
   }
 
   const filteredProposals = proposals.filter((p) =>
-    p.title.toLowerCase().includes(searchQuery.toLowerCase())
+    p?.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -90,7 +158,7 @@ export default function PolicyManagement({ userRole }) {
         </div>
 
         <div className="flex justify-end mb-4">
-          <Button className={`${isDarkMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-700"} px-4 py-2 rounded transition` } onClick={openDialog}>
+          <Button className={`${isDarkMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-700"} px-4 py-2 rounded transition`} onClick={openDialog}>
             Add Proposal
           </Button>
         </div>
@@ -112,7 +180,10 @@ export default function PolicyManagement({ userRole }) {
             setNewProposal={setNewProposal}
             handleFileChange={handleFileChange}
             addProposal={addProposal}
-            closeDialog={() => setOpenModal(false)}
+            closeDialog={() => {
+              setOpenModal(false);
+              setSubmitted(false);
+            }}
             loading={loading}
             submitted={submitted}
             isDarkMode={isDarkMode}

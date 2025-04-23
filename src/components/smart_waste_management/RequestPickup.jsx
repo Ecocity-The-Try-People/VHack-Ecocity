@@ -2,6 +2,18 @@ import { useState, useEffect } from "react";
 import { MapPin, Navigation, Trash2, Clock, X, Check, Trash } from "lucide-react";
 import Swal from "sweetalert2";
 import useDarkMode from "../../hooks/DarkMode";
+import { db } from "../../../config/firebase";
+import { 
+  collection, 
+  addDoc, 
+  getDocs, 
+  deleteDoc, 
+  doc, 
+  query, 
+  where,
+  writeBatch
+} from "firebase/firestore";
+import { auth } from "../../../config/firebase";
 
 const RequestPickup = () => {
     const isDarkMode = useDarkMode();
@@ -11,14 +23,37 @@ const RequestPickup = () => {
     const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isUsingCurrentLocation, setIsUsingCurrentLocation] = useState(false);
+    const [userId, setUserId] = useState(null); // Assuming you have user auth
+
+    // Get reference to the wasteRequests collection
+    const wasteRequestsRef = collection(db, "wasteRequests");
 
     useEffect(() => {
-        loadRequests();
+        // You would typically get the userId from your auth context
+        const currentUserId = auth.currentUser.uid; // Replace with actual user ID
+        setUserId(currentUserId);
+        loadRequests(currentUserId);
     }, []);
 
-    const loadRequests = () => {
-        const storedRequests = JSON.parse(localStorage.getItem("waste_requests")) || [];
-        setRequests(storedRequests);
+    const loadRequests = async (userId) => {
+        try {
+            setIsLoading(true);
+            // Query requests for the current user
+            const q = query(wasteRequestsRef, where("userId", "==", userId));
+            const querySnapshot = await getDocs(q);
+            
+            const loadedRequests = [];
+            querySnapshot.forEach((doc) => {
+                loadedRequests.push({ id: doc.id, ...doc.data() });
+            });
+            
+            setRequests(loadedRequests);
+        } catch (error) {
+            console.error("Error loading requests: ", error);
+            showAlert("Error", "Failed to load requests", "error");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleLocation = async () => {
@@ -39,7 +74,7 @@ const RequestPickup = () => {
             });
 
             const { latitude, longitude, accuracy } = position.coords;
-            setCoords([latitude, longitude]);
+            setCoords({ latitude, longitude });
 
             if (accuracy > 100) {
                 showAlert(
@@ -72,29 +107,38 @@ const RequestPickup = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!location.trim() || !coords) {
+        if (!location.trim() || !coords || !userId) {
             showAlert("Error", "Please enter a valid location", "error");
             return;
         }
 
-        const newRequest = {
-            id: Date.now(),
-            location,
-            coords,
-            type,
-            status: "pending",
-            timestamp: new Date().toISOString()
-        };
+        try {
+            setIsLoading(true);
+            const newRequest = {
+                location,
+                coordinates: coords,
+                wasteType: type,
+                status: "pending",
+                userId, // Associate request with user
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
 
-        const updatedRequests = [...requests, newRequest];
-        localStorage.setItem("waste_requests", JSON.stringify(updatedRequests));
-        setRequests(updatedRequests);
-        setLocation("");
-        setCoords(null);
-        setType("Plastic");
-        showAlert("Success", "Pickup request submitted successfully!", "success");
+            const docRef = await addDoc(wasteRequestsRef, newRequest);
+            setRequests([...requests, { id: docRef.id, ...newRequest }]);
+            
+            setLocation("");
+            setCoords(null);
+            setType("Plastic");
+            showAlert("Success", "Pickup request submitted successfully!", "success");
+        } catch (error) {
+            console.error("Error adding request: ", error);
+            showAlert("Error", "Failed to submit request", "error");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleDeleteRequest = async (id) => {
@@ -104,17 +148,25 @@ const RequestPickup = () => {
             "Delete this request?",
             `<div class="text-left">
                 <p><strong>Location:</strong> ${requestToDelete.location}</p>
-                <p><strong>Type:</strong> ${requestToDelete.type}</p>
-                <p><strong>Date:</strong> ${new Date(requestToDelete.timestamp).toLocaleString()}</p>
+                <p><strong>Type:</strong> ${requestToDelete.wasteType}</p>
+                <p><strong>Date:</strong> ${new Date(requestToDelete.createdAt).toLocaleString()}</p>
             </div>`,
             "warning"
         );
 
         if (result.isConfirmed) {
-            const updatedRequests = requests.filter(req => req.id !== id);
-            localStorage.setItem("waste_requests", JSON.stringify(updatedRequests));
-            setRequests(updatedRequests);
-            showAlert("Deleted!", "Your waste request has been deleted.", "success");
+            try {
+                setIsLoading(true);
+                await deleteDoc(doc(db, "wasteRequests", id));
+                const updatedRequests = requests.filter(req => req.id !== id);
+                setRequests(updatedRequests);
+                showAlert("Deleted!", "Your waste request has been deleted.", "success");
+            } catch (error) {
+                console.error("Error deleting request: ", error);
+                showAlert("Error", "Failed to delete request", "error");
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -131,9 +183,25 @@ const RequestPickup = () => {
         );
 
         if (result.isConfirmed) {
-            localStorage.removeItem("waste_requests");
-            setRequests([]);
-            showAlert("Cleared!", "All requests have been deleted.", "success");
+            try {
+                setIsLoading(true);
+                
+                // Batch delete for better performance
+                const batch = writeBatch(db);
+                requests.forEach(request => {
+                    const docRef = doc(db, "wasteRequests", request.id);
+                    batch.delete(docRef);
+                });
+                
+                await batch.commit();
+                setRequests([]);
+                showAlert("Cleared!", "All requests have been deleted.", "success");
+            } catch (error) {
+                console.error("Error clearing requests: ", error);
+                showAlert("Error", "Failed to clear requests", "error");
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
@@ -226,19 +294,23 @@ const RequestPickup = () => {
 
                 <button
                     type="submit"
-                    disabled={!location || !coords}
+                    disabled={!location || !coords || isLoading}
                     className={`cursor-pointer w-full py-3 px-4 font-medium rounded-lg transition-colors flex items-center justify-center ${
-                        !location || !coords
+                        !location || !coords || isLoading
                             ? `${isDarkMode ? "bg-gray-600" : "bg-gray-400"} cursor-not-allowed`
                             : "bg-green-600 hover:bg-green-700 text-white"
                     } `}
                 >
                     <Check className="w-5 h-5 mr-2" />
-                    Submit Pickup Request
+                    {isLoading ? "Submitting..." : "Submit Pickup Request"}
                 </button>
             </form>
 
-            {requests.length > 0 && (
+            {isLoading && requests.length === 0 ? (
+                <div className="flex justify-center items-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            ) : requests.length > 0 && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                     <div className="flex justify-between items-center mb-3">
                         <h3 className={`flex items-center text-lg font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
@@ -247,6 +319,7 @@ const RequestPickup = () => {
                         </h3>
                         <button
                             onClick={handleClearAll}
+                            disabled={isLoading}
                             className="cursor-pointer flex items-center text-sm transition-colors text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                         >
                             <Trash className="w-4 h-4 mr-1" />
@@ -268,11 +341,12 @@ const RequestPickup = () => {
                                     </p>
                                     <p className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"} flex items-center mt-1`}>
                                         <Trash2 className="w-4 h-4 mr-2 text-amber-500" />
-                                        {request.type} • {new Date(request.timestamp).toLocaleString()}
+                                        {request.wasteType} • {new Date(request.createdAt).toLocaleString()}
                                     </p>
                                 </div>
                                 <button
                                     onClick={() => handleDeleteRequest(request.id)}
+                                    disabled={isLoading}
                                     className={`cursor-pointer p-2 rounded-full transition-colors ${
                                         isDarkMode 
                                             ? "hover:bg-gray-600 text-gray-300 hover:text-red-400" 
