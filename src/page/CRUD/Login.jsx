@@ -1,24 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSpinner } from 'react-icons/fa';
-import { currentLoginUser } from '../../data';
+import { motion, AnimatePresence } from 'framer-motion';
 import videoSrc from '../../assets/videos/Smart-City.mp4';
 import { auth, db } from '../../../config/firebase';
-import { getDocs,collection } from 'firebase/firestore';
+import { getDocs, collection } from 'firebase/firestore';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-
 
 export function Login() {
   const userCollection = collection(db, "smart_city");
+  const user_collection = collection(db, "users");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
-  const user_collection = collection(db, "users");
 
   const signIn = async (e) => {
+    e.preventDefault(); // Prevent default form submission
     setLoading(true);
     setError(null);
     let ignore = false;
@@ -26,15 +28,14 @@ export function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       const user_data = await getDocs(user_collection);
-      if(!ignore){
+      if (!ignore) {
         const filteredData = user_data.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
         filteredData.forEach(user => {
-          if(user.id === auth.currentUser.uid){
+          if (user.id === auth.currentUser.uid) {
             navigate(user.redirect);
-
           }
         });
       }
@@ -44,56 +45,6 @@ export function Login() {
       setLoading(false);
     }
   };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
-    setError('');
-  }
-    // try {
-    //   await new Promise(resolve => setTimeout(resolve, 500));
-      
-    //   let validLogin = false;
-
-      // const user = async () => { 
-      //   try{
-      //     const data = await getDocs(userCollection);
-      //     const currentLoginUser = data.docs.map((doc) => ({
-      //       ...doc.data(),
-      //       id: doc.id, 
-      //     }))
-
-      //     for(const user of currentLoginUser) {
-      //       if(user.username === username && user.password === password) {
-      //         navigate(user.redirect);
-      //         validLogin = true;
-      //         break;
-      //       }
-      //     }
-      //   }catch (err) {
-      //     console.error(err);
-      //   }
-      // }
-      // user();
-
-      // for (const user of currentLoginUser) {
-      //   console.log(user);
-      //   if (username === user.username && password === user.password) {
-      //     navigate(user.redirect);
-      //     validLogin = true;
-      //     break;
-      //   }
-      // }
-
-    //   if (!validLogin) {
-    //     setError('Wrong username or password');
-    //   }
-    // } catch (err) {
-    //   setError('Login failed. Please try again.');
-    // } finally {
-    //   setLoading(false);
-    // }
-  // };
 
   const handleSignUp = () => {
     navigate('/register');
@@ -109,15 +60,24 @@ export function Login() {
         <div className="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm"
+              >
+                {error}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <form onSubmit={signIn} className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <div className="relative">
@@ -161,21 +121,36 @@ export function Login() {
               </div>
             </div>
 
-            <button
+            <motion.button
               type="submit"
-              onClick={signIn}
               disabled={loading}
+              whileTap={{ scale: 0.98 }}
               className="w-full flex justify-center items-center bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition cursor-pointer"
             >
-              {loading ? (
-                <>
-                  <FaSpinner className="animate-spin mr-2" />
-                  Logging in...
-                </>
-              ) : (
-                'Login'
-              )}
-            </button>
+              <AnimatePresence mode="wait">
+                {loading ? (
+                  <motion.div
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center"
+                  >
+                    <FaSpinner className="animate-spin mr-2" />
+                    Logging in...
+                  </motion.div>
+                ) : (
+                  <motion.span
+                    key="login"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    Login
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </form>
 
           <button
@@ -184,7 +159,6 @@ export function Login() {
           >
             Sign Up
           </button>
-
         </div>
       </div>
     </div>

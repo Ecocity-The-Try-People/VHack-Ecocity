@@ -8,7 +8,7 @@ import { PopUpDialog } from "../components/PopUpDialog";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import { db } from "../../config/firebase";
-import { collection, addDoc, onSnapshot, query, where } from "firebase/firestore";
+import { collection, addDoc, onSnapshot, query, serverTimestamp } from "firebase/firestore";
 import { ProposalCard } from "../components/ProposalCard.jsx";
 
 export default function PolicyManagement({ userRole }) {
@@ -19,10 +19,12 @@ export default function PolicyManagement({ userRole }) {
     title: "", 
     description: "", 
     file: null,
+    fileName: null,
+    fileType: null,
     votes: 0,
     comments: [],
     createdAt: new Date(),
-    createdBy: userRole // or user ID if available
+    createdBy: userRole
   });
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,21 +32,6 @@ export default function PolicyManagement({ userRole }) {
   const [submitted, setSubmitted] = useState(false);
 
   // Fetch proposals from Firestore
-  useEffect(() => {
-    const proposalsRef = collection(db, "proposals");
-    const q = query(proposalsRef);
-    
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const proposalsData = [];
-      querySnapshot.forEach((doc) => {
-        proposalsData.push({ id: doc.id, ...doc.data() });
-      });
-      setProposals(proposalsData);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   useEffect(() => {
     const proposalsRef = collection(db, "proposals");
     const q = query(proposalsRef);
@@ -65,7 +52,9 @@ export default function PolicyManagement({ userRole }) {
             createdAt: data.createdAt?.toDate() || new Date(),
             createdBy: data.createdBy || 'anonymous',
             status: data.status || 'pending',
-            file: data.file || null
+            file: data.file || null,          // base64 string
+            fileName: data.fileName || null,
+            fileType: data.fileType || null
           });
         }
       });
@@ -79,21 +68,54 @@ export default function PolicyManagement({ userRole }) {
     setOpenModal(true);
   }
 
-  function handleFileChange(event) {
-    const selectedFile = event.target.files[0];
-    if (selectedFile) {
-      setLoading(true);
-      setTimeout(() => {
-        setNewProposal((prev) => ({ ...prev, file: selectedFile }));
-        setLoading(false);
-      }, 1500);
+  async function handleFileChange(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Check file type (allow images and PDFs)
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      showNotification('Please upload only PNG, JPG, or PDF files', 'error');
+      return;
+    }
+
+    // Check file size (limit to 2MB for base64)
+    if (file.size > 2 * 1024 * 1024) {
+      showNotification('File size too large (max 2MB)', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const base64String = await convertToBase64(file);
+      setNewProposal({
+        ...newProposal,
+        file: base64String,
+        fileName: file.name,
+        fileType: file.type
+      });
+    } catch (error) {
+      console.error("Error converting file:", error);
+      showNotification("Error processing file", "error");
+    } finally {
+      setLoading(false);
     }
   }
 
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  };
+
   async function addProposal() {
     setSubmitted(true);
-    if (!newProposal.title || !newProposal.description || !newProposal.file) {
-      showNotification("Please provide all fields including a document.", "error");
+    if (!newProposal.title || !newProposal.description) {
+      showNotification("Please provide title and description", "error");
       return;
     }
 
@@ -102,29 +124,39 @@ export default function PolicyManagement({ userRole }) {
       await addDoc(proposalsRef, {
         title: newProposal.title,
         description: newProposal.description,
-        file: newProposal.file.name, // Store file name or upload to storage and store URL
+        file: newProposal.file,          // base64 string
+        fileName: newProposal.fileName,   // original filename
+        fileType: newProposal.fileType,   // file type
         votes: 0,
+        votedUsers: [],
         comments: [],
-        createdAt: new Date(),
-        createdBy: userRole, // or user ID if available
+        createdAt: serverTimestamp(),
+        createdBy: userRole,
         status: "pending"
       });
 
       showNotification("Proposal submitted successfully!", "success");
       setOpenModal(false);
-      setNewProposal({ 
-        title: "", 
-        description: "", 
-        file: null,
-        votes: 0,
-        comments: [],
-        createdAt: new Date(),
-        createdBy: userRole
-      });
+      resetForm();
     } catch (error) {
       console.error("Error adding proposal: ", error);
       showNotification("Failed to submit proposal", "error");
     }
+  }
+
+  function resetForm() {
+    setNewProposal({ 
+      title: "", 
+      description: "", 
+      file: null,
+      fileName: null,
+      fileType: null,
+      votes: 0,
+      comments: [],
+      createdAt: new Date(),
+      createdBy: userRole
+    });
+    setSubmitted(false);
   }
 
   const filteredProposals = proposals.filter((p) =>
@@ -184,11 +216,10 @@ export default function PolicyManagement({ userRole }) {
             addProposal={addProposal}
             closeDialog={() => {
               setOpenModal(false);
-              setSubmitted(false);
+              resetForm();
             }}
             loading={loading}
             submitted={submitted}
-            isDarkMode={isDarkMode}
           />
         )}
 

@@ -1,14 +1,36 @@
 import { useState, useRef, useEffect } from "react";
 import { CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
-import { Reply, Trash2, ThumbsUp } from "lucide-react";
+import { Reply, Trash2, ThumbsUp, Download } from "lucide-react";
 import { useToggle } from "../hooks/useToggle";
 import { ConfirmDialog } from "../components/ConfirmationDialog";
 import { useConfirmationDialog } from "../hooks/useConfirmationDialog";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import { db } from "../../config/firebase";
-import { doc, updateDoc, arrayUnion, arrayRemove,getDocs, collection } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, arrayRemove, getDocs, collection, deleteDoc } from "firebase/firestore";
 import { auth } from "../../config/firebase";
+
+export function ImageViewer({ imageUrl, onClose }) {
+  if (!imageUrl) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onClick={onClose}>
+      <div className="relative max-w-[90vw] max-h-[90vh]">
+        <img 
+          src={imageUrl} 
+          alt="Full preview" 
+          className="max-h-[85vh] max-w-full object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white bg-black/50 p-2 rounded-full hover:bg-black/75 transition"
+        >
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function ProposalCard({ proposal, role, isDarkMode }) {
   const user_collection = collection(db, "users");
@@ -24,18 +46,17 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
     ic_number: user?.ic_number,
     avatar_url: user?.avatar_url,
   });
+  const [viewingImage, setViewingImage] = useState(null);
 
   const handleVote = async () => {
     try {
       const proposalRef = doc(db, "proposals", proposal.id);
       if (proposal.votedUsers?.includes(auth.currentUser.uid)) {
-        // User already voted - remove vote
         await updateDoc(proposalRef, {
           votes: proposal.votes - 1,
           votedUsers: arrayRemove(auth.currentUser.uid)
         });
       } else {
-        // User hasn't voted - add vote
         await updateDoc(proposalRef, {
           votes: proposal.votes + 1,
           votedUsers: arrayUnion(auth.currentUser.uid)
@@ -49,34 +70,33 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
   useEffect(() => {
     let ignore = false;
     const get_user = async() => {
-      try{
+      try {
         const user_data = await getDocs(user_collection);
-        if(!ignore){
-        const filteredData = user_data.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        filteredData.forEach(user => {
-          console.log("inside useeffect");
-          if(user.id === auth.currentUser.uid){
-            setUser(user);
-            setProfile({
-              name: user.name || '',
-              dob: user.dob?.toDate() || null,
-              address: user.address || '',
-              ic_number: user.ic_number || '',
-              avatar_url: user.avatar_url,
-            });
-          }
-        });
-      }
-      }catch (err){
+        if (!ignore) {
+          const filteredData = user_data.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          filteredData.forEach(user => {
+            if (user.id === auth.currentUser.uid) {
+              setUser(user);
+              setProfile({
+                name: user.name || '',
+                dob: user.dob?.toDate() || null,
+                address: user.address || '',
+                ic_number: user.ic_number || '',
+                avatar_url: user.avatar_url,
+              });
+            }
+          });
+        }
+      } catch (err) {
         console.log(err);
       }
     };
     get_user();
-    return ()=> {ignore = true};
-  },[]);
+    return () => { ignore = true };
+  }, []);
 
   const addComment = async () => {
     if (comment.trim() === "") return;
@@ -129,7 +149,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
         if (comment === parentComment) {
           return {
             ...comment,
-            replies: [...comment.replies, newReply]
+            replies: [...(comment.replies || []), newReply]
           };
         }
         return comment;
@@ -168,8 +188,15 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const deleteProposal = async () => {
+    try {
+      const proposalRef = doc(db, "proposals", proposal.id);
+      await deleteDoc(proposalRef);
+    } catch (error) {
+      console.error("Error deleting proposal:", error);
+    }
+  };
 
-console.log(proposal);
   const hasVoted = proposal.votedUsers?.includes(auth.currentUser.uid);
 
   return (
@@ -185,22 +212,86 @@ console.log(proposal);
                 {proposal.description}
               </p>
             </div>
-            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-700"}`}>
-              {proposal.status || "pending"}
-            </span>
+            <div className="flex flex-col items-end gap-1">
+              {(role === "Admin" || proposal.userId === auth.currentUser.uid) && (
+                <button
+                  onClick={() => openDialog(deleteProposal)}
+                  className={`p-1 rounded-full ${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-200"} transition cursor-pointer`}
+                  title="Delete Proposal"
+                >
+                  <Trash2 size={16} className="text-red-500" />
+                </button>
+              )}
+              <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-700"}`}>
+                {proposal.status || "pending"}
+              </span>
+            </div>
           </div>
 
           {proposal.file && (
             <div className="mb-3">
-              <span className={`font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>Attached File: </span>
-              <a 
-                href={proposal.file} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-500 underline cursor-pointer hover:text-blue-600"
-              >
-                {proposal.file.split("/").pop() || "View File"}
-              </a>
+              <div className="flex items-center gap-2">
+                <span className={`font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+                  Attached File:
+                </span>
+                <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (proposal.fileType?.startsWith('image/')) {
+                      setSelectedImage(proposal.file);
+                    } else if (proposal.fileType === 'application/pdf') {
+                      // For PDFs, open in new tab
+                      const pdfWindow = window.open();
+                      pdfWindow.document.write(`
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          src="${proposal.file}" 
+                          frameborder="0"
+                        ></iframe>
+                      `);
+                    } else {
+                      // For other file types, download directly
+                      const link = document.createElement('a');
+                      link.href = proposal.file;
+                      link.target = '_blank';
+                      link.download = proposal.fileName || 'download';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                  }}
+                  className="text-blue-500 underline cursor-pointer hover:text-blue-600"
+                >
+                  {proposal.fileName || "View File"}
+                </button>
+                  <button 
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = proposal.file;
+                      link.download = proposal.fileName || `proposal-${proposal.id}-attachment`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 cursor-pointer"
+                    title="Download file"
+                  >
+                    <Download size={16} />
+                  </button>
+                </div>
+              </div>
+              
+              {proposal.fileType?.startsWith('image/') && (
+                <div className="mt-2 max-w-xs">
+                  <img 
+                    src={proposal.file} 
+                    alt="Preview" 
+                    className="max-h-40 w-auto rounded border border-gray-200 cursor-pointer"
+                    onClick={() => setViewingImage(proposal.file)}
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -216,7 +307,7 @@ console.log(proposal);
             <Button 
               className={`flex items-center gap-2 px-4 py-2 rounded ${hasVoted 
                 ? "bg-blue-600 hover:bg-blue-700" 
-                : "bg-gray-600 hover:bg-gray-700"} text-white`} 
+                : "bg-gray-600 hover:bg-gray-500"} text-white`} 
               onClick={handleVote}
             >
               {hasVoted ? "Voted" : "Vote"}
@@ -250,7 +341,7 @@ console.log(proposal);
                 <div key={index} className={`p-3 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"} rounded-lg shadow-sm`}>
                   <div className="flex items-start">
                     <img 
-                      src={comment.userAvatar || "/default-avatar.png"} 
+                      src={comment.userAvatar || "https://png.pngtree.com/element_our/20200610/ourmid/pngtree-character-default-avatar-image_2237203.jpg"} 
                       alt={comment.userName} 
                       className="w-8 h-8 rounded-full mr-3" 
                     />
@@ -264,7 +355,7 @@ console.log(proposal);
                             {new Date(comment.timestamp).toLocaleString()}
                           </p>
                         </div>
-                        {role === "Admin" && (
+                        {(role === "Admin" || comment.userId === auth.currentUser.uid) && (
                           <button 
                             className="text-red-400 hover:text-red-500 transition cursor-pointer"
                             onClick={() => openDialog(() => deleteComment(comment))}
@@ -286,7 +377,6 @@ console.log(proposal);
                     </div>
                   </div>
 
-                  {/* Reply Input */}
                   {commentReply.parentIndex === index && (
                     <div ref={replyInputRef} className="mt-3 pl-11">
                       <input
@@ -314,7 +404,6 @@ console.log(proposal);
                     </div>
                   )}
 
-                  {/* Replies */}
                   {comment.replies?.length > 0 && (
                     <div className={`mt-3 space-y-3 pl-11 border-l-2 ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
                       {comment.replies.map((reply, replyIndex) => (
@@ -354,6 +443,13 @@ console.log(proposal);
           title="Delete Comment"
           message="Are you sure you want to delete this comment? This action cannot be undone."
         />
+
+        {viewingImage && (
+          <ImageViewer 
+            imageUrl={viewingImage} 
+            onClose={() => setViewingImage(null)} 
+          />
+        )}
       </CardContent>
     </div>
   );
