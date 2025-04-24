@@ -9,6 +9,61 @@ import useDarkMode from "../hooks/DarkMode.jsx";
 import { db } from "../../config/firebase";
 import { doc, updateDoc, arrayUnion, arrayRemove,getDocs, collection } from "firebase/firestore";
 import { auth } from "../../config/firebase";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+const uploadPDF = async (file, proposalId) => {
+  const storage = getStorage();
+  
+  // Create a reference in Firebase Storage for the file
+  const fileRef = ref(storage, `proposal_files/${proposalId}/${file.name}`);
+
+  const metadata = {
+    contentType: 'application/pdf', // Set the content type to PDF
+  };
+
+  try {
+    // Step 1: Upload the file to Firebase Storage
+    await uploadBytes(fileRef, file, metadata);
+    
+    // Step 2: Get the download URL of the uploaded file
+    const fileURL = await getDownloadURL(fileRef);
+
+    // Step 3: Store the URL as a string in Firestore
+    const proposalRef = doc(db, "proposals", proposalId);
+    await updateDoc(doc(db, "proposals", proposalId), {
+      file: fileURL, // ✅ Save the actual URL here, not just the name
+      status: 'pending',
+    });
+
+    console.log("✅ PDF uploaded and URL saved:", fileURL);
+  } catch (error) {
+    console.error("❌ Error uploading PDF:", error);
+  }
+};
+
+
+
+
+
+const handleFileChange = (e) => {
+  const file = e.target.files[0];
+  console.log("📄 File Info:", file);
+
+  if (!file || file.type !== "application/pdf") {
+    alert("Please upload a valid PDF file.");
+    return;
+  }
+
+  uploadPDF(file, proposal.id);
+};
+
+const metadata = {
+  contentType: 'application/pdf',
+};
+
+// await uploadBytes(fileRef, file, metadata);
+
+
 
 export function ProposalCard({ proposal, role, isDarkMode }) {
   const user_collection = collection(db, "users");
@@ -194,12 +249,11 @@ console.log(proposal);
             <div className="mb-3">
               <span className={`font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>Attached File: </span>
               <a 
-                href={proposal.file} 
-                target="_blank" 
-                rel="noopener noreferrer"
+                href={proposal.file} // Ensure this is the full URL from Firebase Storage
+                download={`proposal-${proposal.id}.pdf`} 
                 className="text-blue-500 underline cursor-pointer hover:text-blue-600"
               >
-                {proposal.file.split("/").pop() || "View File"}
+                Download PDF
               </a>
             </div>
           )}
