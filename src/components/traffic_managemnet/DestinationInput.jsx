@@ -27,7 +27,7 @@ export function DestinationInput({ setDestination, handleSubmitDestination, erro
         isDarkMode 
             ? "bg-blue-600 hover:bg-blue-700 text-white" 
             : "bg-blue-500 hover:bg-blue-600 text-white"
-    } font-medium`;
+    } font-medium cursor-pointer`;
 
     return (
         <div className={containerStyle}>

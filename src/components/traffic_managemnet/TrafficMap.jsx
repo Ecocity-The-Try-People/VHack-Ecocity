@@ -12,54 +12,33 @@ const congestionColors = {
     High: "red",
 };
 
+// Cheras coordinates (example: near Cheras Leisure Mall)
+const CHERAS_POSITION = [3.0902, 101.7617];
+
 const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
-    // Initialize centerPosition as null to detect first load
-    const [centerPosition, setCenterPosition] = useState(null);
-    const [userLocation, setUserLocation] = useState(null); // Start as null
+    const [userLocation, setUserLocation] = useState(null);
     const [destination, setDestination] = useState({});
     const [errorMessage, setErrorMessage] = useState('');
     const mapRef = useRef();
 
-    // Default fallback position (KL coordinates)
-    const defaultPosition = [3.109351, 101.7331131];
-
     useEffect(() => {
+        // Get user location but don't auto-center
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const newPos = {
+                    setUserLocation({
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
-                    };
-                    setUserLocation(newPos);
-                    // Only set center position if it's not already set
-                    if (centerPosition === null) {
-                        setCenterPosition([newPos.lat, newPos.lng]);
-                    }
+                    });
                 },
                 (error) => {
                     console.error(error);
-                    setErrorMessage('Unable to retrieve your location. Using default position.');
-                    // Fallback to default position if geolocation fails
-                    if (centerPosition === null) {
-                        setCenterPosition(defaultPosition);
-                    }
+                    setErrorMessage('Unable to retrieve your location.');
                 },
-                { timeout: 10000 } // 10 second timeout
+                { timeout: 10000 }
             );
-        } else {
-            // Browser doesn't support geolocation
-            setErrorMessage('Geolocation not supported. Using default position.');
-            setCenterPosition(defaultPosition);
         }
     }, []);
-
-    // This effect handles auto-recentering when userLocation changes
-    useEffect(() => {
-        if (userLocation && mapRef.current) {
-            mapRef.current.setView([userLocation.lat, userLocation.lng]);
-        }
-    }, [userLocation]);
 
     const geocodeLocation = async (destinationName) => {
         try {
@@ -87,17 +66,24 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
         const location = await geocodeLocation(destinationName);
         if (location) {
             setDestination(location);
-            setCenterPosition([location.lat, location.lng]);
+            // Center on destination when selected
+            if (mapRef.current) {
+                mapRef.current.setView([location.lat, location.lng]);
+            }
             setErrorMessage('');
         } else {
             setErrorMessage('Destination not found. Please check the address.');
         }
     };
 
-    // Don't render MapContainer until we have a centerPosition
-    if (centerPosition === null) {
-        return <div>Loading map...</div>;
-    }
+    // Function to handle recentering
+    const handleRecenter = () => {
+        if (mapRef.current) {
+            // Center on user location if available, otherwise Cheras
+            const center = userLocation ? [userLocation.lat, userLocation.lng] : CHERAS_POSITION;
+            mapRef.current.setView(center);
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -109,8 +95,8 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
             />
             
             <MapContainer 
-                center={centerPosition} 
-                zoom={14.25} 
+                center={CHERAS_POSITION}
+                zoom={12} 
                 style={{ height: "50vh", width: "100%" }}
                 whenCreated={(map) => { mapRef.current = map; }}
             >
@@ -145,7 +131,11 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
                     </Marker>
                 ))}
 
-                <RecenterButton position={centerPosition} />
+                {/* Updated RecenterButton with onClick handler */}
+                <RecenterButton 
+                    position={userLocation ? [userLocation.lat, userLocation.lng] : CHERAS_POSITION}
+                    onClick={handleRecenter}
+                />
 
                 {userLocation && (
                     <Marker position={[userLocation.lat, userLocation.lng]}>
@@ -153,7 +143,13 @@ const TrafficMap = ({ trafficData, onSelectTraffic, isDarkMode }) => {
                     </Marker>
                 )}
                 
-                {destination.lat && destination.lng && <Routing from={userLocation || { lat: defaultPosition[0], lng: defaultPosition[1] }} to={destination} />}
+                {destination.lat && destination.lng && (
+                    <Routing 
+                        from={userLocation || { lat: CHERAS_POSITION[0], lng: CHERAS_POSITION[1] }} 
+                        to={destination}
+                        isDarkMode={isDarkMode}
+                    />
+                )}
             </MapContainer>
         </div>
     );

@@ -8,7 +8,7 @@ const RecenterButton = ({ position }) => {
 
   const centerOnTruck = () => {
     if (position) {
-      map.flyTo(position, 17, {
+      map.flyTo(position, 15, {
         duration: 1,
         easeLinearity: 0.25
       });
