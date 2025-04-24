@@ -7,6 +7,7 @@ import SmartCityVideo from "../assets/videos/Smart-City.mp4";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import { db } from "../../config/firebase";
 import { addDoc, updateDoc, doc, collection, getDocs } from "firebase/firestore";
+import { auth } from "../../config/firebase";
 
 function FeedbackModule({ userRole }) {
   // 1. Original state declarations (unchanged)
@@ -19,6 +20,47 @@ function FeedbackModule({ userRole }) {
   const [sortOrder, setSortOrder] = useState("Pending");
   const isDarkMode = useDarkMode();
   const feedback_data = collection(db, "user_feedback")
+  const [user, setUser] = useState({});
+  const user_collection = collection(db, "users");
+  const [profile, setProfile] = useState({
+    name: user?.name,
+    dob: user?.dob,
+    address: user?.address,
+    ic_number: user?.ic_number,
+    avatar_url: user?.avatar_url,
+  });
+
+
+    useEffect(() => {
+      let ignore = false;
+      const get_user = async() => {
+        try{
+          const user_data = await getDocs(user_collection);
+          if(!ignore){
+          const filteredData = user_data.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+          filteredData.forEach(user => {
+            if(user.id === auth.currentUser.uid){
+              setUser(user);
+              setProfile({
+                name: user.name || '',
+                dob: user.dob?.toDate() || null,
+                address: user.address || '',
+                ic_number: user.ic_number || '',
+                avatar_url: user.avatar_url,
+              });
+            }
+          });
+        }
+        }catch (err){
+          console.log(err);
+        }
+      };
+      get_user();
+      return ()=> {ignore = true};
+    },[]);
 
   // 2. Initialize data with Firebase (only addition)
   useEffect(() => {
@@ -70,7 +112,7 @@ function FeedbackModule({ userRole }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
-    if (!newFeedback.name || !newFeedback.email || !newFeedback.message) {
+    if (!profile.name || !auth.currentUser.email || !newFeedback.message) {
       showNotification("Please fill in the required field!", "error");
       return;
     }
@@ -158,7 +200,7 @@ function FeedbackModule({ userRole }) {
               <input
                 type="text"
                 placeholder="Name"
-                value={newFeedback.name}
+                value={profile?.name}
                 onChange={(e) => setNewFeedback({ ...newFeedback, name: e.target.value })}
                 className={`w-full p-2 border rounded mb-3 ${
                   isDarkMode 
@@ -173,7 +215,7 @@ function FeedbackModule({ userRole }) {
               <input
                 type="email"
                 placeholder="Email"
-                value={newFeedback.email}
+                value={auth.currentUser?.email}
                 onChange={(e) => setNewFeedback({ ...newFeedback, email: e.target.value })}
                 className={`w-full p-2 border rounded mb-3 ${
                   isDarkMode 
