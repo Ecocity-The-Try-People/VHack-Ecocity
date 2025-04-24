@@ -196,7 +196,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
           </p>
         </div>
         <div className="flex flex-col items-end gap-1">
-          {role === "Admin" && (
+          {(role === "Admin" || proposal.userId === auth.currentUser.uid) &&  (
             <button
               onClick={() => openDialog(deleteProposal)}
               className={`p-1 rounded-full ${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-200"} transition cursor-pointer`}
@@ -286,7 +286,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                             {new Date(comment.timestamp).toLocaleString()}
                           </p>
                         </div>
-                        {role === "Admin" && (
+                        {(role === "Admin" || comment.userId === auth.currentUser.uid) && (
                           <button 
                             className="text-red-400 hover:text-red-500 transition cursor-pointer"
                             onClick={() => openDialog(() => deleteComment(comment))}

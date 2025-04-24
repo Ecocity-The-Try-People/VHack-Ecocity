@@ -82,15 +82,6 @@ const Weather_detail = ({ location }) => {
                             <p>{alertMessage}</p>
                         </div>
                     )}
-
-                    <div className="mt-6">
-                        <Toggle_button
-                            isOn={showDetails}
-                            onToggle={toggleDetails}
-                            label={showDetails ? "Show Less" : "Show More"}
-                        />
-                    </div>
-
                     {showDetails && (
                         <div className="mt-6 space-y-3">
                             <div className="flex items-center justify-center">
