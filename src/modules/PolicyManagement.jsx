@@ -145,7 +145,9 @@ export default function PolicyManagement({ userRole }) {
         </video>
       </div>
 
-      <div className="fixed inset-0 z-0 bg-[hsla(180,0%,4%,0.6)] ml-20" />
+      <div className={`fixed inset-0 -z-10 ml-20 ${
+        isDarkMode ? "bg-[hsla(180,0%,10%,0.8)]" : "bg-[hsla(0,0%,100%,0.8)]"
+      }`} />
 
       <div className="relative z-10 p-4">
         <div className="mb-5">

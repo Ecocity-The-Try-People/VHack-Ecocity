@@ -26,7 +26,9 @@ export default function SmartWasteManagementPage({userRole}) {
     return (
         <div className="relative h-full">
             {/* Fixed background */}
-            <div className="fixed inset-0 bg-[hsla(180,0%,10%,0.8)] -z-10 ml-20" />
+            <div className={`fixed inset-0 -z-10 ml-20 ${
+        isDarkMode ? "bg-[hsla(180,0%,10%,0.8)]" : "bg-[hsla(0,0%,100%,0.8)]"
+      }`} />
             
                 <div className="space-y-6">
                     {/* Header */}

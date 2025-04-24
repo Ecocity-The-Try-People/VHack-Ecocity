@@ -243,7 +243,7 @@ const RequestPickup = () => {
                             type="text"
                             value={location}
                             onChange={(e) => setLocation(e.target.value)}
-                            placeholder="Enter address or coordinates"
+                            placeholder="Enter address"
                             className={`flex-1 border ${
                                 isDarkMode ? "border-gray-600 bg-gray-700 text-white" : "border-gray-300 bg-white text-black"
                             } transition-all duration-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent`}

@@ -76,10 +76,10 @@ const CitizenRewards = () => {
       }`}>
         <h3 className="flex items-center font-semibold mb-2">
           <Trophy className="mr-2 text-yellow-300" size={20} />
-          Current Reward
+          Current #72
         </h3>
         <p className="text-sm text-white/90">
-          Recycle 5 times this week to earn 50 bonus points and a chance to win eco-friendly products!
+          Recycle 5 times this week to earn 50 bonus points and Rank-Up!
         </p>
       </div>
     </div>
