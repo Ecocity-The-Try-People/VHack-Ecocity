@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import useDarkMode from "../hooks/DarkMode.jsx";
 // import Sidebar from "../components/Sidebar.jsx";
 import EnergyVideo from "../assets/videos/energy.mp4";
-import BinSensors from "../components/smart_waste_management/BinSensors_admin.jsx";
+import BinSensors from "../components/smart_waste_management/BinSensors.jsx";
 import RouteOptimizer from '../components/smart_waste_management/RouteOptimizer';
 import EquipmentHealth from '../components/smart_waste_management/EquipmentHealth';
 import CitizenRewards from '../components/smart_waste_management/CitizenRewards';
