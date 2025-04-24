@@ -4,15 +4,64 @@ import { AlertTriangle, CheckCircle, Trash2, TrafficCone } from "lucide-react";
 import { chartData, statsData, systemFeedbacks, userFeedbacks } from "../data";
 import { StatCard } from "../components/Card";
 import useDarkMode from "../hooks/DarkMode";
+import { db } from "../../config/firebase.js"
+import { collection, query, orderBy, limit, onSnapshot,getDocs } from "firebase/firestore";
+import { useState, useEffect } from "react";
+
 
 export default function HomePage({ setActiveModule }) {
+  const [userFeedbacks, setUserFeedbacks] = useState([]);
+  const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
+  const feedback_data = collection(db, "user_feedback")
+  
+  // const [user, setUser] = useState({});
+  
   const stats = statsData;
   const isDarkMode = useDarkMode();
+
+  useEffect(() => {
+    const initializeData = async () => {
+      try {
+        const feedback_data = collection(db, "user_feedback");
+        const user_Feedbacks = await getDocs(feedback_data);
+  
+        // Get all feedbacks
+        const allFeedbacks = user_Feedbacks.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+  
+        // Sort by timestamp descending (latest first)
+        const sortedFeedbacks = allFeedbacks.sort((a, b) => {
+          const dateA = a.timestamp?.toDate() || new Date(0);
+          const dateB = b.timestamp?.toDate() || new Date(0);
+          return dateB - dateA;
+        });
+  
+        // Take the latest 3 feedbacks
+        const latestThree = sortedFeedbacks.slice(0, 3);
+        
+        setUserFeedbacks(latestThree);
+        setLoadingFeedbacks(false);
+        
+        console.log("Latest 3 User Feedbacks:", latestThree);
+      } catch (error) {
+        console.error("Firebase load error:", error);
+        setLoadingFeedbacks(false);
+      }
+    };
+    console.log(userFeedbacks);
+    initializeData();
+  }, []);
+  
+
 
   // Style variables for consistency
   const cardStyle = `rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ${
     isDarkMode ? "bg-gray-800/90 border-gray-700" : "bg-white/90 border-gray-200"
   } border backdrop-blur-sm`;
+
+  
 
   return (
     <div className="p-4">
@@ -134,34 +183,45 @@ export default function HomePage({ setActiveModule }) {
                   </div>
                 </div>
 
-                {/* User Feedbacks */}
-                <div>
-                  <h2 className={`text-lg font-semibold flex items-center ${
-                    isDarkMode ? "text-blue-400" : "text-blue-600"
-                  }`}>
-                    🗣️ User Feedbacks
-                  </h2>
-                  <div className={`border-l-4 pl-3 mt-2 space-y-2 ${
-                    isDarkMode ? "text-gray-100 border-blue-500" : "text-gray-800 border-blue-500"
-                  }`}>
-                    {userFeedbacks.length > 0 ? (
-                      userFeedbacks.slice(-3).reverse().map((feedback, index) => (
-                        <div 
-                          key={index} 
-                          className={`p-2 rounded ${
-                            isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
-                          }`}
-                        >
-                          {feedback.message}
-                        </div>
-                      ))
-                    ) : (
-                      <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
-                        No user feedback available.
-                      </p>
-                    )}
-                  </div>
+              {/* User Feedbacks (latest 3 from Firestore) */}
+              <div>
+                <h2 className={`text-lg font-semibold flex items-center ${
+                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                }`}>
+                  🗣️ User Feedbacks
+                </h2>
+                <div className={`border-l-4 pl-3 mt-2 space-y-2 ${
+                  isDarkMode ? "text-gray-100 border-blue-500" : "text-gray-800 border-blue-500"
+                }`}>
+                  {loadingFeedbacks ? (
+                    <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                      Loading feedback...
+                    </p>
+                  ) : userFeedbacks.length > 0 ? (
+                    userFeedbacks.map((feedback) => (
+                      <div 
+                        key={feedback.id} 
+                        className={`p-2 rounded ${
+                          isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
+                        }`}
+                      >
+                        <p>{feedback.message}</p>
+                        {feedback.timestamp && (
+                          <p className={`text-xs mt-1 ${
+                            isDarkMode ? "text-blue-300" : "text-blue-600"
+                          }`}>
+                            {feedback.timestamp.toDate().toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                      No user feedback available.
+                    </p>
+                  )}
                 </div>
+              </div>
               </div>
             </CardContent>
           </Card>

@@ -7,7 +7,7 @@ import { ConfirmDialog } from "../components/ConfirmationDialog";
 import { useConfirmationDialog } from "../hooks/useConfirmationDialog";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import { db } from "../../config/firebase";
-import { doc, updateDoc, arrayUnion, arrayRemove,getDocs, collection } from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, arrayRemove,getDocs, collection,deleteDoc  } from "firebase/firestore";
 import { auth } from "../../config/firebase";
 
 export function ProposalCard({ proposal, role, isDarkMode }) {
@@ -168,27 +168,49 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const deleteProposal = async () => {
+    try {
+      const proposalRef = doc(db, "proposals", proposal.id);
+      await deleteDoc(proposalRef);
+      // You might want to add a success notification or redirect here
+    } catch (error) {
+      console.error("Error deleting proposal:", error);
+      // Add error handling/notification here
+    }
+  };
+  
 
-console.log(proposal);
   const hasVoted = proposal.votedUsers?.includes(auth.currentUser.uid);
 
   return (
     <div className="mb-5">
       <CardContent>
         <div className={`p-4 ${isDarkMode ? "bg-gray-700" : "bg-gray-100"} rounded-lg`}>
-          <div className="flex justify-between items-start">
-            <div>
-              <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
-                {proposal.title}
-              </h3>
-              <p className={`mb-3 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
-                {proposal.description}
-              </p>
-            </div>
-            <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-700"}`}>
-              {proposal.status || "pending"}
-            </span>
-          </div>
+        <div className="flex justify-between items-start">
+        <div>
+          <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-900"}`}>
+            {proposal.title}
+          </h3>
+          <p className={`mb-3 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+            {proposal.description}
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          {role === "Admin" && (
+            <button
+              onClick={() => openDialog(deleteProposal)}
+              className={`p-1 rounded-full ${isDarkMode ? "hover:bg-gray-600" : "hover:bg-gray-200"} transition cursor-pointer`}
+              title="Delete Proposal"
+            >
+              <Trash2 size={16} className="text-red-500" />
+            </button>
+          )}
+          <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-700"}`}>
+            {proposal.status || "pending"}
+          </span>
+        </div>
+      </div>
+
 
           {proposal.file && (
             <div className="mb-3">
@@ -216,7 +238,7 @@ console.log(proposal);
             <Button 
               className={`flex items-center gap-2 px-4 py-2 rounded ${hasVoted 
                 ? "bg-blue-600 hover:bg-blue-700" 
-                : "bg-gray-600 hover:bg-gray-700"} text-white`} 
+                : "bg-gray-600 hover:bg-gray-500"} text-white`} 
               onClick={handleVote}
             >
               {hasVoted ? "Voted" : "Vote"}
@@ -250,7 +272,7 @@ console.log(proposal);
                 <div key={index} className={`p-3 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"} rounded-lg shadow-sm`}>
                   <div className="flex items-start">
                     <img 
-                      src={comment.userAvatar || "/default-avatar.png"} 
+                      src={comment.userAvatar || "https://png.pngtree.com/element_our/20200610/ourmid/pngtree-character-default-avatar-image_2237203.jpg"} 
                       alt={comment.userName} 
                       className="w-8 h-8 rounded-full mr-3" 
                     />
