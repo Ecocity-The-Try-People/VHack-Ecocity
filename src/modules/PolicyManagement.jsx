@@ -205,7 +205,7 @@ export default function PolicyManagement({ userRole }) {
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`flex-1 p-2 border ${isDarkMode ? "border-gray-600 bg-gray-700 text-white placeholder-gray-400" : "border-gray-300 bg-white text-gray-800 placeholder-gray-500"} rounded focus:outline-none focus:ring-2 focus:ring-blue-500`}
           />
-          <FaSearch className={`${isDarkMode ? "text-gray-300" : "text-gray-500"}`} />
+          <FaSearch className={`${isDarkMode ? "text-gray-300" : "text-gray-500"} cursor-pointer`} />
         </div>
 
         {openModal && (

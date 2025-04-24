@@ -25,6 +25,19 @@ const RouteOptimizer = ({ bins }) => {
       setIsLoading(false);
     }, 1500);
   };
+  // Add this right after the calculateRoute function
+  if (bins.length > 0 && bins.every(bin => bin.fillLevel < 50)) {
+    return (
+      <div className={`p-4 rounded-lg ${
+        isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700'
+      }`}>
+        <p className="flex items-center">
+          <Leaf className="mr-2" size={18} />
+          All bins have sufficient space (below 50% full). Collection route not urgently needed.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

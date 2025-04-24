@@ -88,7 +88,7 @@ function Register() {
         email: formData.email,
         createdAt: new Date(),
         role: "user",
-        avatar_url: null
+        avatar_url: "https://png.pngtree.com/element_our/20200610/ourmid/pngtree-character-default-avatar-image_2237203.jpg"
       });
 
       setRegistrationSuccess(true);
