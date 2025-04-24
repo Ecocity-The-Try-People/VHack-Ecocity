@@ -8,6 +8,10 @@ import Flood_page from './page/flood_page';
 import Traffic_page from './page/traffic_page';
 import Smart_waste_management_page from './page/smart_waste_management_page';
 import PublicAdminModule from '@/page/PublicAdmin';
+import AuthGuard from './hooks/authGuard';
+import RoleGuard from './hooks/RoleGuard'; 
+import NotFound from './hooks/NotFound';
+
 
 function App() {
   useEffect(() => {
@@ -18,17 +22,51 @@ function App() {
   }, [])
 
   return (
-      <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/homepage" element={<Homepage />} />
-          <Route path="/traffic" element={<Traffic_page />} />
-          <Route path="/flood_page" element={<Flood_page />} />
-          <Route path="/smart_waste_management_page" element={<Smart_waste_management_page />} />
-          <Route path="/admin_page" element={<PublicAdminModule />} />
-        </Routes>
-      </Router>
+    <Router>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Protected routes (require authentication) */}
+        <Route path="/homepage" element={
+          <AuthGuard>
+            <Homepage />
+          </AuthGuard>
+        } />
+        
+        <Route path="/traffic" element={
+          <AuthGuard>
+            <Traffic_page />
+          </AuthGuard>
+        } />
+        
+        <Route path="/flood_page" element={
+          <AuthGuard>
+            <Flood_page />
+          </AuthGuard>
+        } />
+        
+        <Route path="/smart_waste_management_page" element={
+          <AuthGuard>
+            <Smart_waste_management_page />
+          </AuthGuard>
+        } />
+        
+        {/* Admin-only route (example with role protection) */}
+        <Route path="/admin_page" element={
+          <AuthGuard>
+            <RoleGuard allowedRoles={['Admin']}>
+              <PublicAdminModule />
+            </RoleGuard>
+          </AuthGuard>
+        } />
+        
+        {/* 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   );
 }
 
