@@ -266,7 +266,7 @@ console.log(proposal);
                         </div>
                         {role === "Admin" && (
                           <button 
-                            className="text-red-400 hover:text-red-500 transition"
+                            className="text-red-400 hover:text-red-500 transition cursor-pointer"
                             onClick={() => openDialog(() => deleteComment(comment))}
                           >
                             <Trash2 size={16} />
@@ -278,7 +278,7 @@ console.log(proposal);
                       </p>
                       
                       <button
-                        className="mt-2 text-blue-500 hover:text-blue-600 text-xs flex items-center gap-1 transition"
+                        className="mt-2 text-blue-500 hover:text-blue-600 text-xs flex items-center gap-1 transition cursor-pointer"
                         onClick={() => setCommentReply({ parentIndex: index, text: "" })}
                       >
                         <Reply size={14} /> Reply

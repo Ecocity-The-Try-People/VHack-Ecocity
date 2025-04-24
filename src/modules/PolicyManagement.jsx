@@ -132,7 +132,7 @@ export default function PolicyManagement({ userRole }) {
   );
 
   return (
-    <div className={`relative min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div className={`relative min-h-screen`}>
       <div className="fixed inset-0 z-0 overflow-hidden ml-20" style={{ opacity: isDarkMode ? 0.3 : 0.5 }}>
         <video
           autoPlay
@@ -145,7 +145,7 @@ export default function PolicyManagement({ userRole }) {
         </video>
       </div>
 
-      <div className="fixed inset-0 z-0 bg-[hsla(180,0%,10%,0.6)] ml-20" />
+      <div className="fixed inset-0 z-0 bg-[hsla(180,0%,4%,0.6)] ml-20" />
 
       <div className="relative z-10 p-4 ml-3">
         <div className="mb-5">
