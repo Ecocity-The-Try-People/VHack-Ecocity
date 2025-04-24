@@ -4,13 +4,25 @@ import 'leaflet/dist/leaflet.css';
 import { malaysiaCities } from '../../data';
 import { subscribeToSensors, simulateSensors } from '../../../config/sensorService';
 import useDarkMode from "../../hooks/DarkMode";
+import { LocateFixed } from "lucide-react";
 
+// Custom icons
 const WeatherIcon = L.Icon.extend({
   options: {
     iconSize: [40, 40],
     iconAnchor: [20, 40],
     popupAnchor: [0, -40]
   }
+});
+
+// Create a custom icon for user location
+const userLocationIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+  iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34]
 });
 
 const WeatherFloodMap = () => {
@@ -25,11 +37,31 @@ const WeatherFloodMap = () => {
     weather: true,
     flood: true
   });
+  const [centerPosition, setCenterPosition] = useState([4.2105, 101.9758]);
+  const [userPosition, setUserPosition] = useState(null);
+  const userMarkerRef = useRef(null);
 
   const layers = useRef({
     weather: L.layerGroup(),
-    flood: L.layerGroup()
+    flood: L.layerGroup(),
+    user: L.layerGroup()
   });
+
+  // Clear and update user marker
+  const updateUserMarker = (position) => {
+    if (userMarkerRef.current) {
+      layers.current.user.removeLayer(userMarkerRef.current);
+    }
+    
+    if (position) {
+      userMarkerRef.current = L.marker([position.lat, position.lng], {
+        icon: userLocationIcon,
+        zIndexOffset: 1000
+      })
+      .addTo(layers.current.user)
+      .bindPopup("<b>Your Location</b>");
+    }
+  };
 
   const toggleLayer = (layer) => {
     const newActiveLayers = {
@@ -42,6 +74,39 @@ const WeatherFloodMap = () => {
       layers.current[layer].addTo(map.current);
     } else {
       map.current.removeLayer(layers.current[layer]);
+    }
+  };
+
+  const centerOnLocation = () => {
+    if (map.current) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const newPos = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude
+            };
+            setUserPosition(newPos);
+            updateUserMarker(newPos);
+            setCenterPosition([newPos.lat, newPos.lng]);
+            map.current.flyTo([newPos.lat, newPos.lng], 12, {
+              duration: 1,
+              easeLinearity: 0.25
+            });
+          },
+          () => {
+            map.current.flyTo(centerPosition, 12, {
+              duration: 1,
+              easeLinearity: 0.25
+            });
+          }
+        );
+      } else {
+        map.current.flyTo(centerPosition, 12, {
+          duration: 1,
+          easeLinearity: 0.25
+        });
+      }
     }
   };
 
@@ -74,7 +139,7 @@ const WeatherFloodMap = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    map.current = L.map(mapContainer.current).setView([4.2105, 101.9758], 6);
+    map.current = L.map(mapContainer.current).setView(centerPosition, 6);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -82,9 +147,11 @@ const WeatherFloodMap = () => {
 
     layers.current.weather = L.layerGroup();
     layers.current.flood = L.layerGroup();
+    layers.current.user = L.layerGroup();
 
     if (activeLayers.weather) layers.current.weather.addTo(map.current);
     if (activeLayers.flood) layers.current.flood.addTo(map.current);
+    layers.current.user.addTo(map.current);
 
     simulateSensors();
     const sensorInterval = setInterval(simulateSensors, 10000);
@@ -142,7 +209,6 @@ const WeatherFloodMap = () => {
     
     layers.current.flood.clearLayers();
 
-    // Group sensors by location to create combined flood areas
     const locationGroups = {};
     sensorData.forEach(sensor => {
       if (!locationGroups[sensor.location]) {
@@ -151,16 +217,13 @@ const WeatherFloodMap = () => {
       locationGroups[sensor.location].push(sensor);
     });
 
-    // Create flood polygons for each location
     Object.entries(locationGroups).forEach(([location, sensors]) => {
       const floodedSensors = sensors.filter(s => s.status === "flooded");
       const safeSensors = sensors.filter(s => s.status !== "flooded");
 
-      // Create a convex hull polygon for flooded areas
       if (floodedSensors.length > 0) {
         const points = floodedSensors.map(s => [s.lat, s.lon]);
         
-        // Create a more visible flood polygon
         const floodPolygon = L.polygon(points, {
           color: '#ff0000',
           fillColor: '#ff0000',
@@ -170,12 +233,10 @@ const WeatherFloodMap = () => {
           className: 'flood-polygon'
         }).addTo(layers.current.flood);
 
-        // Add pulsing effect to flood areas
         floodPolygon.setStyle({
           fillOpacity: 0.4
         });
 
-        // Add popup with aggregated flood information
         const totalWaterLevel = floodedSensors.reduce((sum, s) => sum + s.waterLevel, 0);
         const avgWaterLevel = Math.round(totalWaterLevel / floodedSensors.length);
         
@@ -190,7 +251,6 @@ const WeatherFloodMap = () => {
           </div>
         `);
 
-        // Add tooltip that shows on hover
         floodPolygon.bindTooltip(`Flood Area: ${location}`, {
           permanent: false,
           direction: 'top',
@@ -198,11 +258,10 @@ const WeatherFloodMap = () => {
         });
       }
 
-      // Mark individual sensors with more visible markers
       sensors.forEach(sensor => {
         const isFlooded = sensor.status === "flooded";
         const markerColor = isFlooded ? '#ff0000' : '#00aa00';
-        const markerSize = isFlooded ? 12 : 8; // Larger markers for flooded areas
+        const markerSize = isFlooded ? 12 : 8;
         
         const sensorMarker = L.circleMarker([sensor.lat, sensor.lon], {
           radius: markerSize,
@@ -261,9 +320,7 @@ const WeatherFloodMap = () => {
         className="relative min-h-screen z-1"
       />
       
-      {/* Combined Controls Container */}
       <div className={`absolute top-4 right-4 flex flex-col items-end space-y-2 z-5`}>
-        {/* Map Layers Control - Now on top */}
         <div className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200 text-black"} p-3 rounded shadow-lg`}>
           <h3 className="font-bold text-lg mb-1">Map Layers</h3>
           
@@ -288,7 +345,6 @@ const WeatherFloodMap = () => {
           </label>
         </div>
         
-        {/* Legend - Now below the layers control */}
         <div className={`${isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200 text-black"} p-3 rounded shadow-lg`}>
           <h3 className="font-bold text-lg mb-2">Map Legend</h3>
           
@@ -331,6 +387,16 @@ const WeatherFloodMap = () => {
           )}
         </div>
       </div>
+
+      <button
+        onClick={centerOnLocation}
+        className={`cursor-pointer absolute z-[1000] bottom-4 right-4 p-2 rounded-full shadow-lg border transition-colors ${
+          isDarkMode ? "bg-gray-800 border-gray-600 hover:bg-gray-700" : "bg-white border-gray-300 hover:bg-gray-100"}`}
+        title="Center on my location"
+        aria-label="Center map on my current location"
+      >
+        <LocateFixed className={isDarkMode ? "text-gray-300" : "text-gray-700"} size={25} />
+      </button>
 
       {loading && (
         <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-3 py-1 rounded shadow z-10">
