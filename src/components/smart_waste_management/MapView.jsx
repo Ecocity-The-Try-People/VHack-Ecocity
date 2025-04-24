@@ -3,10 +3,11 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import RecenterButton from "../smart_waste_management/RecenterButton"; // Import the new component
+import garbageIcon from '../../assets/png/garbage.png';
 
 // Truck icon
 const truckIcon = new L.Icon({
-  iconUrl: 'src/assets/png/garbage.png',
+  iconUrl: garbageIcon,
   iconSize: [40, 40],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40]
