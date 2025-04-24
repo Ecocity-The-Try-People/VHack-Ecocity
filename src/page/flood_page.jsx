@@ -40,10 +40,10 @@ export default function Flood_page() {
             <div className="ml-20 flex-grow p-6 pl-10 pr-10 z-10">
                 {/* Header */}
         <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-800 dark:text-white mb-2">
+          <h1 className={`text-4xl font-bold ${isDarkMode ? "text-white" : "text-gray-800"} mb-2`}>
             Weather Forecast
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className={`text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
           Real-time weather and flood risk updates for Malaysia
           </p>
         </header>
