@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
-import SmartCityVideo from "../assets/videos/Smart-City.mp4"; // Import the first video file
-import FeaturesVideo from "../assets/videos/weather.mp4"; // Import the second video file
-import TransportationVideo from "../assets/videos/transportation.mp4"; // Import the third video file
-import EnergyVideo from "../assets/videos/energy.mp4"; // Import the fourth video file
+import SmartCityVideo from "../assets/videos/Smart-City.mp4"; 
+import FeaturesVideo from "../assets/videos/weather.mp4"; 
+import TransportationVideo from "../assets/videos/transportation.mp4"; 
+import EnergyVideo from "../assets/videos/energy.mp4"; 
 import Weather_detail from "../components/weatherPage/weather_detail.jsx";
 import { useNavigate } from "react-router-dom";
 import TrafficIntro from "../components/TrafficIntro.jsx";

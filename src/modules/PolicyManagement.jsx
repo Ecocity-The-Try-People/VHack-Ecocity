@@ -147,7 +147,7 @@ export default function PolicyManagement({ userRole }) {
 
       <div className="fixed inset-0 z-0 bg-[hsla(180,0%,4%,0.6)] ml-20" />
 
-      <div className="relative z-10 p-4 ml-3">
+      <div className="relative z-10 p-4">
         <div className="mb-5">
           <Card className={`${isDarkMode ? "bg-[hsla(180,0%,10%,0.8]" : "bg-white/90"} ${isDarkMode ? "text-white" : "text-gray-800"}`}>
             <CardContent>
