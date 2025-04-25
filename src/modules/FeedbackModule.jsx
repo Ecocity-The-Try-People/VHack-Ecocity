@@ -6,8 +6,9 @@ import { useToggle } from "../hooks/useToggle";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4";
 import useDarkMode from "../hooks/DarkMode.jsx";
 import { db } from "../../config/firebase";
-import { addDoc, updateDoc, doc, collection, getDocs } from "firebase/firestore";
+import { addDoc, updateDoc, doc, collection, getDocs,deleteDoc } from "firebase/firestore";
 import { auth } from "../../config/firebase";
+import { Trash2 } from "lucide-react";
 
 function FeedbackModule({ userRole }) {
   // 1. Original state declarations (unchanged)
@@ -29,6 +30,36 @@ function FeedbackModule({ userRole }) {
     ic_number: user?.ic_number,
     avatar_url: user?.avatar_url,
   });
+  const handleDeleteAll = async () => {
+    // Check if there are any feedbacks to delete
+    if (!feedbacks || feedbacks.length === 0) {
+      showNotification("No feedbacks to delete", "error");
+      return;
+    }
+  
+    // Confirm before deletion
+    if (!window.confirm("Are you sure you want to delete ALL feedbacks? This cannot be undone.")) {
+      return;
+    }
+  
+    try {
+      // Filter out only feedbacks that have valid IDs (from Firebase)
+      const feedbacksToDelete = feedbacks.filter(fb => typeof fb.id === 'string');
+      
+      // Delete from Firebase
+      const deletePromises = feedbacksToDelete.map(fb => 
+        deleteDoc(doc(db, "user_feedback", fb.id))
+      );
+      await Promise.all(deletePromises);
+  
+      // Update local state
+      setFeedbacks([]);
+      showNotification("All feedbacks deleted successfully!", "success");
+    } catch (error) {
+      console.error("Error deleting feedbacks:", error);
+      showNotification("Failed to delete feedbacks", "error");
+    }
+  };
 
 
     useEffect(() => {
@@ -262,21 +293,36 @@ function FeedbackModule({ userRole }) {
                 Admin Panel - Feedback Management
               </h3>
               <div className="mb-4 relative inline-block w-full">
-                <div className="flex justify-end">
-                  <button
-                    onClick={toggleOpen}
-                    className={`flex items-center gap-2 ${
-                      isDarkMode 
-                        ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
-                        : "bg-gray-100 border-gray-300 hover:bg-gray-200"
-                    } p-2 border rounded shadow-md transition cursor-pointer`}
-                  >
-                    <Filter size={18} className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`} />
-                    <span className={`font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                      {sortOrder}
-                    </span>
-                  </button>
-                </div>
+              <div className="flex justify-end gap-2">  {/* Added gap-2 for spacing between buttons */}
+  <button
+    onClick={toggleOpen}
+    className={`flex items-center gap-2 ${
+      isDarkMode 
+        ? "bg-gray-700 border-gray-600 hover:bg-gray-600" 
+        : "bg-gray-100 border-gray-300 hover:bg-gray-200"
+    } p-2 border rounded shadow-md transition cursor-pointer`}
+  >
+    <Filter size={18} className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`} />
+    <span className={`font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+      {sortOrder}
+    </span>
+  </button>
+  
+  {/* Delete Button */}
+  {/* <button
+    onClick={handleDeleteAll}
+    className={`flex items-center gap-2 ${
+      isDarkMode 
+        ? "bg-red-700 border-red-600 hover:bg-red-600" 
+        : "bg-red-100 border-red-300 hover:bg-red-200"
+    } p-2 border rounded shadow-md transition cursor-pointer`}
+  >
+    <Trash2 size={18} className={`${isDarkMode ? "text-gray-300" : "text-red-700"}`} />
+    <span className={`font-medium ${isDarkMode ? "text-gray-300" : "text-red-700"}`}>
+      Delete All
+    </span>
+  </button> */}
+</div>
 
                 {isOpen && (
                   <div className={`absolute right-0 mt-2 w-48 ${

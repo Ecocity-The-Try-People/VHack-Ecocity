@@ -11,6 +11,23 @@ export function PopUpDialog({
   submitted,
 }) {
   const [fileUploading, setFileUploading] = useState(false);
+  const [errors, setErrors] = useState({ title: false, description: false, file: false });
+
+  const validateForm = () => {
+    const newErrors = {
+      title: !newProposal.title,
+      description: !newProposal.description,
+      file: !newProposal.file
+    };
+    setErrors(newErrors);
+    return !newErrors.title && !newErrors.description && !newErrors.file;
+  };
+
+  const handleSubmit = () => {
+    if (validateForm()) {
+      addProposal();
+    }
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -39,6 +56,7 @@ export function PopUpDialog({
         fileName: file.name,
         fileType: file.type
       });
+      setErrors({...errors, file: false});
     } catch (error) {
       console.error("Error converting file:", error);
       alert("Error processing file");
@@ -77,76 +95,90 @@ export function PopUpDialog({
         </div>
 
         <div className="space-y-4">
-          <input
-            type="text"
-            className={`w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              submitted && !newProposal.title ? "border-red-500" : "border-gray-600"
-            }`}
-            placeholder="Proposal Title*"
-            value={newProposal.title}
-            onChange={(e) => setNewProposal({ ...newProposal, title: e.target.value })}
-          />
-          
-          <textarea
-            className={`w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              submitted && !newProposal.description ? "border-red-500" : "border-gray-600"
-            }`}
-            placeholder="Proposal Description*"
-            value={newProposal.description}
-            onChange={(e) => setNewProposal({ ...newProposal, description: e.target.value })}
-            rows={4}
-          />
-
-          <div className="border border-dashed border-gray-600 rounded-lg p-4">
+          <div>
             <input
-              type="file"
-              id="file-upload"
-              className="hidden"
-              onChange={handleFileChange}
-              accept="image/png, image/jpeg, image/jpg, application/pdf"
-            />
-            <label
-              htmlFor="file-upload"
-              className={`flex flex-col items-center justify-center p-4 rounded-lg cursor-pointer transition ${
-                fileUploading ? "bg-gray-700" : "bg-gray-700 hover:bg-gray-600"
-              } ${
-                submitted && !newProposal.file ? "border border-red-500" : ""
+              type="text"
+              className={`w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.title ? "border-red-500" : "border-gray-600"
               }`}
-            >
-              {fileUploading ? (
-                <>
-                  <Loader className="animate-spin h-5 w-5 text-blue-500 mb-2" />
-                  <span>Uploading file...</span>
-                </>
-              ) : newProposal.file ? (
-                <div className="flex items-center justify-between w-full">
-                  <span className="truncate text-gray-300">{newProposal.fileName}</span>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setNewProposal({ ...newProposal, file: null, fileName: null, fileType: null });
-                    }}
-                    className="text-red-500 hover:text-red-400 p-1"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <Upload className="h-5 w-5 text-gray-400 mb-2" />
-                  <span className="text-center">
-                    <span className="text-blue-400">Click to upload</span> or drag and drop
-                    <br />
-                    <span className="text-sm text-gray-400">(PNG, JPG, PDF up to 2MB)</span>
-                  </span>
-                </>
-              )}
-            </label>
+              placeholder="Proposal Title*"
+              value={newProposal.title}
+              onChange={(e) => {
+                setNewProposal({ ...newProposal, title: e.target.value });
+                setErrors({...errors, title: false});
+              }}
+            />
+            {errors.title && <p className="text-red-500 text-sm mt-1">Title is required</p>}
+          </div>
+          
+          <div>
+            <textarea
+              className={`w-full p-3 border rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.description ? "border-red-500" : "border-gray-600"
+              }`}
+              placeholder="Proposal Description*"
+              value={newProposal.description}
+              onChange={(e) => {
+                setNewProposal({ ...newProposal, description: e.target.value });
+                setErrors({...errors, description: false});
+              }}
+              rows={4}
+            />
+            {errors.description && <p className="text-red-500 text-sm mt-1">Description is required</p>}
+          </div>
+
+          <div>
+            <div className={`border ${errors.file ? "border-red-500" : "border-dashed border-gray-600"} rounded-lg p-4`}>
+              <input
+                type="file"
+                id="file-upload"
+                className="hidden"
+                onChange={handleFileChange}
+                accept="image/png, image/jpeg, image/jpg, application/pdf"
+              />
+              <label
+                htmlFor="file-upload"
+                className={`flex flex-col items-center justify-center p-4 rounded-lg cursor-pointer transition ${
+                  fileUploading ? "bg-gray-700" : "bg-gray-700 hover:bg-gray-600"
+                }`}
+              >
+                {fileUploading ? (
+                  <>
+                    <Loader className="animate-spin h-5 w-5 text-blue-500 mb-2" />
+                    <span>Uploading file...</span>
+                  </>
+                ) : newProposal.file ? (
+                  <div className="flex items-center justify-between w-full">
+                    <span className="truncate text-gray-300">{newProposal.fileName}</span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setNewProposal({ ...newProposal, file: null, fileName: null, fileType: null });
+                        setErrors({...errors, file: true});
+                      }}
+                      className="text-red-500 hover:text-red-400 p-1"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="h-5 w-5 text-gray-400 mb-2" />
+                    <span className="text-center">
+                      <span className="text-blue-400">Click to upload</span> or drag and drop
+                      <br />
+                      <span className="text-sm text-gray-400">(PNG, JPG, PDF up to 2MB)</span>
+                    </span>
+                  </>
+                )}
+              </label>
+            </div>
+            {errors.file && <p className="text-red-500 text-sm mt-1">File is required</p>}
           </div>
 
           <Button
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800"
-            onClick={addProposal}
+            onClick={handleSubmit}
             disabled={loading || fileUploading}
           >
             {loading ? (
