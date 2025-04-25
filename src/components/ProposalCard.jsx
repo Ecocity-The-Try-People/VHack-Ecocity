@@ -3,6 +3,7 @@ import { CardContent } from "@/components/Card";
 import { Button } from "@/components/Button";
 import { Reply, Trash2, ThumbsUp, Download, X } from "lucide-react";
 import { useConfirmationDialog } from "../hooks/useConfirmationDialog";
+import { ConfirmationDialog } from "./ConfirmationDialog"; // Add this import
 import { db } from "../../config/firebase";
 import { 
   collection, query, where, orderBy,
@@ -13,7 +14,7 @@ import { auth, storage } from "../../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onSnapshot } from "firebase/firestore";
 
-// Image Viewer Component (unchanged)
+// Image Viewer Component
 export function ImageViewer({ imageUrl, onClose }) {
   if (!imageUrl) return null;
 
@@ -37,9 +38,8 @@ export function ImageViewer({ imageUrl, onClose }) {
   );
 }
 
-// Main Proposal Card Component with original layout
+// Main Proposal Card Component
 export function ProposalCard({ proposal, role, isDarkMode }) {
-  // State initialization with proper defaults
   const [comment, setComment] = useState("");
   const [commentReply, setCommentReply] = useState({ 
     parentIndex: null, 
@@ -49,17 +49,26 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
   const [comments, setComments] = useState([]);
   const [viewingImage, setViewingImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const replyInputRef = useRef(null);
-  const { isOpen, openDialog, closeDialog, confirm } = useConfirmationDialog();
-  const user_collection = collection(db, "users");
-    const [user, setUser] = useState({});
   
-    useEffect(() => {
-      let ignore = false;
-      const get_user = async() => {
-        try{
-          const user_data = await getDocs(user_collection);
-          if(!ignore){
+  const {
+    isOpen,
+    openDialog,
+    closeDialog,
+    confirm,
+    config
+  } = useConfirmationDialog();
+
+  const user_collection = collection(db, "users");
+  const [user, setUser] = useState({});
+  
+  useEffect(() => {
+    let ignore = false;
+    const get_user = async() => {
+      try{
+        const user_data = await getDocs(user_collection);
+        if(!ignore){
           const filteredData = user_data.docs.map((doc) => ({
             ...doc.data(),
             id: doc.id,
@@ -67,24 +76,16 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
           filteredData.forEach(user => {
             if(user.id === auth.currentUser.uid){
               setUser(user);
-              setProfile({
-                name: user.name || '',
-                dob: user.dob?.toDate() || null,
-                address: user.address || '',
-                ic_number: user.ic_number || '',
-                avatar_url: user.avatar_url,
-              });
             }
           });
         }
-        }catch (err){
-          console.log(err);
-        }
-      };
-      get_user();
-      return ()=> {ignore = true};
-    },[]);
-
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    get_user();
+    return () => { ignore = true };
+  }, []);
 
   // Fetch comments from subcollection
   useEffect(() => {
@@ -114,7 +115,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
     fetchComments();
   }, [proposal.id]);
 
-  // Voting functionality (unchanged)
+  // Voting functionality
   const handleVote = async () => {
     try {
       const proposalRef = doc(db, "proposals", proposal.id);
@@ -134,6 +135,59 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
     }
   };
 
+  // Delete proposal function
+  const deleteProposal = async (proposalId) => {
+    try {
+      setIsDeleting(true);
+      await deleteDoc(doc(db, "proposals", proposalId));
+    } catch (error) {
+      console.error("Error deleting proposal: ", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Delete comment function
+  const deleteComment = async (commentId) => {
+    try {
+      setIsDeleting(true);
+      const commentRef = doc(db, "proposals", proposal.id, "comments", commentId);
+      await deleteDoc(commentRef);
+    } catch (error) {
+      console.error("Error deleting comment: ", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Confirmation handlers
+  const confirmDeleteProposal = () => {
+    openDialog(() => deleteProposal(proposal.id), {
+      message: "Are you sure you want to delete this proposal? This cannot be undone.",
+      title: "Delete Proposal"
+    });
+  };
+
+  const confirmDeleteComment = (commentId) => {
+    openDialog(() => deleteComment(commentId), {
+      message: "Are you sure you want to delete this comment? This cannot be undone.",
+      title: "Delete Comment"
+    });
+  };
+  
+  const confirmDeleteReply = (comment, replyIndex) => {
+    openDialog(() => {
+      const updatedReplies = [...comment.replies];
+      updatedReplies.splice(replyIndex, 1);
+      updateDoc(doc(db, "proposals", proposal.id, "comments", comment.id), {
+        replies: updatedReplies
+      });
+    }, {
+      message: "Are you sure you want to delete this reply? This cannot be undone.",
+      title: "Delete Reply"
+    });
+  };
+
   // Add comment to subcollection
   const addComment = async () => {
     if (!comment.trim() || !auth.currentUser) return;
@@ -148,19 +202,9 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
         timestamp: serverTimestamp(),
         replies: []
       });
-      setComment(""); // Reset to empty string
+      setComment("");
     } catch (error) {
       console.error("Error adding comment: ", error);
-    }
-  };
-
-  // Delete comment from subcollection
-  const deleteComment = async (commentId) => {
-    try {
-      const commentRef = doc(db, "proposals", proposal.id, "comments", commentId);
-      await deleteDoc(commentRef);
-    } catch (error) {
-      console.error("Error deleting comment: ", error);
     }
   };
 
@@ -170,8 +214,8 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
   
     const newReply = {
       userId: auth.currentUser?.uid,
-      userName: auth.currentUser?.displayName || "Anonymous",
-      userAvatar: auth.currentUser?.photoURL || "",
+      userName: user.name || "Anonymous",
+      userAvatar: user.avatar_url || "",
       text: commentReply.text.trim(),
       timestamp: new Date().toISOString()
     };
@@ -181,13 +225,13 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
       await updateDoc(commentRef, {
         replies: arrayUnion(newReply)
       });
-      setCommentReply({ parentIndex: null, text: "", parentComment: null }); // Reset properly
+      setCommentReply({ parentIndex: null, text: "", parentComment: null });
     } catch (error) {
       console.error("Error adding reply: ", error);
     }
   };
 
-  // File handling (unchanged)
+  // File handling
   const handleFileView = (file) => {
     if (file.fileType?.startsWith('image/')) {
       setViewingImage(file.url);
@@ -205,7 +249,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
     document.body.removeChild(link);
   };
 
-  // Event handlers with proper controlled inputs
+  // Event handlers
   const handleKeyDownComment = (e) => {
     if (e.key === "Enter") addComment();
   };
@@ -242,14 +286,16 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                 {proposal.description}
               </p>
             </div>
-            {(role === "Admin" || proposal.userId === auth.currentUser.uid)  && (
+            {console.log(proposal.userId)}
+            {(auth.currentUser?.uid == proposal.userId || role === "admin") && (
               <button
-                onClick={() => openDialog(() => deleteProposal(proposal.id))}
-                className={`p-2 rounded-full ${
+                onClick={confirmDeleteProposal}
+                className={`cursor-pointer p-2 rounded-full ${
                   isDarkMode 
                     ? "text-gray-400 hover:bg-gray-600 hover:text-red-400" 
                     : "text-gray-500 hover:bg-gray-200 hover:text-red-500"
                 }`}
+                disabled={isDeleting}
               >
                 <Trash2 size={18} />
               </button>
@@ -295,14 +341,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                   {proposal.fileName || "View File"}
                 </button>
                   <button 
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = proposal.file;
-                      link.download = proposal.fileName || `proposal-${proposal.id}-attachment`;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
+                    onClick={() => handleFileDownload(proposal.file)}
                     className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 cursor-pointer"
                     title="Download file"
                   >
@@ -328,7 +367,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={handleVote}
-              className={`flex items-center gap-2 px-3 py-1 rounded-full ${
+              className={`flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer ${
                 hasVoted 
                   ? (isDarkMode ? "bg-blue-600 text-white" : "bg-blue-100 text-blue-800")
                   : (isDarkMode ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-800")
@@ -390,12 +429,13 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                     </div>
                     {(auth.currentUser?.uid === comment.userId || role === "admin") && (
                       <button 
-                        onClick={() => deleteComment(comment.id)}
-                        className={`p-1 rounded-full ${
+                        onClick={() => confirmDeleteComment(comment.id)}
+                        className={`cursor-pointer p-1 rounded-full ${
                           isDarkMode 
                             ? "text-gray-400 hover:bg-gray-700 hover:text-red-400" 
                             : "text-gray-500 hover:bg-gray-200 hover:text-red-500"
                         }`}
+                        disabled={isDeleting}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -432,7 +472,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                     <div ref={replyInputRef} className="mt-3 pl-11">
                       <input
                         type="text"
-                        value={commentReply.text || ""} // Ensured controlled input
+                        value={commentReply.text || ""}
                         onChange={(e) => setCommentReply({...commentReply, text: e.target.value})}
                         onKeyDown={handleKeyDownReply}
                         placeholder={`Replying to ${comment.userName}...`}
@@ -487,12 +527,8 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                             {(auth.currentUser?.uid === reply.userId || role === "admin") && (
                               <button 
                                 onClick={() => {
-                                  // Handle reply deletion
-                                  const updatedReplies = [...comment.replies];
-                                  updatedReplies.splice(replyIndex, 1);
-                                  updateDoc(doc(db, "proposals", proposal.id, "comments", comment.id), {
-                                    replies: updatedReplies
-                                  });
+                                  confirmDeleteReply(comment, replyIndex)
+
                                 }}
                                 className={`p-1 rounded-full ${
                                   isDarkMode 
@@ -528,33 +564,15 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
         )}
 
         {/* Confirmation Dialog */}
-        {isOpen && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-            <div className={`p-6 rounded-lg max-w-md w-full ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
-              <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                {confirm.title}
-              </h3>
-              <p className={`mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                {confirm.message}
-              </p>
-              <div className="flex justify-end gap-3">
-                <Button onClick={closeDialog} variant="outline">
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={() => {
-                    confirm.onConfirm();
-                    closeDialog();
-                  }} 
-                  variant="destructive"
-                >
-                  Confirm
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmationDialog
+          isOpen={isOpen}
+          onClose={closeDialog}
+          onConfirm={confirm}
+          isLoading={isDeleting}
+          title={config.title}
+          message={config.message}
+        />
       </CardContent>
     </div>
   );
-}
+} 

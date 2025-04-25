@@ -55,7 +55,7 @@ export default function PolicyManagement({ userRole }) {
             file: data.file || null,          // base64 string
             fileName: data.fileName || null,
             fileType: data.fileType || null,
-            userId:auth.currentUser.uid
+            userId:data.userId
           });
         }
       });
