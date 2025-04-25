@@ -1,42 +1,62 @@
-import React from 'react';
-import { X } from 'lucide-react';
 import { Button } from "./Button";
+import { X } from "lucide-react";
 
-export function ConfirmDialog({ open, onClose, onConfirm, message }) {
-  if (!open) return null;
+export const ConfirmationDialog = ({ 
+  isOpen, 
+  onClose, 
+  onConfirm, 
+  isLoading,
+  title,
+  message
+}) => {
+  if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed items-center justify-center flex inset-0 z-[9999] bg-black/30 backdrop-blur-xs data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=open]:delay-200 data-[state=closed]:delay-200 py-3"
-      onClick={onClose}
-    >
-      <div
-        className="bg-gray-800 p-5 rounded-lg shadow-lg w-100 md:w-150 text-white"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-800 p-5 rounded-lg shadow-lg max-w-md w-full text-white">
         <div className="flex justify-end">
-          <button onClick={onClose}>
-            <X size={24} className="text-gray-300 hover:text-gray-100 cursor-pointer" />
+          <button 
+            onClick={onClose} 
+            disabled={isLoading}
+            className="text-gray-300 hover:text-white"
+          >
+            <X size={24} />
           </button>
         </div>
-
-        <h2 className="text-lg font-semibold mb-2">Confirm Action</h2>
-        <p className="text-gray-300">{message}</p>
-        <div className="flex flex-row justify-end gap-3">
+        
+        <h2 className="text-xl font-semibold mb-4">{title}</h2>
+        <p className="text-gray-300 mb-6">
+          {message}
+        </p>
+        
+        <div className="flex justify-end gap-3">
           <Button
             onClick={onClose}
-            className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            variant="outline"
+            disabled={isLoading}
           >
             Cancel
           </Button>
           <Button
-            onClick={onConfirm}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            Confirm
-          </Button>
+              onClick={onConfirm}
+              variant="destructive"
+              disabled={isLoading}
+              className="bg-red-600 hover:bg-red-700 focus-visible:ring-red-500"
+            >
+              {isLoading ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Deleting...
+                </span>
+              ) : (
+                "Delete"
+              )}
+            </Button>
         </div>
       </div>
     </div>
   );
-}
+};
