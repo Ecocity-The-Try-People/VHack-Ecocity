@@ -2,7 +2,7 @@
 export const systemFeedbacks = [
     { id: 1, message: "🚧 Road blockage near downtown", category: "Traffic Reports", name: "System", email: "N/A", status: "Pending" },
     { id: 2, message: "🗑️ Overflowing garbage at Sector 5", category: "Waste Issues", name: "System", email: "N/A", status: "Reviewed" },
-    { id: 3, message: "🌊 Flood alert in North Street", category: "Flood Warnings", name: "System", email: "N/A", status: "Resolved" },
+    { id: 3, message: "🌊 Flood alert in George Town", category: "Flood Warnings", name: "System", email: "N/A", status: "Resolved" },
 ];
 
 export const userFeedbacks = [
