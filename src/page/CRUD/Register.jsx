@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate } from 'react-router-dom';
 import { FaUser, FaCalendarAlt, FaHome, FaIdCard, FaLock, FaEye, FaEyeSlash, FaCheckCircle } from 'react-icons/fa';
 import DatePicker from 'react-datepicker'; 
 import 'react-datepicker/dist/react-datepicker.css'; 
@@ -18,6 +18,7 @@ function Register() {
     icNumber: '',
     password: '',
     confirmPassword: '',
+    redirect:"/homepage"
   });
 
   const [error, setError] = useState('');

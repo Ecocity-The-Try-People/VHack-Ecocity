@@ -61,7 +61,6 @@ function FeedbackModule({ userRole }) {
     }
   };
 
-
     useEffect(() => {
       let ignore = false;
       const get_user = async() => {
@@ -92,6 +91,16 @@ function FeedbackModule({ userRole }) {
       get_user();
       return ()=> {ignore = true};
     },[]);
+
+    useEffect(() => {
+      if (profile?.name) {
+        setNewFeedback(prev => ({
+          ...prev,
+          name: profile.name,
+          email: auth.currentUser.email
+        }));
+      }
+    }, [profile?.name,profile?.email]); // This runs whenever profile.name changes
 
   // 2. Initialize data with Firebase (only addition)
   useEffect(() => {
@@ -193,6 +202,7 @@ function FeedbackModule({ userRole }) {
   const sortedFeedbacks = feedbacks.filter(fb => 
     fb.status.toLowerCase() === sortOrder.toLowerCase() || sortOrder === "All"
   );
+
 
   // 7. Original render method (completely unchanged)
   return (
