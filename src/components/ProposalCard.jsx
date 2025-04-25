@@ -457,7 +457,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                       });
                       setTimeout(() => replyInputRef.current?.focus(), 0);
                     }}
-                    className={`flex items-center gap-1 text-xs ${
+                    className={`cursor-pointer flex items-center gap-1 text-xs ${
                       isDarkMode 
                         ? "text-gray-400 hover:text-gray-300" 
                         : "text-gray-500 hover:text-gray-700"
@@ -530,7 +530,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                                   confirmDeleteReply(comment, replyIndex)
 
                                 }}
-                                className={`p-1 rounded-full ${
+                                className={`cursor-pointer p-1 rounded-full ${
                                   isDarkMode 
                                     ? "text-gray-400 hover:bg-gray-700 hover:text-red-400" 
                                     : "text-gray-500 hover:bg-gray-200 hover:text-red-500"
