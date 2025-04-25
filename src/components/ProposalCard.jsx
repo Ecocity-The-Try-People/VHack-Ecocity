@@ -265,13 +265,44 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                 </span>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleFileView(proposal.file)}
-                    className="text-blue-500 underline cursor-pointer hover:text-blue-600"
-                  >
-                    {proposal.file.name || "View File"}
-                  </button>
+                  onClick={() => {
+                    if (proposal.fileType?.startsWith('image/')) {
+                      setSelectedImage(proposal.file);
+                    } else if (proposal.fileType === 'application/pdf') {
+                      // For PDFs, open in new tab
+                      const pdfWindow = window.open();
+                      pdfWindow.document.write(`
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          src="${proposal.file}" 
+                          frameborder="0"
+                        ></iframe>
+                      `);
+                    } else {
+                      // For other file types, download directly
+                      const link = document.createElement('a');
+                      link.href = proposal.file;
+                      link.target = '_blank';
+                      link.download = proposal.fileName || 'download';
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }
+                  }}
+                  className="text-blue-500 underline cursor-pointer hover:text-blue-600"
+                >
+                  {proposal.fileName || "View File"}
+                </button>
                   <button 
-                    onClick={() => handleFileDownload(proposal.file)}
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = proposal.file;
+                      link.download = proposal.fileName || `proposal-${proposal.id}-attachment`;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
                     className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 cursor-pointer"
                     title="Download file"
                   >
