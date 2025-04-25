@@ -13,6 +13,7 @@ import { auth } from "../../config/firebase";
 export default function ProfileModule({ userRole }) {
   const user_collection = collection(db, "users");
   const [user, setUser] = useState({});
+  const [icError, setIcError] = useState("");
 
   useEffect(() => {
     let ignore = false;
@@ -44,7 +45,7 @@ export default function ProfileModule({ userRole }) {
     get_user();
     return ()=> {ignore = true};
   },[]);
-  // const currentUser = currentLoginUser.find((user) => user.role.toLowerCase() === userRole.toLowerCase()) || {};
+
   const { showNotification } = useNotificationContext() || {};
   const [profile, setProfile] = useState({
     name: user?.name,
@@ -59,10 +60,34 @@ export default function ProfileModule({ userRole }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfile({
-      ...profile,
-      [name]: value,
-    });
+    
+    // Special handling for IC number
+    if (name === "ic_number") {
+      // Only allow numbers
+      const numericValue = value.replace(/\D/g, '');
+      
+      // Validate length (max 12 digits)
+      if (numericValue.length > 12) {
+        return; // Don't update if exceeds 12 digits
+      }
+      
+      setProfile({
+        ...profile,
+        [name]: numericValue,
+      });
+      
+      // Set error message if not exactly 12 digits (but allow empty input)
+      if (numericValue.length > 0 && numericValue.length !== 12) {
+        setIcError("IC number must be exactly 12 digits");
+      } else {
+        setIcError("");
+      }
+    } else {
+      setProfile({
+        ...profile,
+        [name]: value,
+      });
+    }
   };
 
   const handleDateChange = (date) => {
@@ -97,10 +122,21 @@ export default function ProfileModule({ userRole }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userRef = doc(db, "users", auth.currentUser.uid);
-    await updateDoc(userRef,profile);
-
-    showNotification("Profile updated successfully!", "success");
+    
+    if (profile.ic_number && profile.ic_number.length !== 12) {
+      setIcError("Invalid IC Number");
+      showNotification("Please enter a valid IC number", "error");
+      return;
+    }
+    
+    try {
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userRef, profile);
+      showNotification("Profile updated successfully!", "success");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      showNotification("Failed to update profile", "error");
+    }
   };
 
   return (
@@ -177,7 +213,6 @@ export default function ProfileModule({ userRole }) {
                     placeholderText="Select your date of birth"
                     required
                     wrapperClassName="w-full"
-
                   />
                 </div>
 
@@ -207,8 +242,15 @@ export default function ProfileModule({ userRole }) {
                     onChange={handleInputChange}
                     className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 ${isDarkMode ? "bg-gray-700/90 text-gray-200 placeholder-gray-500 border-gray-600" : "bg-white/90 text-gray-900 placeholder-gray-400 border-gray-300"}`}
                     required
-                    placeholder="Enter your IC number"
+                    placeholder="Enter 12-digit IC number"
+                    maxLength={12}
+                    inputMode="numeric"
                   />
+                  {icError && (
+                    <p className={`mt-1 text-sm ${isDarkMode ? "text-red-400" : "text-red-600"}`}>
+                      {icError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="pt-2">
