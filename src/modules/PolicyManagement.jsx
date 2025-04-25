@@ -7,7 +7,7 @@ import { useNotificationContext } from "../context/NotificationContext";
 import { PopUpDialog } from "../components/PopUpDialog";
 import SmartCityVideo from "../assets/videos/Smart-City.mp4";
 import useDarkMode from "../hooks/DarkMode.jsx";
-import { db } from "../../config/firebase";
+import { auth, db } from "../../config/firebase";
 import { collection, addDoc, onSnapshot, query, serverTimestamp } from "firebase/firestore";
 import { ProposalCard } from "../components/ProposalCard.jsx";
 
@@ -54,7 +54,8 @@ export default function PolicyManagement({ userRole }) {
             status: data.status || 'pending',
             file: data.file || null,          // base64 string
             fileName: data.fileName || null,
-            fileType: data.fileType || null
+            fileType: data.fileType || null,
+            userId:auth.currentUser.uid
           });
         }
       });
@@ -132,7 +133,8 @@ export default function PolicyManagement({ userRole }) {
         comments: [],
         createdAt: serverTimestamp(),
         createdBy: userRole,
-        status: "pending"
+        status: "pending",
+        userId: auth.currentUser.uid
       });
 
       showNotification("Proposal submitted successfully!", "success");
@@ -154,7 +156,8 @@ export default function PolicyManagement({ userRole }) {
       votes: 0,
       comments: [],
       createdAt: new Date(),
-      createdBy: userRole
+      createdBy: userRole,
+      userId:auth.currentUser.uid
     });
     setSubmitted(false);
   }
