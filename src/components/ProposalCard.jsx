@@ -287,7 +287,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
               </p>
             </div>
             {console.log(proposal.userId)}
-            {(auth.currentUser?.uid == proposal.userId || role === "admin") && (
+            {(auth.currentUser?.uid === proposal.userId || role?.toLowerCase() === "admin") && (
               <button
                 onClick={confirmDeleteProposal}
                 className={`cursor-pointer p-2 rounded-full ${
@@ -427,7 +427,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                         {new Date(comment.timestamp).toLocaleString()}
                       </span>
                     </div>
-                    {(auth.currentUser?.uid === comment.userId || role === "admin") && (
+                    {(auth.currentUser?.uid === comment.userId || role?.toLowerCase() === "admin") && (
                       <button 
                         onClick={() => confirmDeleteComment(comment.id)}
                         className={`cursor-pointer p-1 rounded-full ${
@@ -524,7 +524,7 @@ export function ProposalCard({ proposal, role, isDarkMode }) {
                                 {new Date(reply.timestamp).toLocaleString()}
                               </span>
                             </div>
-                            {(auth.currentUser?.uid === reply.userId || role === "admin") && (
+                            {(auth.currentUser?.uid === reply.userId || role?.toLowerCase() === "admin") && (
                               <button 
                                 onClick={() => {
                                   confirmDeleteReply(comment, replyIndex)
