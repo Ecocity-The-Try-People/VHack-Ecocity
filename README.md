@@ -58,3 +58,8 @@ The **Smart City Management System** is an innovative solution designed to enhan
 ## 📬 References & Support
 🌐 **Website:** [ecocity](https://ecocity-the-try-people.github.io/VHack-Ecocity/) <br>
 🐞 **GitHub Issues:** [Report Issues](https://github.com/jiayin04/VHack-Ecocity/issues)
+
+## 📄 License
+**© 2025 Ecocity-The-Try-People. All rights reserved.**
+Code is provided for reference only.
+No use, modification, or distribution is allowed without written permission.
