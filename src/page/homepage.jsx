@@ -46,7 +46,7 @@ export default function SmartCityHome() {
   };
 
   return (
-    <div className={`h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative`}>
+    <div className={`h-screen w-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative`}>
       <Sidebar />
       <div className={`h-6 ${visibleSection === "profile" ? "block" : "hidden"}`}>
         <ProfileModule userRole={UserRole} />

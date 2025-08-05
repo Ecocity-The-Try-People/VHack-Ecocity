@@ -36,7 +36,7 @@ export default function SmartWasteManagementPage() {
     }, []);
 
     return (
-        <div className={`flex min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+        <div className={`flex w-screen min-h-screen transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
             <Sidebar />
 
             <div className="ml-20 flex-grow p-6 pl-10 pr-10 relative">

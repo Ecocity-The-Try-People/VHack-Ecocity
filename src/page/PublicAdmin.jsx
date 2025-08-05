@@ -78,7 +78,7 @@ export default function Dashboard() {
         Your browser does not support the video tag.
       </video>
 
-      <aside className={`w-20 shadow-md flex flex-col items-center py-4 fixed min-h-dvh z-20 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+<aside className={`w-20 shadow-md flex flex-col items-center py-4 fixed top-0 left-0 min-h-dvh z-20 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
         <div className="flex flex-col items-center space-y-4">
           <NavButton
             icon={<Home className={`w-6 h-6 ${activeModule === "home" ? (isDarkMode ? "text-blue-400" : "text-blue-600") : (isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}`} />}
