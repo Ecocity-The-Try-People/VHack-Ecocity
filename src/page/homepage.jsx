@@ -46,7 +46,7 @@ export default function SmartCityHome() {
   };
 
   return (
-    <div className={`h-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative`}>
+    <div className={`h-screen w-screen overflow-y-scroll snap-mandatory snap-y scroll-smooth relative`}>
       <Sidebar />
       <div className={`h-6 ${visibleSection === "profile" ? "block" : "hidden"}`}>
         <ProfileModule userRole={UserRole} />
@@ -74,7 +74,7 @@ export default function SmartCityHome() {
           </video>
         </div>
 
-        <section id="home" className={`snap-start flex items-center justify-center h-screen relative z-10 ml-20`}>
+        <section id="home" className={`snap-start flex border-1 border-red items-center justify-center h-screen relative z-10 ml-20`}>
           <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -288,7 +288,7 @@ export default function SmartCityHome() {
           </motion.div>
         </section>
 
-        <div className="fixed bottom-10 right-10 flex flex-col gap-4 z-20">
+        <div className="fixed bottom-10 right-10 flex flex-col border-1 border-black gap-4 z-20">
           <motion.div
             whileHover={{ scale: 1.1 }}
             className="w-16 h-16 rounded-full shadow-lg flex items-center justify-center cursor-pointer relative group"

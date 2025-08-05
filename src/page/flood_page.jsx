@@ -32,7 +32,7 @@ export default function Flood_page() {
       }, []);
     
     return (
-        <div className={`flex min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+        <div className={`flex w-screen min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
             {/* Sidebar */}
             <Sidebar />
 
