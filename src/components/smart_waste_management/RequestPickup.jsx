@@ -26,7 +26,7 @@ const RequestPickup = () => {
     const [userId, setUserId] = useState(null); // Assuming you have user auth
 
     // Get reference to the wasteRequests collection
-    const wasteRequestsRef = collection(db, "wasteRequests");
+    const wasteRequestsRef = collection(db, "waste_requests");
 
     useEffect(() => {
         // You would typically get the userId from your auth context
@@ -157,7 +157,7 @@ const RequestPickup = () => {
         if (result.isConfirmed) {
             try {
                 setIsLoading(true);
-                await deleteDoc(doc(db, "wasteRequests", id));
+                await deleteDoc(doc(db, "waste_requests", id));
                 const updatedRequests = requests.filter(req => req.id !== id);
                 setRequests(updatedRequests);
                 showAlert("Deleted!", "Your waste request has been deleted.", "success");
@@ -189,7 +189,7 @@ const RequestPickup = () => {
                 // Batch delete for better performance
                 const batch = writeBatch(db);
                 requests.forEach(request => {
-                    const docRef = doc(db, "wasteRequests", request.id);
+                    const docRef = doc(db, "waste_requests", request.id);
                     batch.delete(docRef);
                 });
                 
