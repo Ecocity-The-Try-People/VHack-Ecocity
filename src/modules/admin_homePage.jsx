@@ -1,86 +1,81 @@
 import { Card, CardContent } from "@/components/Card";
 import { LineChart, BarChart, PieChart } from "@/components/Charts";
 import { AlertTriangle, CheckCircle, Trash2, TrafficCone } from "lucide-react";
-import { chartData, statsData, systemFeedbacks, userFeedbacks } from "../data";
+import { chartData } from "../data";
 import { StatCard } from "../components/Card";
 import useDarkMode from "../hooks/DarkMode";
 import { db } from "../../config/firebase.js"
-import { collection, query, orderBy, limit, onSnapshot,getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
 
 
 export default function HomePage({ setActiveModule }) {
   const [userFeedbacks, setUserFeedbacks] = useState([]);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
-  const feedback_data = collection(db, "user_feedback")
-  
-  // const [user, setUser] = useState({});
-  
-  const stats = statsData;
+  const [statsData, setStatsData] = useState([]);
+  const [systemFeedback, setSystemFeedback] = useState([]);
   const isDarkMode = useDarkMode();
 
   useEffect(() => {
     const initializeData = async () => {
       try {
-        const feedback_data = collection(db, "user_feedback");
-        const user_Feedbacks = await getDocs(feedback_data);
-  
-        // Get all feedbacks
-        const allFeedbacks = user_Feedbacks.docs.map((doc) => ({
+        
+        const [statsSnapshot, feedbackSnapshot, systemFeedbackSnapshot] = await Promise.all([
+          getDocs(collection(db, "stats_data")),
+          getDocs(collection(db, "user_feedback")),
+          getDocs(collection(db, "system_feedback"))
+        ]);
+
+        const user_feedback = filterSortFeedback(feedbackSnapshot);
+        const system_feedback = filterSortFeedback(systemFeedbackSnapshot);
+
+        const resolved_case = calcResolvedCase(user_feedback, system_feedback);
+        console.log(resolved_case)
+
+        // Get Stats Data
+        const all_stats = statsSnapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
-  
-        // Sort by timestamp descending (latest first)
-        const sortedFeedbacks = allFeedbacks.sort((a, b) => {
-          const dateA = a.timestamp?.toDate() || new Date(0);
-          const dateB = b.timestamp?.toDate() || new Date(0);
-          return dateB - dateA;
+
+        all_stats.forEach(stat => {
+          if (stat.id === "resolved_cases") {
+            stat.value = resolved_case;
+          }
         });
-  
-        // Take the latest 3 feedbacks
-        const latestThree = sortedFeedbacks.slice(0, 3);
-        
-        setUserFeedbacks(latestThree);
+
+        setStatsData(all_stats);
+        setUserFeedbacks(user_feedback);
+        setSystemFeedback(system_feedback);
         setLoadingFeedbacks(false);
-        
-        console.log("Latest 3 User Feedbacks:", latestThree);
+
       } catch (error) {
         console.error("Firebase load error:", error);
         setLoadingFeedbacks(false);
       }
     };
-    console.log(userFeedbacks);
     initializeData();
   }, []);
-  
-
 
   // Style variables for consistency
-  const cardStyle = `rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ${
-    isDarkMode ? "bg-gray-800/90 border-gray-700" : "bg-white/90 border-gray-200"
-  } border backdrop-blur-sm`;
-
-  
+  const cardStyle = `rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ${isDarkMode ? "bg-gray-800/90 border-gray-700" : "bg-white/90 border-gray-200"
+    } border backdrop-blur-sm`;
 
   return (
     <div className="p-4">
-      <div className={`fixed inset-0 -z-10 ml-20 ${
-        isDarkMode ? "bg-[hsla(180,0%,10%,0.8)]" : "bg-[hsla(0,0%,100%,0.8)]"
-      }`} />
-      
+      <div className={`fixed inset-0 -z-10 ml-20 ${isDarkMode ? "bg-[hsla(180,0%,10%,0.8)]" : "bg-[hsla(0,0%,100%,0.8)]"
+        }`} />
+
       {/* Header Card */}
       <div className="mb-5">
         <Card className={cardStyle}>
           <CardContent>
-            <h2 className={`text-xl font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}>
+            <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+              }`}>
               Smart City Management Dashboard
             </h2>
-            <p className={`${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            } break-words whitespace-normal mb-2`}>
+            <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"
+              } break-words whitespace-normal mb-2`}>
               Monitor key city operations, statistics, and public concerns in real time.
             </p>
           </CardContent>
@@ -89,13 +84,13 @@ export default function HomePage({ setActiveModule }) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => (
-          <StatCard 
-            key={index} 
-            icon={getIcon(stat.category)} 
-            title={stat.category} 
-            value={stat.value} 
-            darkMode={isDarkMode} 
+        {statsData.map((stat, index) => (
+          <StatCard
+            key={index}
+            icon={getIcon(stat.category)}
+            title={stat.category}
+            value={stat.value}
+            darkMode={isDarkMode}
           />
         ))}
       </div>
@@ -105,9 +100,8 @@ export default function HomePage({ setActiveModule }) {
         {/* Traffic Chart */}
         <Card className={cardStyle}>
           <CardContent>
-            <h3 className={`font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}>
+            <h3 className={`font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+              }`}>
               Traffic Congestion Trends
             </h3>
             <LineChart data={chartData.traffic} darkMode={isDarkMode} />
@@ -117,9 +111,8 @@ export default function HomePage({ setActiveModule }) {
         {/* Waste Chart */}
         <Card className={cardStyle}>
           <CardContent>
-            <h3 className={`font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}>
+            <h3 className={`font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+              }`}>
               Waste Collection Efficiency
             </h3>
             <BarChart data={chartData.waste} darkMode={isDarkMode} />
@@ -129,9 +122,8 @@ export default function HomePage({ setActiveModule }) {
         {/* Flood Chart */}
         <Card className={cardStyle}>
           <CardContent>
-            <h3 className={`font-semibold mb-2 ${
-              isDarkMode ? "text-white" : "text-gray-800"
-            }`}>
+            <h3 className={`font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+              }`}>
               Flood Risk Distribution
             </h3>
             <PieChart data={chartData.flood} darkMode={isDarkMode} />
@@ -139,38 +131,32 @@ export default function HomePage({ setActiveModule }) {
         </Card>
 
         {/* Feedback Section */}
-        <div 
-          onClick={() => setActiveModule("feedback")} 
-          className={`cursor-pointer hover:shadow-lg transition-all duration-200 rounded-lg ${
-            isDarkMode ? "bg-gray-800/90" : "bg-white/90"
-          } backdrop-blur-sm`}
-        >          
+        <div
+          onClick={() => setActiveModule("feedback")}
+          className={`cursor-pointer hover:shadow-lg transition-all duration-200 rounded-lg ${isDarkMode ? "bg-gray-800/90" : "bg-white/90"
+            } backdrop-blur-sm`}
+        >
           <Card className="h-full">
             <CardContent>
-              <h3 className={`font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-800"
-              }`}>
+              <h3 className={`font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+                }`}>
                 Latest Feedback & Complaints
               </h3>
-              <div className={`p-4 rounded-lg shadow-md ${
-                isDarkMode ? "bg-gray-700/90 border-gray-600" : "bg-gray-100/90 border-gray-200"
-              } border`}>              
+              <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? "bg-gray-700/90 border-gray-600" : "bg-gray-100/90 border-gray-200"
+                } border`}>
                 <div className="mb-4">
-                  <h2 className={`text-lg font-semibold flex items-center ${
-                    isDarkMode ? "text-red-400" : "text-red-600"
-                  }`}>
+                  <h2 className={`text-lg font-semibold flex items-center ${isDarkMode ? "text-red-400" : "text-red-600"
+                    }`}>
                     🚨 System Feedbacks
                   </h2>
-                  <div className={`border-l-4 pl-3 mt-2 space-y-2 ${
-                    isDarkMode ? "text-gray-100 border-red-500" : "text-gray-800 border-red-500"
-                  }`}>
-                    {systemFeedbacks.length > 0 ? (
-                      systemFeedbacks.slice(-3).reverse().map((feedback, index) => (
-                        <div 
-                          key={index} 
-                          className={`p-2 rounded ${
-                            isDarkMode ? "bg-red-900/50" : "bg-red-100"
-                          }`}
+                  <div className={`border-l-4 pl-3 mt-2 space-y-2 ${isDarkMode ? "text-gray-100 border-red-500" : "text-gray-800 border-red-500"
+                    }`}>
+                    {systemFeedback.length > 0 ? (
+                      systemFeedback.map((feedback, index) => (
+                        <div
+                          key={index}
+                          className={`p-2 rounded ${isDarkMode ? "bg-red-900/50" : "bg-red-100"
+                            }`}
                         >
                           {feedback.message}
                         </div>
@@ -183,45 +169,41 @@ export default function HomePage({ setActiveModule }) {
                   </div>
                 </div>
 
-              {/* User Feedbacks (latest 3 from Firestore) */}
-              <div>
-                <h2 className={`text-lg font-semibold flex items-center ${
-                  isDarkMode ? "text-blue-400" : "text-blue-600"
-                }`}>
-                  🗣️ User Feedbacks
-                </h2>
-                <div className={`border-l-4 pl-3 mt-2 space-y-2 ${
-                  isDarkMode ? "text-gray-100 border-blue-500" : "text-gray-800 border-blue-500"
-                }`}>
-                  {loadingFeedbacks ? (
-                    <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
-                      Loading feedback...
-                    </p>
-                  ) : userFeedbacks.length > 0 ? (
-                    userFeedbacks.map((feedback) => (
-                      <div 
-                        key={feedback.id} 
-                        className={`p-2 rounded ${
-                          isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
-                        }`}
-                      >
-                        <p>{feedback.message}</p>
-                        {feedback.timestamp && (
-                          <p className={`text-xs mt-1 ${
-                            isDarkMode ? "text-blue-300" : "text-blue-600"
-                          }`}>
-                            {feedback.timestamp.toDate().toLocaleString()}
-                          </p>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
-                      No user feedback available.
-                    </p>
-                  )}
+                {/* User Feedbacks (latest 3 from Firestore) */}
+                <div>
+                  <h2 className={`text-lg font-semibold flex items-center ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`}>
+                    🗣️ User Feedbacks
+                  </h2>
+                  <div className={`border-l-4 pl-3 mt-2 space-y-2 ${isDarkMode ? "text-gray-100 border-blue-500" : "text-gray-800 border-blue-500"
+                    }`}>
+                    {loadingFeedbacks ? (
+                      <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                        Loading feedback...
+                      </p>
+                    ) : userFeedbacks.length > 0 ? (
+                      userFeedbacks.map((feedback) => (
+                        <div
+                          key={feedback.id}
+                          className={`p-2 rounded ${isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
+                            }`}
+                        >
+                          <p>{feedback.message}</p>
+                          {feedback.timestamp && (
+                            <p className={`text-xs mt-1 ${isDarkMode ? "text-blue-300" : "text-blue-600"
+                              }`}>
+                              {feedback.timestamp.toDate().toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                        No user feedback available.
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
               </div>
             </CardContent>
           </Card>
@@ -229,6 +211,39 @@ export default function HomePage({ setActiveModule }) {
       </div>
     </div>
   );
+}
+
+function filterSortFeedback(data) {
+  const all_data = data.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
+
+  // Sort by timestamp descending
+  const sortedData = all_data.sort((a, b) => {
+    const dateA = a.timestamp?.toDate() || new Date(0);
+    const dateB = b.timestamp?.toDate() || new Date(0);
+    return dateB - dateA;
+  });
+
+  // Take the latest 3 feedbacks
+  const latestThree = sortedData.slice(0, 3);
+
+  return latestThree;
+}
+
+function calcResolvedCase(systemFeedbacks, userFeedbacks) {
+  const feedback = [...systemFeedbacks, ...userFeedbacks];
+  let resolvedCount = 0
+  feedback.forEach(fb => {
+    if (fb.status == "Resolved" || fb.status == "Reviewed") {
+      resolvedCount++;
+    }
+  });
+  const totalFeedback = feedback.length;
+  const percentage = totalFeedback > 0 ? (resolvedCount / totalFeedback) * 100 : 0;
+
+  return `${percentage.toFixed(2)}%`;
 }
 
 function getIcon(category) {

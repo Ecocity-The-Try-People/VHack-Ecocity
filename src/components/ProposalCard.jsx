@@ -11,7 +11,6 @@ import {
   deleteDoc, addDoc, serverTimestamp, getDocs
 } from "firebase/firestore";
 import { auth, storage } from "../../config/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { onSnapshot } from "firebase/firestore";
 
 // Image Viewer Component
